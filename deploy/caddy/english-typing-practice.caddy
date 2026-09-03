@@ -1,0 +1,40 @@
+english-47-120-37-63.sslip.io {
+	encode zstd gzip
+
+	@api path /api /api/*
+	handle @api {
+		header Cache-Control "no-store"
+		reverse_proxy 127.0.0.1:8091
+	}
+
+	handle {
+		root * /opt/english-typing-practice/current/web/dist
+		try_files {path} {path}/ /index.html
+		file_server
+	}
+
+	@immutable path_regexp immutable ^/assets/.+-[A-Za-z0-9_-]{8,}\.(?:css|js|mjs|png|jpe?g|gif|svg|webp|avif|ico|woff2?)$
+	header @immutable Cache-Control "public, max-age=31536000, immutable"
+
+	@no_store path / /index.html /login /practice /admin /manifest.webmanifest /sw.js
+	header @no_store Cache-Control "no-store"
+
+	header {
+		-Server
+		Content-Security-Policy "default-src 'self'; base-uri 'self'; connect-src 'self'; font-src 'self'; form-action 'self'; frame-ancestors 'none'; img-src 'self' data:; manifest-src 'self'; media-src 'self'; object-src 'none'; script-src 'self'; style-src 'self'; worker-src 'self'; upgrade-insecure-requests"
+		Cross-Origin-Opener-Policy "same-origin"
+		Permissions-Policy "camera=(), display-capture=(), geolocation=(), microphone=(), payment=(), usb=()"
+		Referrer-Policy "strict-origin-when-cross-origin"
+		Strict-Transport-Security "max-age=31536000"
+		X-Content-Type-Options "nosniff"
+		X-Frame-Options "DENY"
+	}
+
+	log {
+		output file /var/log/caddy/english-typing-practice-access.log {
+			roll_size 20MiB
+			roll_keep 5
+			roll_keep_for 168h
+		}
+	}
+}

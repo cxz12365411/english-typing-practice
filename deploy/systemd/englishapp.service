@@ -1,0 +1,48 @@
+[Unit]
+Description=English Typing Practice API
+Documentation=file:/usr/local/share/english-typing-practice/README.md
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=englishapp
+Group=englishapp
+WorkingDirectory=/opt/english-typing-practice/current/server
+EnvironmentFile=/etc/english-typing-practice/env
+ExecStart=/usr/bin/node dist/index.js
+Restart=on-failure
+RestartSec=3s
+TimeoutStartSec=30s
+TimeoutStopSec=30s
+KillSignal=SIGTERM
+UMask=0077
+
+# Runtime and filesystem isolation. The application may write only its state path.
+NoNewPrivileges=true
+PrivateDevices=true
+PrivateTmp=true
+ProtectClock=true
+ProtectControlGroups=true
+ProtectHome=true
+ProtectHostname=true
+ProtectKernelLogs=true
+ProtectKernelModules=true
+ProtectKernelTunables=true
+ProtectSystem=strict
+ReadWritePaths=/var/lib/english-typing-practice
+RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6
+RestrictNamespaces=true
+RestrictRealtime=true
+RestrictSUIDSGID=true
+LockPersonality=true
+CapabilityBoundingSet=
+AmbientCapabilities=
+SystemCallArchitectures=native
+SystemCallFilter=@system-service
+SystemCallErrorNumber=EPERM
+MemoryMax=384M
+TasksMax=128
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,11 @@
+[Unit]
+Description=Weekly English Typing Practice SQLite backup
+
+[Timer]
+OnCalendar=Sun *-*-* 04:15:00 Asia/Shanghai
+RandomizedDelaySec=30m
+Persistent=true
+Unit=englishapp-backup@weekly.service
+
+[Install]
+WantedBy=timers.target
