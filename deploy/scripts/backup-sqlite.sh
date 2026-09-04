@@ -50,12 +50,12 @@ readonly destination="${backup_dir}/${filename}"
 readonly temporary="$(/usr/bin/mktemp "${backup_dir}/.${filename}.tmp.XXXXXX")"
 
 cleanup() {
-  [[ ! -e "$temporary" ]] || /usr/bin/rm -f -- "$temporary"
+  /usr/bin/rm -f -- "$temporary" "${temporary}-wal" "${temporary}-shm"
 }
 trap cleanup EXIT
 
 /usr/bin/sqlite3 "$DATABASE_PATH" ".timeout 30000" ".backup '${temporary}'"
-readonly integrity="$(/usr/bin/sqlite3 -readonly "$temporary" 'PRAGMA integrity_check;' 2>&1)"
+readonly integrity="$(/usr/bin/sqlite3 -readonly "file:${temporary}?immutable=1" 'PRAGMA integrity_check;' 2>&1)"
 [[ "$integrity" == "ok" ]] || die "backup integrity check failed: ${integrity}"
 [[ ! -e "$destination" ]] || die "refusing to overwrite existing backup: ${destination}"
 /usr/bin/mv -T -- "$temporary" "$destination"

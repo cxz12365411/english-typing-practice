@@ -83,6 +83,8 @@ english-47-120-37-63.sslip.io {
         self.assertIn("weekly) readonly retention=4", backup)
         self.assertIn(".backup", backup)
         self.assertIn("PRAGMA integrity_check", backup)
+        self.assertIn("?immutable=1", backup)
+        self.assertIn('"${temporary}-wal" "${temporary}-shm"', backup)
         self.assertIn("database-before", backup)
         self.assertIn("rollback-entry-database", backup)
         self.assertIn('"$backup_class" == "pre-restore"', backup)
