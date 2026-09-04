@@ -9,6 +9,8 @@ import type {
   ContentCategory,
   ContentItem,
   ContentResponse,
+  EmailCodePurpose,
+  EmailCodeResponse,
   ImportMistakesResponse,
   ImportPreviewResponse,
   MistakesResponse,
@@ -33,6 +35,22 @@ const FRIENDLY_ERRORS: Record<string, string> = {
   CURRENT_PASSWORD_INVALID: "当前密码不正确",
   INVALID_PASSWORD: "密码必须为 12–128 个字符",
   PASSWORD_UNCHANGED: "新密码不能与当前密码相同",
+  EMAIL_AUTH_DISABLED: "邮箱验证码功能尚未启用",
+  EMAIL_DELIVERY_UNAVAILABLE: "邮箱验证码功能暂不可用，请稍后重试",
+  SELF_REGISTRATION_DISABLED: "当前暂未开放邮箱注册",
+  INVALID_EMAIL: "请输入有效的邮箱地址",
+  INVALID_USERNAME: "账号需使用 3–32 位英文字母、数字、点、下划线或短横线",
+  EMAIL_EXISTS: "该邮箱已经注册，请直接登录",
+  EMAIL_ALREADY_BOUND: "当前账号已经绑定邮箱",
+  EMAIL_NOT_BOUND: "当前账号尚未绑定邮箱",
+  VERIFICATION_CODE_INVALID: "验证码不正确",
+  VERIFICATION_CODE_EXPIRED: "验证码已过期，请重新获取",
+  VERIFICATION_CODE_RATE_LIMITED: "验证码发送过于频繁，请稍后再试",
+  VERIFICATION_CODE_ATTEMPTS_EXCEEDED: "验证码错误次数过多，请重新获取",
+  VERIFICATION_SEND_FAILED: "验证码邮件发送失败，请稍后重试",
+  INVALID_OR_EXPIRED_CODE: "验证码不正确或已过期，请重新获取",
+  EMAIL_RATE_LIMITED: "验证码操作过于频繁，请稍后再试",
+  EMAIL_DAILY_LIMIT_REACHED: "今日验证码发送额度已用完，请明天再试",
   AUTH_REQUIRED: "登录已失效，请重新登录",
   SESSION_EXPIRED: "登录已过期，请重新登录",
   MUST_CHANGE_PASSWORD: "请先修改初始密码",
@@ -46,7 +64,9 @@ const FRIENDLY_ERRORS: Record<string, string> = {
   IMPORT_HAS_ERRORS: "CSV 仍有错误，不能提交导入",
   IMPORT_ALREADY_COMMITTED: "这份 CSV 预览已经提交",
   IMPORT_EXPIRED: "CSV 预览已过期，请重新校验",
-  NETWORK_ERROR: "无法连接服务器，请检查网络后重试"
+  NETWORK_ERROR: "无法连接服务器，请检查网络后重试",
+  CSRF_INVALID: "安全校验已失效，请刷新页面后重试",
+  AUTH_STATE_CHANGED: "登录账号状态已变化，请重新打开页面"
 };
 
 export class ApiError extends Error {
@@ -70,12 +90,37 @@ type RequestOptions = {
 
 class ApiClient {
   private csrfToken = "";
+  private csrfRefreshPromise: Promise<SessionResponse> | null = null;
 
   setCsrfToken(token: string): void {
     this.csrfToken = token;
   }
 
-  async request<T>(path: string, options: RequestOptions = {}): Promise<T> {
+  private async refreshCsrfToken(): Promise<SessionResponse> {
+    if (!this.csrfRefreshPromise) {
+      this.csrfRefreshPromise = this.request<SessionResponse>("/api/auth/session", {}, false)
+        .then((session) => {
+          this.setCsrfToken(session.csrfToken);
+          return session;
+        })
+        .finally(() => { this.csrfRefreshPromise = null; });
+    }
+    return this.csrfRefreshPromise;
+  }
+
+  private anonymousCsrfRetryAllowed(path: string, options: RequestOptions): boolean {
+    if (path === "/api/auth/email/request-code") {
+      return (options.body as { purpose?: unknown } | undefined)?.purpose !== "bind_email";
+    }
+    return new Set([
+      "/api/auth/login",
+      "/api/auth/email/register",
+      "/api/auth/email/login",
+      "/api/auth/email/reset-password"
+    ]).has(path);
+  }
+
+  async request<T>(path: string, options: RequestOptions = {}, allowCsrfRefresh = true): Promise<T> {
     const method = options.method ?? "GET";
     const headers = new Headers({ Accept: "application/json" });
     if (options.body !== undefined) headers.set("Content-Type", "application/json");
@@ -98,6 +143,16 @@ class ApiClient {
     const payload = await response.json().catch(() => ({})) as ApiErrorPayload & T;
     if (!response.ok) {
       const code = payload.error?.code ?? "REQUEST_FAILED";
+      if (
+        allowCsrfRefresh &&
+        method !== "GET" &&
+        response.status === 403 &&
+        code === "CSRF_INVALID" &&
+        this.anonymousCsrfRetryAllowed(path, options)
+      ) {
+        const refreshed = await this.refreshCsrfToken();
+        if (refreshed.user === null) return this.request<T>(path, options, false);
+      }
       throw new ApiError(
         response.status,
         code,
@@ -118,6 +173,66 @@ class ApiClient {
     const response = await this.request<SessionResponse>("/api/auth/login", {
       method: "POST",
       body: { username, password }
+    });
+    this.setCsrfToken(response.csrfToken);
+    return response;
+  }
+
+  async requestEmailCode(
+    email: string,
+    purpose: EmailCodePurpose,
+    expectedUserId: string | null
+  ): Promise<EmailCodeResponse> {
+    // Refresh the guest/session cookie so the returned challenge remains bound to
+    // the same browser session for its full ten-minute lifetime.
+    const session = await this.session();
+    if ((session.user?.id ?? null) !== expectedUserId) {
+      throw new ApiError(409, "AUTH_STATE_CHANGED", "Authentication state changed; reopen this page");
+    }
+    return this.request<EmailCodeResponse>("/api/auth/email/request-code", {
+      method: "POST",
+      body: { email, purpose }
+    });
+  }
+
+  async loginWithEmail(email: string, challengeId: string, code: string): Promise<SessionResponse> {
+    const response = await this.request<SessionResponse>("/api/auth/email/login", {
+      method: "POST",
+      body: { email, challengeId, code }
+    });
+    this.setCsrfToken(response.csrfToken);
+    return response;
+  }
+
+  async registerWithEmail(input: {
+    email: string;
+    challengeId: string;
+    code: string;
+    username: string;
+    displayName: string;
+    password: string;
+  }): Promise<SessionResponse> {
+    const response = await this.request<SessionResponse>("/api/auth/email/register", {
+      method: "POST",
+      body: input
+    });
+    this.setCsrfToken(response.csrfToken);
+    return response;
+  }
+
+  async resetPasswordWithEmail(email: string, challengeId: string, code: string, newPassword: string): Promise<SessionResponse> {
+    const response = await this.request<SessionResponse>("/api/auth/email/reset-password", {
+      method: "POST",
+      body: { email, challengeId, code, newPassword }
+    });
+    this.setCsrfToken(response.csrfToken);
+    return response;
+  }
+
+  async bindEmail(email: string, challengeId: string, code: string, currentPassword: string): Promise<SessionResponse> {
+    const response = await this.request<SessionResponse>("/api/auth/email/bind", {
+      method: "POST",
+      body: { email, challengeId, code, currentPassword }
     });
     this.setCsrfToken(response.csrfToken);
     return response;

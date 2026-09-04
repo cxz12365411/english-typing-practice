@@ -1,9 +1,10 @@
-import { createHash, randomBytes, timingSafeEqual } from "node:crypto";
+import { createHash, createHmac, randomBytes, randomInt, timingSafeEqual } from "node:crypto";
 import argon2 from "argon2";
 
 export const USERNAME_PATTERN = /^[a-z0-9._-]{3,32}$/;
 export const PASSWORD_MIN_LENGTH = 12;
 export const PASSWORD_MAX_LENGTH = 128;
+export const EMAIL_MAX_LENGTH = 254;
 
 const ARGON_OPTIONS = {
   type: argon2.argon2id,
@@ -79,6 +80,54 @@ export function validatePassword(value: unknown): string {
     throw new Error(`Password must contain ${PASSWORD_MIN_LENGTH}-${PASSWORD_MAX_LENGTH} characters`);
   }
   return value;
+}
+
+export function normalizeEmail(value: string): string {
+  return value.normalize("NFKC").trim().toLowerCase();
+}
+
+export function validateEmail(value: unknown): string {
+  if (typeof value !== "string") throw new Error("Email must be a string");
+  const normalized = normalizeEmail(value);
+  if (normalized.length < 3 || normalized.length > EMAIL_MAX_LENGTH) throw new Error("Email address is invalid");
+  const parts = normalized.split("@");
+  if (parts.length !== 2) throw new Error("Email address is invalid");
+  const [local, domain] = parts as [string, string];
+  if (
+    local.length < 1 ||
+    local.length > 64 ||
+    local.startsWith(".") ||
+    local.endsWith(".") ||
+    local.includes("..") ||
+    !/^[a-z0-9.!#$%&'*+/=?^_`{|}~-]+$/i.test(local)
+  ) throw new Error("Email address is invalid");
+  const labels = domain.split(".");
+  if (
+    domain.length > 253 ||
+    labels.length < 2 ||
+    labels.some((label) => label.length < 1 || label.length > 63 || !/^[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$/i.test(label))
+  ) throw new Error("Email address is invalid");
+  return normalized;
+}
+
+export function generateEmailCode(): string {
+  return randomInt(0, 1_000_000).toString().padStart(6, "0");
+}
+
+export function emailCodeHash(
+  secret: string,
+  id: string,
+  email: string,
+  purpose: string,
+  code: string
+): string {
+  return createHmac("sha256", secret).update(id).update("\0").update(email).update("\0").update(purpose).update("\0").update(code).digest("hex");
+}
+
+export function safeHashEqual(actualHex: string, expectedHex: string): boolean {
+  const actual = Buffer.from(actualHex, "hex");
+  const expected = Buffer.from(expectedHex, "hex");
+  return actual.length === expected.length && timingSafeEqual(actual, expected);
 }
 
 export async function hashPassword(password: string): Promise<string> {

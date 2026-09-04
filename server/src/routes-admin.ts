@@ -311,13 +311,15 @@ export async function registerAdminRoutes(app: FastifyInstance, db: SqliteDataba
       ) conflict("TARGET_STATE_CHANGED", "The target account changed while the reset was being prepared");
       const updated = db.prepare(`
         UPDATE users
-        SET password_hash = ?, must_change_password = 1, auth_version = auth_version + 1, updated_at = ?
+        SET password_hash = ?, must_change_password = 1,
+            email = NULL, email_verified_at = NULL,
+            auth_version = auth_version + 1, updated_at = ?
         WHERE id = ? AND auth_version = ? AND password_hash = ?
       `).run(passwordHash, now, targetId, target!.auth_version, target!.password_hash);
       if (updated.changes !== 1) conflict("TARGET_STATE_CHANGED", "The target account changed while the reset was being prepared");
       revokeUserSessions(db, targetId);
       clearLoginGuards(db, target!.username);
-      audit(db, request, "admin.password_reset", "user", targetId);
+      audit(db, request, "admin.password_reset", "user", targetId, { emailCleared: Boolean(currentTarget.email) });
     }).immediate();
     return { user: toUserDto(db.prepare("SELECT * FROM users WHERE id = ?").get(targetId) as UserRow), temporaryPassword: generatedPassword };
   });
@@ -545,7 +547,10 @@ export async function registerAdminRoutes(app: FastifyInstance, db: SqliteDataba
   app.post("/api/admin/items/:id/archive", setItemStatus("archived"));
   app.delete("/api/admin/items/:id", setItemStatus("archived"));
 
-  app.post("/api/admin/imports/preview", async (request) => {
+  app.post(
+    "/api/admin/imports/preview",
+    { bodyLimit: 2_100_000, onRequest: async (request) => { requireAdmin(request); } },
+    async (request) => {
     const admin = requireAdmin(request);
     const body = objectBody(request.body);
     const csv = stringField(body, "csv", { min: 1, max: 2_000_000, trim: false })!;
@@ -561,7 +566,8 @@ export async function registerAdminRoutes(app: FastifyInstance, db: SqliteDataba
     `).run(id, admin.id, categoryId ?? null, JSON.stringify(preview.rows), JSON.stringify(preview.errors), preview.rows.length, now, now + 30 * 60_000);
     audit(db, request, "admin.import_previewed", "import_preview", id, { rows: preview.rows.length, errors: preview.errors.length });
     return { previewId: id, rows: preview.rows, errors: preview.errors, expiresAt: new Date(now + 30 * 60_000).toISOString() };
-  });
+    }
+  );
 
   app.post("/api/admin/imports/commit", async (request) => {
     const admin = requireAdmin(request);

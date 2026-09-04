@@ -9,6 +9,8 @@ import { registerAdminRoutes } from "./routes-admin.js";
 import { registerAuthRoutes } from "./routes-auth.js";
 import { registerPracticeRoutes } from "./routes-practice.js";
 import { PasswordWorkQueueFullError } from "./security.js";
+import { createEmailProvider, type EmailProvider } from "./email-provider.js";
+import { emailAuthCapabilities, registerEmailAuthRoutes } from "./routes-email-auth.js";
 
 export interface BuildAppOptions {
   config?: Partial<AppConfig>;
@@ -16,6 +18,7 @@ export interface BuildAppOptions {
   migrate?: boolean;
   seed?: boolean;
   logger?: boolean;
+  emailProvider?: EmailProvider;
 }
 
 const MUTATING_METHODS = new Set(["POST", "PUT", "PATCH", "DELETE"]);
@@ -26,10 +29,14 @@ function isLoopbackAddress(address: string): boolean {
 
 export async function buildApp(options: BuildAppOptions = {}): Promise<FastifyInstance> {
   const config = loadConfig(options.config);
+  const emailProvider = options.emailProvider ?? createEmailProvider(config.emailDelivery, config.environment);
+  if (emailProvider.kind === "test" && config.environment !== "test") {
+    throw new Error("The test email provider is permitted only when NODE_ENV=test");
+  }
   const app = Fastify({
     logger: options.logger === false ? false : { level: config.logLevel },
     trustProxy: config.trustProxy === "loopback" ? (address, hop) => hop === 0 && isLoopbackAddress(address) : false,
-    bodyLimit: 2_100_000
+    bodyLimit: 64 * 1024
   });
   const db = options.database ?? openDatabase(config);
   if (options.migrate !== false) {
@@ -50,13 +57,25 @@ export async function buildApp(options: BuildAppOptions = {}): Promise<FastifyIn
     reply.header("Referrer-Policy", "same-origin");
   });
 
-  app.addHook("preHandler", async (request, reply) => {
+  const loadAndValidateRequestSecurity = (request: Parameters<typeof loadSession>[1], reply: Parameters<typeof loadSession>[2]): void => {
     request.authSession = loadSession(db, request, reply, config.guestTokenSecret);
     if (!MUTATING_METHODS.has(request.method)) return;
     if (request.headers.origin !== config.appOrigin) {
       throw new ApiError(403, "ORIGIN_INVALID", "Request origin is not allowed");
     }
     requireCsrf(request);
+  };
+
+  // Reject unauthenticated/cross-origin writes before Fastify parses a body. The
+  // preHandler check then reloads the session after parsing so a concurrent revoke,
+  // password reset or role change still wins before the handler mutates state.
+  app.addHook("onRequest", async (request, reply) => {
+    loadAndValidateRequestSecurity(request, reply);
+  });
+
+  app.addHook("preHandler", async (request, reply) => {
+    if (!MUTATING_METHODS.has(request.method)) return;
+    loadAndValidateRequestSecurity(request, reply);
   });
 
   app.get("/api/healthz", async () => {
@@ -65,7 +84,14 @@ export async function buildApp(options: BuildAppOptions = {}): Promise<FastifyIn
     return { ok: true, database: "ok", schemaVersion: migration.version };
   });
 
-  await registerAuthRoutes(app, db, config.guestTokenSecret);
+  const emailOptions = {
+    selfRegistrationEnabled: config.emailSelfRegistration,
+    dailySendLimit: config.emailDailySendLimit,
+    registrationDailySendLimit: config.emailRegistrationDailySendLimit,
+    registrationIpDailyLimit: config.emailRegistrationIpDailyLimit
+  };
+  await registerAuthRoutes(app, db, config.guestTokenSecret, emailAuthCapabilities(emailProvider, emailOptions));
+  const closeEmailAuth = await registerEmailAuthRoutes(app, db, emailProvider, config.emailCodeSecret, emailOptions);
   await registerPracticeRoutes(app, db);
   await registerAdminRoutes(app, db);
 
@@ -117,6 +143,7 @@ export async function buildApp(options: BuildAppOptions = {}): Promise<FastifyIn
   cleanupTimer.unref();
   app.addHook("onClose", async () => {
     clearInterval(cleanupTimer);
+    await closeEmailAuth();
     if (!options.database) db.close();
   });
 

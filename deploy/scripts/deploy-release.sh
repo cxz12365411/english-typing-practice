@@ -43,7 +43,7 @@ for command_path in /usr/bin/node /usr/bin/sqlite3 /usr/bin/curl /usr/bin/flock 
 done
 readonly RUNUSER="$(command -v runuser || true)"
 [[ -n "$RUNUSER" && -x "$RUNUSER" ]] || die "runuser is required (normally /usr/sbin/runuser)"
-for helper in backup-sqlite.sh rollback-release.sh activate-caddy-site.sh robot-regression.sh prune-deployments.sh acceptance-test.sh; do
+for helper in backup-sqlite.sh rollback-release.sh activate-caddy-site.sh robot-regression.sh prune-deployments.sh acceptance-test.sh check-email-config.sh; do
   [[ -x "${LIBEXEC_DIR}/${helper}" ]] || die "deployment helper is missing: ${LIBEXEC_DIR}/${helper}"
 done
 
@@ -80,6 +80,7 @@ guest_secret_count="$(/usr/bin/grep -Ec '^GUEST_TOKEN_SECRET=' "$ENV_FILE" || tr
 guest_secret_value="$(/usr/bin/sed -n 's/^GUEST_TOKEN_SECRET=//p' "$ENV_FILE")"
 [[ "${#guest_secret_value}" -ge 32 && "$guest_secret_value" != '__GENERATED_BY_PROVISION_HOST__' ]] ||
   die "GUEST_TOKEN_SECRET must be a generated secret of at least 32 characters"
+"${LIBEXEC_DIR}/check-email-config.sh" --config-only
 
 for required_path in \
   server/dist/index.js \
@@ -247,9 +248,11 @@ restart_old_service_armed=0
 "$RUNUSER" --user englishapp -- /bin/bash -c '
   set -euo pipefail
   umask 0077
-  set -a
-  source /etc/english-typing-practice/env
-  set +a
+  while IFS="=" read -r key value || [[ -n "$key" ]]; do
+    [[ -z "$key" || "$key" == \#* ]] && continue
+    [[ "$key" =~ ^[A-Z][A-Z0-9_]*$ ]] || exit 64
+    export "$key=$value"
+  done </etc/english-typing-practice/env
   cd "$1"
   exec /usr/bin/node dist/scripts/migrate.js
 ' englishapp-migrate "${release_dir}/server"
@@ -271,9 +274,11 @@ if [[ "$active_admin_count" -eq 0 ]]; then
   /usr/bin/install -m 0640 -o root -g englishapp "$ADMIN_STATE_PASSWORD_FILE" "$ADMIN_PASSWORD_FILE"
   "$RUNUSER" --user englishapp -- /bin/bash -c '
     set -euo pipefail
-    set -a
-    source /etc/english-typing-practice/env
-    set +a
+    while IFS="=" read -r key value || [[ -n "$key" ]]; do
+      [[ -z "$key" || "$key" == \#* ]] && continue
+      [[ "$key" =~ ^[A-Z][A-Z0-9_]*$ ]] || exit 64
+      export "$key=$value"
+    done </etc/english-typing-practice/env
     cd "$1"
     exec /usr/bin/node dist/scripts/bootstrap-admin.js --username admin --password-file /run/english-typing-practice/initial-admin-password
   ' englishapp-bootstrap "${release_dir}/server"
@@ -295,6 +300,7 @@ for _ in {1..30}; do
   /usr/bin/sleep 1
 done
 [[ "$healthy" -eq 1 ]] || die "new API did not become ready at ${HEALTH_URL}"
+"${LIBEXEC_DIR}/check-email-config.sh" --smtp
 
 "${LIBEXEC_DIR}/activate-caddy-site.sh" "$release_id"
 if [[ -n "$initial_admin_password" ]]; then

@@ -157,6 +157,24 @@ test("guest CSRF is stateless, malformed JSON stays 4xx, and proxy trust accepts
     assert.equal(malformed.statusCode, 400, malformed.body);
     assert.equal(malformed.json().error.code, "INVALID_JSON");
 
+    const oversized = await app.inject({
+      method: "POST",
+      url: "/api/auth/login",
+      headers: writeHeaders(first),
+      payload: { username: "missing.user", password: "invalid", junk: "x".repeat(9_000) }
+    });
+    assert.equal(oversized.statusCode, 413, oversized.body);
+    assert.equal(oversized.json().error.code, "BODY_TOO_LARGE");
+
+    const oversizedUnauthenticatedWrite = await app.inject({
+      method: "POST",
+      url: "/api/practice/sessions",
+      headers: writeHeaders(first),
+      payload: { mode: "sequential", junk: "x".repeat(70_000) }
+    });
+    assert.equal(oversizedUnauthenticatedWrite.statusCode, 413, oversizedUnauthenticatedWrite.body);
+    assert.equal(oversizedUnauthenticatedWrite.json().error.code, "BODY_TOO_LARGE");
+
     const proxyGuest = await guest(app);
     const failed = await app.inject({
       method: "POST",
@@ -215,6 +233,11 @@ test("login has hard IP+account reservations, account-only risk does not lock, r
   try {
     await insertUser(db, "admin.one", "Admin-One-Password!", "admin");
     const target = await insertUser(db, "target.user", "Target-User-Password!");
+    db.prepare("UPDATE users SET email = ?, email_verified_at = ? WHERE id = ?").run(
+      "target.user@example.com",
+      Date.now(),
+      target.id
+    );
     const account = "target.user";
     const ip = "127.0.0.1";
     const now = Date.now();
@@ -258,6 +281,12 @@ test("login has hard IP+account reservations, account-only risk does not lock, r
     });
     assert.equal(reset.statusCode, 200, reset.body);
     assert.equal((db.prepare("SELECT COUNT(*) AS count FROM login_guards WHERE account_key = ?").get(account) as { count: number }).count, 0);
+    const resetUser = db.prepare("SELECT email, email_verified_at FROM users WHERE id = ?").get(target.id) as {
+      email: string | null;
+      email_verified_at: number | null;
+    };
+    assert.deepEqual(resetUser, { email: null, email_verified_at: null });
+    assert.equal(reset.json().user.email, undefined);
 
     const parallelGuests = await Promise.all(Array.from({ length: 11 }, () => guest(app)));
     const parallel = await Promise.all(parallelGuests.map((candidate) => app.inject({
@@ -645,6 +674,30 @@ test("published edits become drafts until publish, and CSV previews are creator-
     });
     assert.equal(categoryCreate.statusCode, 200, categoryCreate.body);
     const emptyCategoryId = categoryCreate.json().category.id as string;
+    const anonymous = await guest(app);
+    const rejectedBeforeLargeImport = await app.inject({
+      method: "POST",
+      url: "/api/admin/imports/preview",
+      headers: writeHeaders(anonymous),
+      payload: { csv: "x".repeat(100_000) }
+    });
+    assert.equal(rejectedBeforeLargeImport.statusCode, 401, rejectedBeforeLargeImport.body);
+
+    const largeCsv = [
+      "key,categoryId,kind,english,meaning,sortOrder,status",
+      ...Array.from({ length: 900 }, (_, index) =>
+        `large-${index},${emptyCategoryId},word,largeword${index},批量词条${index},${index},draft`)
+    ].join("\n");
+    assert.ok(Buffer.byteLength(JSON.stringify({ csv: largeCsv }), "utf8") > 64 * 1024);
+    const largePreview = await app.inject({
+      method: "POST",
+      url: "/api/admin/imports/preview",
+      headers: writeHeaders(clientA),
+      payload: { csv: largeCsv }
+    });
+    assert.equal(largePreview.statusCode, 200, largePreview.body);
+    assert.deepEqual(largePreview.json().errors, []);
+
     const csv = `key,categoryId,kind,english,meaning,sortOrder,status\ncsv-atomic-item,${emptyCategoryId},word,atomic,原子,1,draft`;
     const preview = await app.inject({
       method: "POST", url: "/api/admin/imports/preview", headers: writeHeaders(clientA), payload: { csv }

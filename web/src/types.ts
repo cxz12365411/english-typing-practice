@@ -3,6 +3,7 @@ export type UserStatus = "active" | "disabled";
 export type ContentKind = "word" | "sentence";
 export type ContentStatus = "draft" | "published" | "archived";
 export type OrderMode = "order" | "shuffle" | "mistakes";
+export type EmailCodePurpose = "register" | "login" | "reset_password" | "bind_email";
 
 export interface User {
   id: string;
@@ -11,13 +12,28 @@ export interface User {
   role: Role;
   status: UserStatus;
   mustChangePassword: boolean;
+  email?: string | null;
+  emailVerified?: boolean;
   lastLoginAt?: string | null;
   createdAt: string;
+}
+
+export interface AuthCapabilities {
+  emailAuthEnabled: boolean;
+  selfRegistrationEnabled: boolean;
 }
 
 export interface SessionResponse {
   user: User | null;
   csrfToken: string;
+  capabilities?: AuthCapabilities;
+}
+
+export interface EmailCodeResponse {
+  ok: true;
+  challengeId: string;
+  retryAfterSeconds: number;
+  expiresInSeconds?: number;
 }
 
 export interface ContentCategory {
@@ -88,6 +104,7 @@ export interface AttemptResponse {
 
 export interface PageContext {
   user: User;
+  capabilities: AuthCapabilities;
   renderShell: (content: string, activeRoute: "/practice" | "/admin") => void;
   navigate: (path: string, replace?: boolean) => void;
   onUserChanged: (user: User) => void;

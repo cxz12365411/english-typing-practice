@@ -1,18 +1,48 @@
+import { existsSync, readFileSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 import { expect, test, type Page } from "@playwright/test";
 
 const INITIAL_ADMIN_PASSWORD = "E2eInitialAdmin!2026";
 const ADMIN_PASSWORD = "E2eChangedAdmin!2026";
 const LEARNER_PASSWORD = "E2eChangedLearner!2026";
 const OTHER_PASSWORD = "E2eChangedOther!2026";
+const EMAIL_RESET_PASSWORD = "E2eEmailResetChanged!2026";
+const EMAIL_REGISTER_PASSWORD = "E2eEmailRegistered!2026";
+const EMAIL_OUTBOX_FILE = join(tmpdir(), "english-typing-practice-e2e-mail-outbox-8091.jsonl");
 
 let learnerTemporaryPassword = "";
 let otherTemporaryPassword = "";
 
 async function login(page: Page, username: string, password: string): Promise<void> {
   await page.goto("/login");
-  await page.locator('[name="username"]').fill(username);
-  await page.locator('[name="password"]').fill(password);
-  await page.getByRole("button", { name: "登录", exact: true }).click();
+  const passwordTab = page.getByRole("tab", { name: "账号密码" });
+  if (await passwordTab.count()) await passwordTab.click();
+  const form = page.locator("#passwordLoginForm");
+  await form.locator('[name="username"]').fill(username);
+  await form.locator('[name="password"]').fill(password);
+  await form.getByRole("button", { name: "登录", exact: true }).click();
+}
+
+interface CapturedEmail {
+  to: string;
+  code: string;
+  purpose: "register" | "login" | "reset_password" | "bind_email";
+}
+
+function capturedCode(email: string, purpose: CapturedEmail["purpose"]): string | null {
+  if (!existsSync(EMAIL_OUTBOX_FILE)) return null;
+  const messages = readFileSync(EMAIL_OUTBOX_FILE, "utf8")
+    .split(/\r?\n/)
+    .filter(Boolean)
+    .map((line) => JSON.parse(line) as CapturedEmail)
+    .filter((message) => message.to === email && message.purpose === purpose);
+  return messages.at(-1)?.code ?? null;
+}
+
+async function waitForCapturedCode(email: string, purpose: CapturedEmail["purpose"]): Promise<string> {
+  await expect.poll(() => capturedCode(email, purpose), { timeout: 5_000 }).toMatch(/^\d{6}$/);
+  return capturedCode(email, purpose)!;
 }
 
 async function changeForcedPassword(page: Page, currentPassword: string, nextPassword: string): Promise<void> {
@@ -85,6 +115,76 @@ test.describe.serial("multi-user application", () => {
     expect(adminStatus).toBe(403);
     await page.goto("/admin");
     await expect(page).toHaveURL(/\/practice$/);
+  });
+
+  test("an existing user can bind a verified email", async ({ page }) => {
+    const email = "learner2@example.com";
+    await login(page, "learner2", OTHER_PASSWORD);
+    await expect(page).toHaveURL(/\/practice$/);
+    await page.getByText("账号安全与邮箱", { exact: true }).click();
+    const form = page.locator("#bindEmailForm");
+    await form.locator('[name="email"]').fill(email);
+    await form.getByRole("button", { name: "发送验证码" }).click();
+    const code = await waitForCapturedCode(email, "bind_email");
+    await form.locator('[name="code"]').fill(code);
+    await form.locator('[name="currentPassword"]').fill(OTHER_PASSWORD);
+    await form.getByRole("button", { name: "确认绑定" }).click();
+    await expect(page.locator("#bindEmailMessage")).toContainText("邮箱已绑定");
+  });
+
+  test("email verification code logs a verified user in", async ({ page }) => {
+    const email = "email.login@example.com";
+    await page.goto("/login");
+    await expect(page.getByRole("tab", { name: "验证码登录" })).toHaveAttribute("aria-selected", "true");
+    const form = page.locator("#emailLoginForm");
+    await form.locator('[name="email"]').fill(email);
+    await form.getByRole("button", { name: "发送验证码" }).click();
+    const code = await waitForCapturedCode(email, "login");
+    await form.locator('[name="code"]').fill(code);
+    await form.getByRole("button", { name: "登录", exact: true }).click();
+    await expect(page).toHaveURL(/\/practice$/);
+    await expect(page.getByText(/已载入 850 个单词，168 条句型/)).toBeVisible();
+  });
+
+  test("email verification code resets a password and revokes the old password", async ({ page }) => {
+    const email = "email.reset@example.com";
+    await page.goto("/login");
+    await page.getByRole("tab", { name: "找回密码" }).click();
+    const form = page.locator("#resetPasswordForm");
+    await form.locator('[name="email"]').fill(email);
+    await form.getByRole("button", { name: "发送验证码" }).click();
+    const code = await waitForCapturedCode(email, "reset_password");
+    await form.locator('[name="code"]').fill(code);
+    await form.locator('[name="newPassword"]').fill(EMAIL_RESET_PASSWORD);
+    await form.locator('[name="confirmPassword"]').fill(EMAIL_RESET_PASSWORD);
+    await form.getByRole("button", { name: "验证并修改密码" }).click();
+    await expect(page).toHaveURL(/\/practice$/);
+
+    await page.getByRole("button", { name: "退出" }).click();
+    await login(page, "email.reset", "E2eEmailReset!2026");
+    await expect(page).toHaveURL(/\/login$/);
+    await expect(page.locator("#passwordLoginMessage")).toContainText("账号或密码错误");
+    await login(page, "email.reset", EMAIL_RESET_PASSWORD);
+    await expect(page).toHaveURL(/\/practice$/);
+  });
+
+  test("a visitor can create only a learner account after verifying email", async ({ page }) => {
+    const email = "email.register@example.com";
+    await page.goto("/login");
+    await page.getByRole("tab", { name: "注册账号" }).click();
+    const form = page.locator("#registerForm");
+    await form.locator('[name="email"]').fill(email);
+    await form.getByRole("button", { name: "发送验证码" }).click();
+    const code = await waitForCapturedCode(email, "register");
+    await form.locator('[name="code"]').fill(code);
+    await form.locator('[name="username"]').fill("email.register");
+    await form.locator('[name="displayName"]').fill("邮箱注册学员");
+    await form.locator('[name="password"]').fill(EMAIL_REGISTER_PASSWORD);
+    await form.locator('[name="confirmPassword"]').fill(EMAIL_REGISTER_PASSWORD);
+    await form.getByRole("button", { name: "注册并登录" }).click();
+    await expect(page).toHaveURL(/\/practice$/);
+    const adminStatus = await page.evaluate(async () => (await fetch("/api/admin/stats", { credentials: "include" })).status);
+    expect(adminStatus).toBe(403);
   });
 
   test("a slow practice request cannot overwrite a page the user has left", async ({ page }) => {

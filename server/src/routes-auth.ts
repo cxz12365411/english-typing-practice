@@ -16,11 +16,13 @@ import {
 import { ApiError, badRequest } from "./errors.js";
 import { hashPassword, normalizeUsername, tokenHash, validatePassword, validateUsername, verifyPassword } from "./security.js";
 import { objectBody, stringField } from "./validation.js";
+import type { EmailAuthCapabilities } from "./routes-email-auth.js";
 
 const LIMIT_WINDOW_MS = 15 * 60_000;
 const BLOCK_MS = 15 * 60_000;
 const IP_ATTEMPT_LIMIT = 60;
 const IP_ACCOUNT_ATTEMPT_LIMIT = 10;
+const AUTH_BODY_LIMIT = 8 * 1024;
 
 type GuardScope = "ip" | "ip_account" | "account_risk";
 
@@ -146,19 +148,24 @@ function directAudit(db: SqliteDatabase, request: FastifyRequest, actorId: strin
   `).run(actorId, action, request.ip, Date.now());
 }
 
-export async function registerAuthRoutes(app: FastifyInstance, db: SqliteDatabase, guestSecret: string): Promise<void> {
+export async function registerAuthRoutes(
+  app: FastifyInstance,
+  db: SqliteDatabase,
+  guestSecret: string,
+  capabilities: EmailAuthCapabilities
+): Promise<void> {
   const dummyHash = await hashPassword("not-a-real-user-password-123!");
 
   app.get("/api/auth/session", async (request, reply) => {
     const existing = request.authSession;
     if (!existing?.user) {
       const created = createGuestSession(reply, guestSecret);
-      return { user: null, csrfToken: created.csrfToken };
+      return { user: null, csrfToken: created.csrfToken, capabilities };
     }
-    return { user: toUserDto(existing.user), csrfToken: existing.csrfToken };
+    return { user: toUserDto(existing.user), csrfToken: existing.csrfToken, capabilities };
   });
 
-  app.post("/api/auth/login", async (request, reply) => {
+  app.post("/api/auth/login", { bodyLimit: AUTH_BODY_LIMIT }, async (request, reply) => {
     const body = objectBody(request.body);
     const usernameRaw = stringField(body, "username", { min: 1, max: 100 })!;
     const password = stringField(body, "password", { min: 1, max: 128, trim: false })!;
@@ -216,7 +223,7 @@ export async function registerAuthRoutes(app: FastifyInstance, db: SqliteDatabas
     return { user: toUserDto(result.user), csrfToken: result.created.csrfToken };
   });
 
-  app.post("/api/auth/logout", async (request, reply) => {
+  app.post("/api/auth/logout", { bodyLimit: AUTH_BODY_LIMIT }, async (request, reply) => {
     if (request.authSession?.persistent) {
       db.transaction(() => {
         const now = Date.now();
@@ -236,7 +243,7 @@ export async function registerAuthRoutes(app: FastifyInstance, db: SqliteDatabas
     return { ok: true };
   });
 
-  app.post("/api/auth/change-password", async (request, reply) => {
+  app.post("/api/auth/change-password", { bodyLimit: AUTH_BODY_LIMIT }, async (request, reply) => {
     const snapshot = requireUser(request, true);
     const body = objectBody(request.body);
     const currentPassword = stringField(body, "currentPassword", { min: 1, max: 128, trim: false })!;

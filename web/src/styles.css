@@ -82,11 +82,16 @@ a {
 .auth-card,
 .forced-password-card {
   width: min(460px, 100%);
+  min-width: 0;
   border: 1px solid var(--line);
   border-radius: 14px;
   background: rgba(255, 255, 255, 0.96);
   box-shadow: var(--shadow);
   padding: 34px;
+}
+
+.auth-card.email-auth-card {
+  width: min(540px, 100%);
 }
 
 .brand-mark {
@@ -125,6 +130,42 @@ a {
   margin-top: 5px;
   color: var(--muted);
   font-size: 14px;
+}
+
+.auth-tabs {
+  display: flex;
+  gap: 4px;
+  margin: -8px 0 22px;
+  padding-bottom: 4px;
+  border-bottom: 1px solid var(--line);
+  overflow-x: auto;
+}
+
+.auth-tab {
+  flex: 1 0 auto;
+  min-height: 40px;
+  border: 0;
+  border-bottom: 3px solid transparent;
+  background: transparent;
+  color: var(--muted);
+  padding: 8px 10px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.auth-tab:hover,
+.auth-tab.active {
+  color: var(--green);
+}
+
+.auth-tab.active {
+  border-bottom-color: var(--green);
+}
+
+.auth-capability-note {
+  margin-top: 18px;
 }
 
 .app-shell {
@@ -255,6 +296,22 @@ a {
   gap: 16px;
 }
 
+.verification-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 8px;
+  margin-top: -11px;
+}
+
+.verification-row .btn {
+  min-width: 118px;
+}
+
+.code-input {
+  letter-spacing: 0.16em;
+  font-variant-numeric: tabular-nums;
+}
+
 .field {
   display: grid;
   gap: 7px;
@@ -365,6 +422,11 @@ a {
   padding: 11px 13px;
   font-size: 14px;
   line-height: 1.5;
+}
+
+.message.compact {
+  padding: 8px 10px;
+  font-size: 12px;
 }
 
 .message.error {
@@ -750,6 +812,50 @@ a {
   border-bottom: 1px solid var(--line);
 }
 
+.account-security-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+  align-items: start;
+}
+
+.account-security-card {
+  display: grid;
+  gap: 14px;
+  min-width: 0;
+  padding: 18px;
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  background: var(--panel-alt);
+}
+
+.account-security-card.account-security-primary {
+  border-color: #b9dec8;
+  background: #fbfffc;
+}
+
+.account-security-card h3,
+.account-security-card p {
+  margin: 0;
+}
+
+.account-email {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  overflow-wrap: anywhere;
+}
+
+.account-email > span:first-child {
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.account-code-status {
+  margin-top: 10px;
+}
+
 .narrow-form {
   max-width: 560px;
 }
@@ -991,7 +1097,8 @@ a {
   }
 
   .practice-grid,
-  .admin-grid {
+  .admin-grid,
+  .account-security-grid {
     grid-template-columns: 1fr;
   }
 
@@ -1009,6 +1116,18 @@ a {
   .auth-card,
   .forced-password-card {
     padding: 24px 19px;
+  }
+
+  .auth-tabs {
+    margin-inline: -4px;
+  }
+
+  .verification-row {
+    grid-template-columns: 1fr;
+  }
+
+  .verification-row .btn {
+    width: 100%;
   }
 
   .app-header {

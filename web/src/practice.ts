@@ -1,13 +1,23 @@
 import { ApiError, api } from "./api";
+import {
+  clearVerificationCountdowns,
+  normalizeEmail,
+  retryAfterFromError,
+  startVerificationCountdown,
+  validateEmail,
+  validateVerificationCode
+} from "./email";
 import type {
   AttemptResponse,
   AttemptSummary,
   ContentCategory,
   ContentItem,
+  EmailCodePurpose,
   MistakeRecord,
   OrderMode,
   PageContext,
-  PracticeSession
+  PracticeSession,
+  User
 } from "./types";
 import { errorMarkup, mustElement, setBusy, showToast } from "./ui";
 import {
@@ -103,11 +113,86 @@ function categoriesMarkup(categories: ContentCategory[]): string {
     .join("");
 }
 
+function currentPasswordFormMarkup(): string {
+  return `
+    <section class="account-security-card">
+      <h3>使用当前密码修改</h3>
+      <p class="muted">管理员或暂未绑定邮箱的账号仍可使用此方式。</p>
+      <form class="form-stack" id="changePasswordForm">
+        <label class="field"><span>当前密码</span><input class="input" name="currentPassword" type="password" autocomplete="current-password" required></label>
+        <label class="field"><span>新密码（12–128 个字符）</span><input class="input" name="newPassword" type="password" autocomplete="new-password" minlength="12" maxlength="128" required></label>
+        <label class="field"><span>确认新密码</span><input class="input" name="confirmPassword" type="password" autocomplete="new-password" minlength="12" maxlength="128" required></label>
+        <div class="message error" id="passwordMessage" role="alert" hidden></div>
+        <div><button class="btn" type="submit">修改密码</button></div>
+      </form>
+    </section>
+  `;
+}
+
+function accountMarkup(user: User, emailAuthEnabled: boolean): string {
+  const email = user.email?.trim() ?? "";
+  const emailSection = !emailAuthEnabled ? `
+    <section class="account-security-card account-security-primary">
+      <h3>邮箱验证码</h3>
+      <div class="message info">邮箱验证码功能正在配置中，启用后可在这里绑定邮箱并用验证码修改密码。</div>
+    </section>
+  ` : email ? `
+    <section class="account-security-card account-security-primary">
+      <h3>邮箱验证码修改密码</h3>
+      <p class="account-email"><span>已绑定邮箱</span><strong>${escapeHtml(email)}</strong><span class="status-pill active">已验证</span></p>
+      <p class="muted">验证码将发送到上面的邮箱。修改成功后，其他设备上的登录会话将失效。</p>
+      <form class="form-stack" id="emailPasswordForm">
+        <input name="challengeId" type="hidden">
+        <div>
+          <button class="btn" id="accountPasswordSendCode" type="button">发送验证码</button>
+          <div class="message compact info account-code-status" id="accountPasswordSendStatus" role="status" aria-live="polite" hidden></div>
+        </div>
+        <label class="field"><span>邮箱验证码</span><input class="input code-input" name="code" inputmode="numeric" autocomplete="one-time-code" minlength="6" maxlength="6" pattern="[0-9]{6}" title="请输入 6 位数字验证码" required></label>
+        <label class="field"><span>新密码（12–128 个字符）</span><input class="input" name="newPassword" type="password" autocomplete="new-password" minlength="12" maxlength="128" required></label>
+        <label class="field"><span>确认新密码</span><input class="input" name="confirmPassword" type="password" autocomplete="new-password" minlength="12" maxlength="128" required></label>
+        <div class="message error" id="emailPasswordMessage" role="alert" hidden></div>
+        <div><button class="btn primary" type="submit">验证并修改密码</button></div>
+      </form>
+      <p class="helper">为保护账号，当前不支持自行更换已绑定邮箱；如需更换请联系管理员。</p>
+    </section>
+  ` : `
+    <section class="account-security-card account-security-primary">
+      <h3>绑定登录邮箱</h3>
+      <p class="muted">绑定并验证后，可以用邮箱验证码登录和找回密码。一个邮箱只能绑定一个账号。</p>
+      <form class="form-stack" id="bindEmailForm">
+        <input name="challengeId" type="hidden">
+        <label class="field" for="bindEmailInput"><span>邮箱</span></label>
+        <div class="verification-row">
+          <input class="input" id="bindEmailInput" name="email" type="email" inputmode="email" autocomplete="email" maxlength="254" required>
+          <button class="btn" id="bindEmailSendCode" type="button">发送验证码</button>
+        </div>
+        <div class="message compact info" id="bindEmailSendStatus" role="status" aria-live="polite" hidden></div>
+        <label class="field"><span>邮箱验证码</span><input class="input code-input" name="code" inputmode="numeric" autocomplete="one-time-code" minlength="6" maxlength="6" pattern="[0-9]{6}" title="请输入 6 位数字验证码" required></label>
+        <label class="field"><span>当前账号密码</span><input class="input" name="currentPassword" type="password" autocomplete="current-password" required><span class="helper">为防止登录会话被盗用，首次绑定邮箱需要再次验证当前密码。</span></label>
+        <div class="message error" id="bindEmailMessage" role="alert" hidden></div>
+        <div><button class="btn primary" type="submit">确认绑定</button></div>
+      </form>
+    </section>
+  `;
+
+  return `
+    <details class="panel account-panel">
+      <summary>账号安全与邮箱</summary>
+      <div class="panel-body account-security-grid">
+        ${emailSection}
+        ${currentPasswordFormMarkup()}
+      </div>
+    </details>
+  `;
+}
+
 function practiceMarkup(
   categories: ContentCategory[],
   wordCount: number,
   sentenceCount: number,
-  hasLegacyMistakes: boolean
+  hasLegacyMistakes: boolean,
+  user: User,
+  emailAuthEnabled: boolean
 ): string {
   return `
     <div class="page-title">
@@ -207,19 +292,7 @@ function practiceMarkup(
       </section>
     </main>
 
-    <details class="panel account-panel">
-      <summary>账号与密码</summary>
-      <div class="panel-body">
-        <form class="form-stack narrow-form" id="changePasswordForm">
-          <p class="muted">修改密码后，其他设备上的登录会话将失效。</p>
-          <label class="field"><span>当前密码</span><input class="input" name="currentPassword" type="password" autocomplete="current-password" required></label>
-          <label class="field"><span>新密码（12–128 个字符）</span><input class="input" name="newPassword" type="password" autocomplete="new-password" minlength="12" maxlength="128" required></label>
-          <label class="field"><span>确认新密码</span><input class="input" name="confirmPassword" type="password" autocomplete="new-password" minlength="12" maxlength="128" required></label>
-          <div class="message error" id="passwordMessage" hidden></div>
-          <div><button class="btn primary" type="submit">修改密码</button></div>
-        </form>
-      </div>
-    </details>
+    ${accountMarkup(user, emailAuthEnabled)}
   `;
 }
 
@@ -652,6 +725,178 @@ async function importLegacyMistakes(button: HTMLButtonElement): Promise<void> {
   }
 }
 
+function setAccountMessage(element: HTMLElement, text: string, kind: "error" | "success" | "info" = "error"): void {
+  element.textContent = text;
+  element.className = `message compact ${kind}`;
+  element.hidden = false;
+}
+
+function clearAccountMessage(element: HTMLElement): void {
+  element.textContent = "";
+  element.hidden = true;
+}
+
+async function sendAccountCode(
+  button: HTMLButtonElement,
+  status: HTMLElement,
+  email: string,
+  purpose: EmailCodePurpose
+): Promise<string | null> {
+  const expectedUserId = state?.context.user.id;
+  if (!expectedUserId) return null;
+  clearAccountMessage(status);
+  setBusy(button, true, "发送中…");
+  try {
+    const response = await api.requestEmailCode(email, purpose, expectedUserId);
+    setBusy(button, false);
+    startVerificationCountdown(button, response.retryAfterSeconds);
+    setAccountMessage(status, "如果该邮箱符合条件，验证码将发送，请检查收件箱和垃圾邮件。", "success");
+    return response.challengeId;
+  } catch (error) {
+    setBusy(button, false);
+    if (state?.context.handleAuthError(error)) return null;
+    const retryAfter = retryAfterFromError(error);
+    if (retryAfter !== null) startVerificationCountdown(button, retryAfter);
+    setAccountMessage(status, getErrorMessage(error, "验证码发送失败"));
+    return null;
+  }
+}
+
+function bindEmailAccountForms(): void {
+  if (!state?.context.capabilities.emailAuthEnabled) return;
+  const boundEmail = state.context.user.email?.trim() ?? "";
+  if (boundEmail) {
+    const form = mustElement<HTMLFormElement>("#emailPasswordForm");
+    const sendButton = mustElement<HTMLButtonElement>("#accountPasswordSendCode");
+    const sendStatus = mustElement<HTMLElement>("#accountPasswordSendStatus");
+    sendButton.addEventListener("click", () => {
+      void sendAccountCode(sendButton, sendStatus, boundEmail, "reset_password").then((challengeId) => {
+        mustElement<HTMLInputElement>('[name="challengeId"]', form).value = challengeId ?? "";
+      });
+    });
+    form.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      if (!state) return;
+      const data = new FormData(form);
+      const challengeId = String(data.get("challengeId") ?? "");
+      const code = String(data.get("code") ?? "").trim();
+      const newPassword = String(data.get("newPassword") ?? "");
+      const confirmation = String(data.get("confirmPassword") ?? "");
+      const message = mustElement<HTMLElement>("#emailPasswordMessage");
+      const codeValidation = validateVerificationCode(code);
+      if (codeValidation) {
+        setAccountMessage(message, codeValidation);
+        mustElement<HTMLInputElement>('[name="code"]', form).focus();
+        return;
+      }
+      if (!challengeId) {
+        setAccountMessage(message, "请先获取新的邮箱验证码");
+        return;
+      }
+      const validation = validatePassword(newPassword);
+      if (validation || newPassword !== confirmation) {
+        setAccountMessage(message, validation ?? "两次输入的新密码不一致");
+        return;
+      }
+      const submit = mustElement<HTMLButtonElement>('button[type="submit"]', form);
+      clearAccountMessage(message);
+      setBusy(submit, true, "正在修改…");
+      try {
+        const response = await api.resetPasswordWithEmail(
+          boundEmail,
+          challengeId,
+          code,
+          newPassword
+        );
+        if (!response.user) throw new Error("服务器未返回账号信息");
+        state.context.user = response.user;
+        state.context.onUserChanged(response.user);
+        form.reset();
+        setAccountMessage(message, "密码已修改，其他登录会话已撤销。", "success");
+      } catch (error) {
+        if (!state?.context.handleAuthError(error)) {
+          setAccountMessage(message, getErrorMessage(error, "密码修改失败"));
+        }
+      } finally {
+        setBusy(submit, false);
+      }
+    });
+    return;
+  }
+
+  const form = mustElement<HTMLFormElement>("#bindEmailForm");
+  const emailInput = mustElement<HTMLInputElement>("#bindEmailInput");
+  const sendButton = mustElement<HTMLButtonElement>("#bindEmailSendCode");
+  const sendStatus = mustElement<HTMLElement>("#bindEmailSendStatus");
+  const challengeInput = mustElement<HTMLInputElement>('[name="challengeId"]', form);
+  emailInput.addEventListener("input", () => { challengeInput.value = ""; });
+  sendButton.addEventListener("click", () => {
+    const email = normalizeEmail(emailInput.value);
+    const validation = validateEmail(email);
+    if (validation) {
+      emailInput.setAttribute("aria-invalid", "true");
+      setAccountMessage(sendStatus, validation);
+      emailInput.focus();
+      return;
+    }
+    emailInput.value = email;
+    emailInput.removeAttribute("aria-invalid");
+    void sendAccountCode(sendButton, sendStatus, email, "bind_email").then((challengeId) => {
+      challengeInput.value = challengeId ?? "";
+    });
+  });
+  form.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    if (!state) return;
+    const email = normalizeEmail(emailInput.value);
+    const message = mustElement<HTMLElement>("#bindEmailMessage");
+    const validation = validateEmail(email);
+    if (validation) {
+      emailInput.setAttribute("aria-invalid", "true");
+      setAccountMessage(message, validation);
+      emailInput.focus();
+      return;
+    }
+    emailInput.value = email;
+    emailInput.removeAttribute("aria-invalid");
+    const data = new FormData(form);
+    const challengeId = String(data.get("challengeId") ?? "");
+    const code = String(data.get("code") ?? "").trim();
+    const currentPassword = String(data.get("currentPassword") ?? "");
+    const codeValidation = validateVerificationCode(code);
+    if (codeValidation) {
+      setAccountMessage(message, codeValidation);
+      mustElement<HTMLInputElement>('[name="code"]', form).focus();
+      return;
+    }
+    if (!challengeId) {
+      setAccountMessage(message, "请先获取新的邮箱验证码");
+      return;
+    }
+    const submit = mustElement<HTMLButtonElement>('button[type="submit"]', form);
+    clearAccountMessage(message);
+    setBusy(submit, true, "正在绑定…");
+    try {
+      const response = await api.bindEmail(email, challengeId, code, currentPassword);
+      if (!response.user) throw new Error("服务器未返回账号信息");
+      state.context.user = response.user;
+      state.context.onUserChanged(response.user);
+      clearVerificationCountdowns();
+      form.reset();
+      form.querySelectorAll<HTMLInputElement | HTMLButtonElement>("input, button").forEach((control) => {
+        control.disabled = true;
+      });
+      sendButton.textContent = "邮箱已绑定";
+      setAccountMessage(message, "邮箱已绑定，现在可以使用邮箱验证码登录。下次打开此区域时将显示新邮箱。", "success");
+    } catch (error) {
+      if (!state?.context.handleAuthError(error)) {
+        setAccountMessage(message, getErrorMessage(error, "邮箱绑定失败"));
+      }
+      setBusy(submit, false);
+    }
+  });
+}
+
 function bindPasswordForm(): void {
   const form = mustElement<HTMLFormElement>("#changePasswordForm");
   form.addEventListener("submit", async (event) => {
@@ -674,6 +919,7 @@ function bindPasswordForm(): void {
     try {
       const response = await api.changePassword(currentPassword, newPassword);
       if (!response.user) throw new Error("服务器未返回账号信息");
+      state.context.user = response.user;
       state.context.onUserChanged(response.user);
       form.reset();
       showToast("密码已修改，其他登录会话已撤销", "success");
@@ -754,6 +1000,7 @@ function bindPracticeEvents(): void {
   mustElement<HTMLButtonElement>("#importLegacyButton").addEventListener("click", (event) => {
     void importLegacyMistakes(event.currentTarget as HTMLButtonElement);
   });
+  bindEmailAccountForms();
   bindPasswordForm();
 
   if (state?.canSpeak) {
@@ -848,7 +1095,14 @@ export async function renderPractice(context: PageContext): Promise<void> {
       legacyKeys,
       disposed: false
     };
-    context.renderShell(practiceMarkup(sortedCategories, wordCount, sentenceCount, legacyKeys.length > 0), "/practice");
+    context.renderShell(practiceMarkup(
+      sortedCategories,
+      wordCount,
+      sentenceCount,
+      legacyKeys.length > 0,
+      context.user,
+      context.capabilities.emailAuthEnabled
+    ), "/practice");
     mustElement<HTMLElement>("#legacyCount").textContent = String(legacyKeys.length);
     bindPracticeEvents();
     renderMistakes();

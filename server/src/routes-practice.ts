@@ -486,11 +486,18 @@ export async function registerPracticeRoutes(app: FastifyInstance, db: SqliteDat
     };
   });
 
-  app.post("/api/me/mistakes/import", async (request) => {
+  app.post(
+    "/api/me/mistakes/import",
+    { bodyLimit: 256 * 1024, onRequest: async (request) => { requireUser(request); } },
+    async (request) => {
     const user = requireUser(request);
     const body = objectBody(request.body);
-    if (!Array.isArray(body.answers) || body.answers.length > 2_000 || body.answers.some((value) => typeof value !== "string")) {
-      badRequest("INVALID_FIELD", "answers must be an array of at most 2000 strings", { field: "answers" });
+    if (
+      !Array.isArray(body.answers) ||
+      body.answers.length > 2_000 ||
+      body.answers.some((value) => typeof value !== "string" || value.length > 500)
+    ) {
+      badRequest("INVALID_FIELD", "answers must be an array of at most 2000 strings (500 characters each)", { field: "answers" });
     }
     const existing = db.prepare("SELECT imported_count FROM user_imports WHERE user_id = ? AND import_kind = 'legacy_mistakes'").get(
       user.id
@@ -525,5 +532,6 @@ export async function registerPracticeRoutes(app: FastifyInstance, db: SqliteDat
       audit(db, request, "mistakes.legacy_imported", "user", user.id, { imported: matchedIds.size, unmatched });
     })();
     return { alreadyImported: false, imported: matchedIds.size, unmatched };
-  });
+    }
+  );
 }

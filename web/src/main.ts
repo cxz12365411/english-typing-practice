@@ -1,16 +1,24 @@
 import "./styles.css";
 import { renderAdmin, disposeAdmin } from "./admin";
 import { ApiError, api } from "./api";
+import { clearVerificationCountdowns } from "./email";
+import { renderLoginScreen } from "./login";
 import { confirmDiscardPendingAttempt, disposePractice, renderPractice } from "./practice";
-import type { PageContext, User } from "./types";
+import type { AuthCapabilities, PageContext, SessionResponse, User } from "./types";
 import { mustElement, setBusy, shellMarkup, showToast } from "./ui";
 import { escapeHtml, getErrorMessage, validatePassword } from "./utils";
 
 const app = mustElement<HTMLElement>("#app");
+const disabledEmailCapabilities: AuthCapabilities = {
+  emailAuthEnabled: false,
+  selfRegistrationEnabled: false
+};
 let currentUser: User | null = null;
+let authCapabilities = disabledEmailCapabilities;
 let renderSequence = 0;
 
 function disposePage(): void {
+  clearVerificationCountdowns();
   disposePractice();
   disposeAdmin();
 }
@@ -53,7 +61,15 @@ function onUserChanged(user: User): void {
 
 function handleAuthError(error: unknown): boolean {
   if (!(error instanceof ApiError)) return false;
-  if (error.status === 401 && error.code !== "CURRENT_PASSWORD_INVALID" && error.code !== "INVALID_CREDENTIALS") {
+  const expectedCredentialError = new Set([
+    "CURRENT_PASSWORD_INVALID",
+    "INVALID_CREDENTIALS",
+    "INVALID_OR_EXPIRED_CODE",
+    "VERIFICATION_CODE_INVALID",
+    "VERIFICATION_CODE_EXPIRED",
+    "VERIFICATION_CODE_ATTEMPTS_EXCEEDED"
+  ]).has(error.code);
+  if (error.status === 401 && !expectedCredentialError) {
     void recoverLoginSession();
     return true;
   }
@@ -69,6 +85,13 @@ function handleAuthError(error: unknown): boolean {
   return false;
 }
 
+function acceptAuthenticatedSession(response: SessionResponse): void {
+  if (!response.user) return;
+  currentUser = response.user;
+  authCapabilities = response.capabilities ?? authCapabilities;
+  navigate(response.user.role === "admin" ? "/admin" : "/practice", true);
+}
+
 async function recoverLoginSession(): Promise<void> {
   const requestedPath = location.pathname;
   currentUser = null;
@@ -80,6 +103,7 @@ async function recoverLoginSession(): Promise<void> {
   try {
     const session = await api.session();
     currentUser = session.user;
+    authCapabilities = session.capabilities ?? disabledEmailCapabilities;
     if (currentUser) {
       if (requestedPath === "/login") history.replaceState({}, "", currentUser.role === "admin" ? "/admin" : "/practice");
       await renderRoute();
@@ -94,6 +118,7 @@ async function recoverLoginSession(): Promise<void> {
 function pageContext(user: User): PageContext {
   return {
     user,
+    capabilities: authCapabilities,
     renderShell,
     navigate,
     onUserChanged,
@@ -101,54 +126,11 @@ function pageContext(user: User): PageContext {
   };
 }
 
-function loginMarkup(): string {
-  return `
-    <main class="screen-center">
-      <section class="auth-card">
-        <div class="auth-brand">
-          <span class="brand-mark" aria-hidden="true">ET</span>
-          <div><h1>英语打字练习</h1><p>登录后开始练习并同步学习记录</p></div>
-        </div>
-        <form class="form-stack" id="loginForm">
-          <label class="field"><span>账号</span><input class="input" name="username" autocomplete="username" autocapitalize="off" required autofocus></label>
-          <label class="field"><span>密码</span><input class="input" name="password" type="password" autocomplete="current-password" required></label>
-          <div class="message error" id="loginMessage" role="alert" hidden></div>
-          <button class="btn primary" type="submit">登录</button>
-          <p class="helper">本站不开放自助注册。请向管理员获取账号和一次性临时密码。</p>
-        </form>
-      </section>
-    </main>
-    <div class="toast-region" id="toastRegion" role="status" aria-live="polite"></div>
-  `;
-}
-
 function renderLogin(): void {
   disposePage();
   if (location.pathname !== "/login") history.replaceState({}, "", "/login");
   document.title = "登录 · 英语打字练习";
-  app.innerHTML = loginMarkup();
-  const form = mustElement<HTMLFormElement>("#loginForm");
-  form.addEventListener("submit", async (event) => {
-    event.preventDefault();
-    const data = new FormData(form);
-    const username = String(data.get("username") ?? "").trim();
-    const password = String(data.get("password") ?? "");
-    const message = mustElement<HTMLElement>("#loginMessage");
-    const submit = mustElement<HTMLButtonElement>('button[type="submit"]', form);
-    message.hidden = true;
-    setBusy(submit, true, "正在登录…");
-    try {
-      const response = await api.login(username, password);
-      if (!response.user) throw new Error("登录成功但服务器未返回账号信息");
-      currentUser = response.user;
-      navigate(response.user.role === "admin" ? "/admin" : "/practice", true);
-    } catch (error) {
-      message.textContent = getErrorMessage(error, "登录失败");
-      message.hidden = false;
-      setBusy(submit, false);
-      mustElement<HTMLInputElement>('[name="password"]', form).select();
-    }
-  });
+  renderLoginScreen(app, authCapabilities, { onAuthenticated: acceptAuthenticatedSession });
 }
 
 function forcedPasswordMarkup(user: User): string {
@@ -208,6 +190,7 @@ function renderForcedPassword(): void {
       const response = await api.changePassword(currentPassword, newPassword);
       if (!response.user) throw new Error("服务器未返回账号信息");
       currentUser = response.user;
+      authCapabilities = response.capabilities ?? authCapabilities;
       showToast("新密码已保存", "success");
       navigate(response.user.role === "admin" ? "/admin" : "/practice", true);
     } catch (error) {
@@ -237,7 +220,8 @@ async function logout(button: HTMLButtonElement): Promise<void> {
   currentUser = null;
   history.replaceState({}, "", "/login");
   try {
-    await api.session();
+    const session = await api.session();
+    authCapabilities = session.capabilities ?? disabledEmailCapabilities;
     renderLogin();
   } catch (error) {
     renderBootFailure(error);
@@ -298,6 +282,7 @@ async function boot(): Promise<void> {
   try {
     const session = await api.session();
     currentUser = session.user;
+    authCapabilities = session.capabilities ?? disabledEmailCapabilities;
     await renderRoute();
   } catch (error) {
     renderBootFailure(error);

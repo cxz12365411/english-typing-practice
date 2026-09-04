@@ -24,6 +24,8 @@ export interface UserRow {
   created_at: number;
   updated_at: number;
   last_login_at: number | null;
+  email: string | null;
+  email_verified_at: number | null;
 }
 
 interface SessionJoinRow extends UserRow {
@@ -60,6 +62,8 @@ export interface UserDto {
   role: "user" | "admin";
   status: "active" | "disabled";
   mustChangePassword: boolean;
+  email?: string;
+  emailVerified: boolean;
   lastLoginAt?: string;
   createdAt: string;
 }
@@ -72,6 +76,8 @@ export function toUserDto(user: UserRow): UserDto {
     role: user.role,
     status: user.active ? "active" : "disabled",
     mustChangePassword: Boolean(user.must_change_password),
+    ...(user.email ? { email: user.email } : {}),
+    emailVerified: Boolean(user.email && user.email_verified_at),
     ...(user.last_login_at ? { lastLoginAt: new Date(user.last_login_at).toISOString() } : {}),
     createdAt: new Date(user.created_at).toISOString()
   };
@@ -257,7 +263,8 @@ export function loadSession(db: SqliteDatabase, request: FastifyRequest, reply: 
       s.id_hash AS session_id_hash, s.csrf_token, s.csrf_hash, s.user_id, s.auth_version AS session_auth_version,
       s.created_at AS session_created_at, s.last_seen_at, s.expires_at, s.absolute_expires_at, s.revoked_at,
       u.id, u.username, u.display_name, u.password_hash, u.role, u.active,
-      u.must_change_password, u.auth_version, u.created_at, u.updated_at, u.last_login_at
+      u.must_change_password, u.auth_version, u.created_at, u.updated_at, u.last_login_at,
+      u.email, u.email_verified_at
     FROM sessions s
     LEFT JOIN users u ON u.id = s.user_id
     WHERE s.id_hash = ?
@@ -288,7 +295,9 @@ export function loadSession(db: SqliteDatabase, request: FastifyRequest, reply: 
     auth_version: row.auth_version,
     created_at: row.created_at,
     updated_at: row.updated_at,
-    last_login_at: row.last_login_at
+    last_login_at: row.last_login_at,
+    email: row.email,
+    email_verified_at: row.email_verified_at
   };
   const [idle] = idleAndAbsolute(user.role);
   const expiresAt = Math.min(now + idle, row.absolute_expires_at);
@@ -398,6 +407,12 @@ export function cleanupExpiredSecurityRows(db: SqliteDatabase): void {
   db.prepare("DELETE FROM login_limits WHERE updated_at < ?").run(now - 7 * 24 * 60 * 60_000);
   db.prepare("DELETE FROM login_guards WHERE updated_at < ?").run(now - 7 * 24 * 60 * 60_000);
   db.prepare("DELETE FROM import_previews WHERE expires_at < ?").run(now);
+  db.prepare(`
+    DELETE FROM email_verification_codes
+    WHERE expires_at < ? OR (used_at IS NOT NULL AND used_at < ?)
+  `).run(now - 24 * 60 * 60_000, now - 24 * 60 * 60_000);
+  db.prepare("DELETE FROM email_auth_guards WHERE updated_at < ?").run(now - 7 * 24 * 60 * 60_000);
+  db.prepare("DELETE FROM email_send_daily WHERE updated_at < ?").run(now - 40 * 24 * 60 * 60_000);
   db.prepare("DELETE FROM attempts WHERE created_at < ?").run(now - 90 * 24 * 60 * 60_000);
   db.prepare(`
     UPDATE practice_sessions

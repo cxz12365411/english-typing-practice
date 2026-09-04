@@ -5,6 +5,8 @@ readonly BASE_URL="https://english-47-120-37-63.sslip.io"
 readonly HTTP_URL="http://english-47-120-37-63.sslip.io"
 readonly ROBOT_URL="https://robot-47-120-37-63.sslip.io"
 readonly ROBOT_LOCAL_URL="http://127.0.0.1:8080/"
+readonly CURRENT_SERVER="/opt/english-typing-practice/current/server"
+readonly ENV_FILE="/etc/english-typing-practice/env"
 readonly LOCAL_HEALTH_URL="http://127.0.0.1:8091/api/healthz"
 readonly ROBOT_CHECKER="/usr/local/libexec/english-typing-practice/robot-regression.sh"
 
@@ -98,13 +100,54 @@ status="$(/usr/bin/curl --silent --show-error --max-time 15 \
   --write-out '%{http_code}' \
   "${BASE_URL}/api/auth/session")"
 assert_status "$status" 200 "anonymous CSRF session"
+expect_email_capabilities="${ETP_EXPECT_EMAIL_CAPABILITIES:-auto}"
+expect_email_auth="${ETP_EXPECT_EMAIL_AUTH:-auto}"
+expect_self_registration="${ETP_EXPECT_SELF_REGISTRATION:-auto}"
+if [[ -r "$ENV_FILE" ]]; then
+  if [[ "$expect_email_auth" == "auto" ]]; then
+    delivery_value="$(/usr/bin/sed -n 's/^EMAIL_DELIVERY=//p' "$ENV_FILE")"
+    delivery_value="${delivery_value,,}"
+    [[ "$delivery_value" == "smtp" ]] && expect_email_auth=true
+    [[ "$delivery_value" == "disabled" ]] && expect_email_auth=false
+  fi
+  if [[ "$expect_self_registration" == "auto" ]]; then
+    expect_self_registration="$(/usr/bin/sed -n 's/^EMAIL_SELF_REGISTRATION=//p' "$ENV_FILE")"
+    expect_self_registration="${expect_self_registration,,}"
+  fi
+fi
+[[ "$expect_email_auth" == "true" || "$expect_email_auth" == "false" || "$expect_email_auth" == "auto" ]] ||
+  die "ETP_EXPECT_EMAIL_AUTH must be true, false, or auto"
+[[ "$expect_self_registration" == "true" || "$expect_self_registration" == "false" || "$expect_self_registration" == "auto" ]] ||
+  die "ETP_EXPECT_SELF_REGISTRATION must be true, false, or auto"
+if [[ "$expect_email_capabilities" == "auto" ]]; then
+  if [[ -d "${CURRENT_SERVER}/node_modules/nodemailer" || "$expect_email_auth" == "true" || "$expect_self_registration" == "true" ]]; then
+    expect_email_capabilities=true
+  else
+    expect_email_capabilities=false
+  fi
+fi
+[[ "$expect_email_capabilities" == "true" || "$expect_email_capabilities" == "false" ]] ||
+  die "ETP_EXPECT_EMAIL_CAPABILITIES must be true, false, or auto"
 /usr/bin/python3 -c '
 import json, sys
 payload = json.load(open(sys.argv[1], encoding="utf-8"))
 assert payload.get("user") is None, "anonymous session unexpectedly contains a user"
 token = payload.get("csrfToken")
 assert isinstance(token, str) and len(token) >= 32, "anonymous session has no usable CSRF token"
-' "${temp_dir}/anonymous-session.body" || die "anonymous CSRF session payload is invalid"
+capabilities = payload.get("capabilities")
+if sys.argv[2] == "true":
+    assert isinstance(capabilities, dict), "anonymous session has no authentication capabilities"
+if capabilities is not None:
+    assert isinstance(capabilities, dict), "authentication capabilities are malformed"
+    assert isinstance(capabilities.get("emailAuthEnabled"), bool), "emailAuthEnabled is not boolean"
+    assert isinstance(capabilities.get("selfRegistrationEnabled"), bool), "selfRegistrationEnabled is not boolean"
+    assert capabilities.get("emailAuthEnabled") or not capabilities.get("selfRegistrationEnabled"), \
+        "self-registration cannot be enabled while email delivery is disabled"
+    if sys.argv[3] != "auto":
+        assert capabilities.get("emailAuthEnabled") is (sys.argv[3] == "true"), "emailAuthEnabled does not match production config"
+    if sys.argv[4] != "auto":
+        assert capabilities.get("selfRegistrationEnabled") is (sys.argv[4] == "true"), "selfRegistrationEnabled does not match production config"
+' "${temp_dir}/anonymous-session.body" "$expect_email_capabilities" "$expect_email_auth" "$expect_self_registration" || die "anonymous CSRF session payload is invalid"
 guest_csrf_token="$(/usr/bin/python3 -c 'import json,sys; print(json.load(open(sys.argv[1], encoding="utf-8"))["csrfToken"])' "${temp_dir}/anonymous-session.body")"
 guest_cookie_header="$(/usr/bin/grep -Ei '^set-cookie:[[:space:]]*__Host-etp_session=' "${temp_dir}/anonymous-session.headers" || true)"
 [[ -n "$guest_cookie_header" ]] || die "guest CSRF bootstrap did not set the opaque session cookie"

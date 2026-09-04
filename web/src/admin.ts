@@ -170,11 +170,12 @@ function usersMarkup(): string {
         <div class="panel-heading"><h2>账号列表</h2><span class="muted">${state.users.length} 个账号</span></div>
         <div class="table-wrap">
           <table class="data-table">
-            <thead><tr><th>账号</th><th>显示名称</th><th>角色</th><th>状态</th><th>首次改密</th><th>操作</th></tr></thead>
+            <thead><tr><th>账号</th><th>邮箱</th><th>显示名称</th><th>角色</th><th>状态</th><th>首次改密</th><th>操作</th></tr></thead>
             <tbody>
               ${state.users.map((user) => `
                 <tr data-user-row="${escapeHtml(user.id)}">
                   <td><strong>${escapeHtml(user.username)}</strong><br><span class="muted">${escapeHtml(formatDate(user.lastLoginAt))}</span></td>
+                  <td>${user.emailVerified && user.email ? `<span>${escapeHtml(user.email)}</span><br><span class="status-pill active">已验证</span>` : `<span class="muted">未绑定</span>`}</td>
                   <td><input class="input" data-user-field="displayName" value="${escapeHtml(user.displayName)}" maxlength="80" aria-label="${escapeHtml(user.username)} 的显示名称"></td>
                   <td>
                     <select class="select" data-user-field="role" aria-label="${escapeHtml(user.username)} 的角色">
@@ -197,7 +198,7 @@ function usersMarkup(): string {
                     </div>
                   </td>
                 </tr>
-              `).join("") || `<tr><td colspan="6"><div class="empty-state">暂无账号</div></td></tr>`}
+              `).join("") || `<tr><td colspan="7"><div class="empty-state">暂无账号</div></td></tr>`}
             </tbody>
           </table>
         </div>
@@ -516,7 +517,8 @@ function bindUserEvents(): void {
           await api.updateUser(id, { displayName, role, active: status === "active" });
           showToast("账号资料已保存", "success");
         } else if (action === "reset") {
-          if (!window.confirm(`重置 ${user.username} 的密码并撤销其现有会话？`)) {
+          const emailNotice = user.emailVerified && user.email ? "、清除已绑定邮箱" : "";
+          if (!window.confirm(`重置 ${user.username} 的密码${emailNotice}并撤销其现有会话？`)) {
             setBusy(button, false);
             return;
           }
@@ -525,7 +527,7 @@ function bindUserEvents(): void {
             username: user.username,
             password: response.temporaryPassword ?? "服务器未返回临时密码"
           };
-          showToast("密码已重置", "success");
+          showToast(user.emailVerified && user.email ? "密码已重置，原邮箱已解除绑定" : "密码已重置", "success");
         } else if (action === "revoke") {
           if (!window.confirm(`撤销 ${user.username} 的全部登录会话？`)) {
             setBusy(button, false);

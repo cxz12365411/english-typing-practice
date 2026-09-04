@@ -63,7 +63,8 @@ for source_file in \
   "${SCRIPT_DIR}/stage-release.sh" \
   "${SCRIPT_DIR}/deploy-release.sh" \
   "${SCRIPT_DIR}/rollback-release.sh" \
-  "${SCRIPT_DIR}/acceptance-test.sh"; do
+  "${SCRIPT_DIR}/acceptance-test.sh" \
+  "${SCRIPT_DIR}/check-email-config.sh"; do
   [[ -f "$source_file" && ! -L "$source_file" ]] || die "missing deployment asset: ${source_file}"
 done
 
@@ -141,7 +142,7 @@ install_managed() {
   /usr/bin/install -m "$mode" -o root -g root "$source_path" "$target_path"
 }
 
-for script_name in backup-sqlite.sh restore-sqlite.sh activate-caddy-site.sh restore-caddy-state.sh robot-regression.sh prune-deployments.sh stage-release.sh deploy-release.sh rollback-release.sh acceptance-test.sh; do
+for script_name in backup-sqlite.sh restore-sqlite.sh activate-caddy-site.sh restore-caddy-state.sh robot-regression.sh prune-deployments.sh stage-release.sh deploy-release.sh rollback-release.sh acceptance-test.sh check-email-config.sh; do
   install_managed "${SCRIPT_DIR}/${script_name}" "${LIBEXEC_DIR}/${script_name}" 0755
 done
 install_managed "${SCRIPT_DIR}/rewrite-caddy.py" "${LIBEXEC_DIR}/rewrite-caddy.py" 0755
@@ -192,6 +193,66 @@ elif [[ "$guest_secret_count" != "1" ]]; then
 fi
 guest_secret_value="$(/usr/bin/sed -n 's/^GUEST_TOKEN_SECRET=//p' "$ENV_FILE")"
 [[ "${#guest_secret_value}" -ge 32 ]] || die "GUEST_TOKEN_SECRET must contain at least 32 characters"
+
+# Upgrade an existing protected environment without overwriting operator choices.
+# All missing, non-secret email settings are appended in one atomic replacement;
+# rerunning provisioning is a no-op once every key exists exactly once.
+email_default_lines=(
+  'EMAIL_DELIVERY=disabled'
+  'EMAIL_SELF_REGISTRATION=false'
+  'EMAIL_DAILY_SEND_LIMIT=180'
+  'EMAIL_REGISTRATION_DAILY_SEND_LIMIT=20'
+  'EMAIL_REGISTRATION_IP_DAILY_LIMIT=10'
+  'SMTP_HOST='
+  'SMTP_PORT=465'
+  'SMTP_USERNAME='
+  'SMTP_PASSWORD='
+  'EMAIL_FROM='
+  'EMAIL_FROM_NAME=英语打字练习'
+)
+email_defaults_missing=0
+for default_line in "${email_default_lines[@]}"; do
+  key="${default_line%%=*}"
+  count="$(/usr/bin/grep -Ec "^${key}=" "$ENV_FILE" || true)"
+  [[ "$count" == "0" || "$count" == "1" ]] || die "environment contains duplicate ${key} values"
+  [[ "$count" == "1" ]] || email_defaults_missing=1
+done
+if [[ "$email_defaults_missing" -eq 1 ]]; then
+  /usr/bin/install -m 0600 -o root -g root "$ENV_FILE" "${config_backup_dir}/env.before-email-defaults.${stamp}"
+  env_temp="$(/usr/bin/mktemp "${CONFIG_DIR}/.env.email-defaults.XXXXXX")"
+  /usr/bin/cat -- "$ENV_FILE" >"$env_temp"
+  printf '\n# Email verification defaults added by provision-host.sh\n' >>"$env_temp"
+  for default_line in "${email_default_lines[@]}"; do
+    key="${default_line%%=*}"
+    if ! /usr/bin/grep -Eq "^${key}=" "$ENV_FILE"; then
+      printf '%s\n' "$default_line" >>"$env_temp"
+    fi
+  done
+  /usr/bin/chown root:"$APP_GROUP" "$env_temp"
+  /usr/bin/chmod 0640 "$env_temp"
+  /usr/bin/mv -Tf -- "$env_temp" "$ENV_FILE"
+  log "atomically added missing fail-closed email settings; previous env retained root-only"
+fi
+
+email_secret_count="$(/usr/bin/grep -Ec '^EMAIL_CODE_SECRET=' "$ENV_FILE" || true)"
+if [[ "$email_secret_count" == "0" ]] || /usr/bin/grep -Fqx 'EMAIL_CODE_SECRET=__GENERATED_BY_PROVISION_HOST__' "$ENV_FILE"; then
+  [[ "$email_secret_count" == "0" || "$email_secret_count" == "1" ]] || die "environment contains duplicate EMAIL_CODE_SECRET values"
+  /usr/bin/install -m 0600 -o root -g root "$ENV_FILE" "${config_backup_dir}/env.before-email-code-secret.${stamp}"
+  env_temp="$(/usr/bin/mktemp "${CONFIG_DIR}/.env.email-code-secret.XXXXXX")"
+  /usr/bin/grep -Ev '^EMAIL_CODE_SECRET=' "$ENV_FILE" >"$env_temp"
+  printf 'EMAIL_CODE_SECRET=%s\n' "$(/usr/bin/openssl rand -hex 32)" >>"$env_temp"
+  /usr/bin/chown root:"$APP_GROUP" "$env_temp"
+  /usr/bin/chmod 0640 "$env_temp"
+  /usr/bin/mv -Tf -- "$env_temp" "$ENV_FILE"
+  log "generated an independent persistent email-code signing secret"
+elif [[ "$email_secret_count" != "1" ]]; then
+  die "environment must define EMAIL_CODE_SECRET exactly once"
+fi
+email_secret_value="$(/usr/bin/sed -n 's/^EMAIL_CODE_SECRET=//p' "$ENV_FILE")"
+[[ "${#email_secret_value}" -ge 32 && "$email_secret_value" != '__GENERATED_BY_PROVISION_HOST__' ]] ||
+  die "EMAIL_CODE_SECRET must contain a generated value of at least 32 characters"
+
+"${LIBEXEC_DIR}/check-email-config.sh" --config-only
 
 /usr/bin/systemd-analyze verify \
   "${SYSTEMD_DIR}/englishapp.service" \
