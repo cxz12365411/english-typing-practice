@@ -30,11 +30,8 @@ english-47-120-37-63.sslip.io {
 		X-Frame-Options "DENY"
 	}
 
-	log {
-		output file /var/log/caddy/english-typing-practice-access.log {
-			roll_size 20MiB
-			roll_keep 5
-			roll_keep_for 168h
-		}
-	}
+	# Keep access logs in Caddy's systemd journal. File log writers can create
+	# root-owned files during `caddy validate`, then fail when the caddy service
+	# reloads as its unprivileged account.
+	log
 }

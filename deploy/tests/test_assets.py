@@ -73,6 +73,8 @@ english-47-120-37-63.sslip.io {
         self.assertNotIn("handle_path /api", caddy)
         self.assertIn("/opt/english-typing-practice/current/web/dist", caddy)
         self.assertIn("Content-Security-Policy", caddy)
+        self.assertIn("\tlog\n", caddy)
+        self.assertNotIn("output file", caddy)
 
     def test_retention_contract(self) -> None:
         backup = (DEPLOY / "scripts" / "backup-sqlite.sh").read_text(encoding="utf-8")

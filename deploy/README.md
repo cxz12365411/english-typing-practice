@@ -14,6 +14,9 @@ SQLite data. It is intentionally tied to the following production layout:
 - API listener: `127.0.0.1:8091`
 - public origin: `https://english-47-120-37-63.sslip.io`
 
+English-site access logs are written to the existing Caddy systemd journal rather
+than a separate file, so configuration validation and runtime use the same permissions.
+
 The filesystem boundary is deliberate: `/opt/english-typing-practice` and each
 release root are traversable `root:root 0755`; `server/` is `root:englishapp 0750`
 with `0640` files; `web/` is `root:caddy 0750` with `0640` files. The two service
