@@ -77,6 +77,8 @@ for asset in /manifest.webmanifest /sw.js; do
   status="$(curl_status "${BASE_URL}${asset}" "${temp_dir}/${safe_name}.body" "${temp_dir}/${safe_name}.headers")"
   assert_status "$status" 200 "PWA asset ${asset}"
 done
+/usr/bin/grep -Eiq '^content-type:[[:space:]]*application/manifest\+json' "${temp_dir}/_manifest.webmanifest.headers" ||
+  die "PWA manifest has an invalid content type"
 
 status="$(curl_status "${BASE_URL}/" "${temp_dir}/security.body" "${temp_dir}/security.headers")"
 assert_status "$status" 200 "HTTPS root"

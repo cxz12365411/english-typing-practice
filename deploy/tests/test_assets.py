@@ -73,6 +73,7 @@ english-47-120-37-63.sslip.io {
         self.assertNotIn("handle_path /api", caddy)
         self.assertIn("/opt/english-typing-practice/current/web/dist", caddy)
         self.assertIn("Content-Security-Policy", caddy)
+        self.assertIn('Content-Type "application/manifest+json; charset=utf-8"', caddy)
         self.assertIn("\tlog\n", caddy)
         self.assertNotIn("output file", caddy)
 
@@ -104,6 +105,7 @@ english-47-120-37-63.sslip.io {
         self.assertIn("generated a persistent guest CSRF signing secret", provision)
         self.assertIn("require_env_value TRUST_PROXY loopback", deploy)
         self.assertIn("environment must define GUEST_TOKEN_SECRET exactly once", deploy)
+        self.assertIn("database ownership or mode is not englishapp:englishapp 0600", deploy)
         self.assertIn('/usr/bin/chown -R root:englishapp "$staging_dir/server"', deploy)
         self.assertIn('/usr/bin/chown -R root:caddy "$staging_dir/web"', deploy)
         self.assertIn('/usr/bin/chmod 0755 "$staging_dir"', deploy)

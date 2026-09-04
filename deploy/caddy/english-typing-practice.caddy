@@ -18,6 +18,8 @@ english-47-120-37-63.sslip.io {
 
 	@no_store path / /index.html /login /practice /admin /manifest.webmanifest /sw.js
 	header @no_store Cache-Control "no-store"
+	@manifest path /manifest.webmanifest
+	header @manifest Content-Type "application/manifest+json; charset=utf-8"
 
 	header {
 		-Server

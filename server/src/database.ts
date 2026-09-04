@@ -1,4 +1,4 @@
-import { existsSync, mkdirSync, readFileSync } from "node:fs";
+import { chmodSync, existsSync, mkdirSync, readFileSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { createHash, randomUUID } from "node:crypto";
@@ -224,6 +224,7 @@ function migrationChecksum(sql: string): string {
 export function openDatabase(config: Pick<AppConfig, "databasePath">): SqliteDatabase {
   if (config.databasePath !== ":memory:") mkdirSync(dirname(config.databasePath), { recursive: true, mode: 0o750 });
   const db = new Database(config.databasePath);
+  if (config.databasePath !== ":memory:") chmodSync(config.databasePath, 0o600);
   db.pragma("foreign_keys = ON");
   db.pragma("busy_timeout = 5000");
   db.pragma("journal_mode = WAL");

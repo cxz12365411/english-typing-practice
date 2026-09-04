@@ -246,12 +246,17 @@ restart_old_service_armed=0
 
 "$RUNUSER" --user englishapp -- /bin/bash -c '
   set -euo pipefail
+  umask 0077
   set -a
   source /etc/english-typing-practice/env
   set +a
   cd "$1"
   exec /usr/bin/node dist/scripts/migrate.js
 ' englishapp-migrate "${release_dir}/server"
+/usr/bin/chown englishapp:englishapp "$DATABASE_PATH"
+/usr/bin/chmod 0600 "$DATABASE_PATH"
+[[ "$(/usr/bin/stat -c '%U:%G:%a' "$DATABASE_PATH")" == "englishapp:englishapp:600" ]] ||
+  die "database ownership or mode is not englishapp:englishapp 0600"
 
 initial_admin_password=""
 active_admin_count="$(/usr/bin/sqlite3 -readonly "$DATABASE_PATH" "SELECT count(*) FROM users WHERE role = 'admin' AND active = 1;")"
