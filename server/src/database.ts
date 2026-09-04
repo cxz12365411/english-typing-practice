@@ -214,6 +214,54 @@ const MIGRATIONS: ReadonlyArray<{ version: number; sql: string }> = [
       CREATE INDEX login_guards_account_idx ON login_guards(account_key, updated_at);
       CREATE INDEX login_guards_updated_idx ON login_guards(updated_at);
     `
+  },
+  {
+    version: 3,
+    sql: `
+      ALTER TABLE users ADD COLUMN email TEXT COLLATE NOCASE;
+      ALTER TABLE users ADD COLUMN email_verified_at INTEGER;
+      CREATE UNIQUE INDEX users_email_unique_idx ON users(email COLLATE NOCASE) WHERE email IS NOT NULL;
+
+      CREATE TABLE email_verification_codes (
+        id TEXT PRIMARY KEY,
+        email TEXT NOT NULL COLLATE NOCASE,
+        purpose TEXT NOT NULL CHECK (purpose IN ('register', 'login', 'reset_password', 'bind_email')),
+        user_id TEXT REFERENCES users(id) ON DELETE CASCADE,
+        user_auth_version INTEGER,
+        code_hash TEXT NOT NULL,
+        created_at INTEGER NOT NULL,
+        expires_at INTEGER NOT NULL,
+        used_at INTEGER,
+        attempt_count INTEGER NOT NULL DEFAULT 0,
+        request_ip TEXT,
+        request_session_hash TEXT NOT NULL
+      ) STRICT;
+      CREATE INDEX email_codes_lookup_idx
+        ON email_verification_codes(email COLLATE NOCASE, purpose, created_at DESC);
+      CREATE INDEX email_codes_expiry_idx ON email_verification_codes(expires_at, used_at);
+
+      CREATE TABLE email_auth_guards (
+        scope TEXT NOT NULL CHECK (scope IN (
+          'request_email', 'request_email_day', 'request_ip', 'request_pair',
+          'verify_email', 'verify_ip', 'verify_pair', 'register_ip_day', 'bind_user_day'
+        )),
+        guard_key TEXT NOT NULL,
+        window_started_at INTEGER NOT NULL,
+        request_count INTEGER NOT NULL DEFAULT 0,
+        blocked_until INTEGER,
+        last_request_at INTEGER,
+        updated_at INTEGER NOT NULL,
+        PRIMARY KEY(scope, guard_key)
+      ) STRICT;
+      CREATE INDEX email_auth_guards_updated_idx ON email_auth_guards(updated_at);
+
+      CREATE TABLE email_send_daily (
+        day_key TEXT PRIMARY KEY,
+        send_count INTEGER NOT NULL DEFAULT 0,
+        registration_send_count INTEGER NOT NULL DEFAULT 0,
+        updated_at INTEGER NOT NULL
+      ) STRICT;
+    `
   }
 ];
 
