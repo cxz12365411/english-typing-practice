@@ -129,7 +129,8 @@ test.describe.serial("multi-user application", () => {
     await form.locator('[name="code"]').fill(code);
     await form.locator('[name="currentPassword"]').fill(OTHER_PASSWORD);
     await form.getByRole("button", { name: "确认绑定" }).click();
-    await expect(page.locator("#bindEmailMessage")).toContainText("邮箱已绑定");
+    await expect(page.locator(".account-email")).toContainText(email);
+    await expect(page.locator("#emailPasswordForm")).toBeVisible();
   });
 
   test("email verification code logs a verified user in", async ({ page }) => {

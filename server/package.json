@@ -18,9 +18,9 @@
     "@fastify/cookie": "^11.0.2",
     "argon2": "^0.45.0",
     "better-sqlite3": "^12.4.1",
-    "csv-parse": "^6.1.0",
+    "csv-parse": "^7.0.2",
     "fastify": "^5.7.4",
-    "nodemailer": "^7.0.13"
+    "nodemailer": "^9.1.1"
   },
   "devDependencies": {
     "@types/better-sqlite3": "^7.6.13",

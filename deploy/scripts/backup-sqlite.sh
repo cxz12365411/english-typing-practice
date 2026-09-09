@@ -87,5 +87,6 @@ for ((index = retention; index < ${#backups[@]}; index++)); do
   /usr/bin/rm -f -- "$candidate_path"
 done
 
+cleanup
 trap - EXIT
 printf '%s\n' "$destination"

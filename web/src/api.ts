@@ -64,6 +64,9 @@ const FRIENDLY_ERRORS: Record<string, string> = {
   IMPORT_HAS_ERRORS: "CSV 仍有错误，不能提交导入",
   IMPORT_ALREADY_COMMITTED: "这份 CSV 预览已经提交",
   IMPORT_EXPIRED: "CSV 预览已过期，请重新校验",
+  IMPORT_PREVIEW_OUTDATED: "这份 CSV 预览需要重新校验，请重新生成预览后再导入",
+  IMPORT_ITEM_CHANGED: "题目在预览后已被修改，请重新校验 CSV，避免覆盖新内容",
+  IMPORT_CATEGORY_CHANGED: "分类在预览后已变化，请重新校验 CSV",
   NETWORK_ERROR: "无法连接服务器，请检查网络后重试",
   CSRF_INVALID: "安全校验已失效，请刷新页面后重试",
   AUTH_STATE_CHANGED: "登录账号状态已变化，请重新打开页面"
@@ -185,10 +188,11 @@ class ApiClient {
   ): Promise<EmailCodeResponse> {
     // Refresh the guest/session cookie so the returned challenge remains bound to
     // the same browser session for its full ten-minute lifetime.
-    const session = await this.session();
+    const session = await this.request<SessionResponse>("/api/auth/session");
     if ((session.user?.id ?? null) !== expectedUserId) {
-      throw new ApiError(409, "AUTH_STATE_CHANGED", "Authentication state changed; reopen this page");
+      throw new ApiError(409, "AUTH_STATE_CHANGED", FRIENDLY_ERRORS.AUTH_STATE_CHANGED!);
     }
+    this.setCsrfToken(session.csrfToken);
     return this.request<EmailCodeResponse>("/api/auth/email/request-code", {
       method: "POST",
       body: { email, purpose }

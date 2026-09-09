@@ -12,8 +12,12 @@ Errors use `{ "error": { "code": string, "message": string, "details"?: unknown 
   CSRF-protected. The response also includes
   `{ capabilities: { emailAuthEnabled, selfRegistrationEnabled } }`. Login and every
   other write must send that cookie, exact `Origin`, and `X-CSRF-Token`.
+  Refreshing an unexpired guest session retains its signed identity and CSRF token,
+  so already-issued email challenges remain valid in other tabs of the same browser.
 - `POST /api/auth/logout` → `{ ok: true }`
 - `POST /api/auth/change-password` — `{ currentPassword, newPassword }` → `{ user, csrfToken }`
+  Current-password verification shares persistent account/IP login throttling and
+  returns `429` with `Retry-After` when the limit is reached.
 - `POST /api/auth/email/request-code` —
   `{ email, purpose: "register"|"login"|"reset_password"|"bind_email" }` →
   `202 { ok: true, challengeId, expiresInSeconds, retryAfterSeconds }`. `bind_email` requires an
@@ -54,6 +58,8 @@ or expired codes return a generic `401`; throttling or daily exhaustion returns 
 - `POST /api/practice/sessions/:id/finish` — `{ durationMs? }` → `{ session }`
 - `GET /api/me/summary`
 - `GET /api/me/mistakes` → `{ items }`
+  Only published items in published categories are returned. Hidden/archived progress
+  is retained and becomes visible again when its content is published.
 - `POST /api/me/mistakes/import` — `{ answers }` → `{ imported, unmatched, alreadyImported }`
 
 ## Administration
@@ -73,6 +79,9 @@ or expired codes return a generic `401`; throttling or daily exhaustion returns 
 - `POST /api/admin/imports/preview` — `{ csv, categoryId? }`
   → `{ previewId, rows, errors, expiresAt }`
 - `POST /api/admin/imports/commit` — `{ previewId }`
+  Revalidates category publication and each previewed item ID/revision. A changed item,
+  newly occupied key or preview from an older server is rejected with `409`, with no
+  partial writes. Generate a fresh preview before retrying.
 - `GET /api/admin/audit`
 
 Only authenticated administrators may access `/api/admin/*`. A regular user receives

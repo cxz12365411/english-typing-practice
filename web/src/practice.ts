@@ -74,6 +74,9 @@ interface PracticeState {
   transitioning: boolean;
   pendingAttempt: PendingAttempt | null;
   pendingSessionStart: boolean;
+  rebuilding: boolean;
+  contentRefreshing: boolean;
+  mistakeRefreshSequence: number;
   contentRefreshRequired: boolean;
   showEnglish: boolean;
   autoSpeak: boolean;
@@ -85,6 +88,10 @@ interface PracticeState {
 
 let state: PracticeState | null = null;
 let renderGeneration = 0;
+
+function isActive(activeState: PracticeState): boolean {
+  return state === activeState && !activeState.disposed;
+}
 
 export function confirmDiscardPendingAttempt(): boolean {
   if (!state?.pendingAttempt) return true;
@@ -421,6 +428,7 @@ function setPracticeInputsDisabled(disabled: boolean): void {
 
 function renderCurrent(): void {
   if (!state) return;
+  const activeState = state;
   const item = currentItem();
   const total = state.pool.length;
   const answerInput = mustElement<HTMLInputElement>("#answerInput");
@@ -444,6 +452,7 @@ function renderCurrent(): void {
   feedback.className = "feedback";
   state.currentHadWrongAttempt = false;
   state.itemStartedAtMs = Date.now();
+  setPracticeInputsDisabled(!state.session || state.submitting || state.transitioning || state.rebuilding || Boolean(state.pendingAttempt));
 
   if (!item) {
     target.className = "target-word";
@@ -467,19 +476,24 @@ function renderCurrent(): void {
   nextButton.disabled = !state.session || state.submitting || state.transitioning || Boolean(state.pendingAttempt);
   speakButton.disabled = !state.canSpeak;
   renderLetters();
-  window.setTimeout(() => answerInput.focus(), 0);
-  if (state.autoSpeak) window.setTimeout(speakCurrent, 180);
+  window.setTimeout(() => { if (isActive(activeState)) answerInput.focus(); }, 0);
+  if (state.autoSpeak) window.setTimeout(() => {
+    if (isActive(activeState) && currentItem() === item && state?.autoSpeak) speakCurrent();
+  }, 180);
 }
 
 async function refreshMistakes(): Promise<void> {
   if (!state || state.disposed) return;
+  const activeState = state;
+  const sequence = ++activeState.mistakeRefreshSequence;
   try {
     const response = await api.mistakes();
-    if (!state || state.disposed) return;
+    if (!isActive(activeState) || sequence !== activeState.mistakeRefreshSequence) return;
     state.mistakes = response.items ?? [];
     state.mistakeIds = new Set(state.mistakes.map((record) => record.item.id));
     renderMistakes();
   } catch (error) {
+    if (!isActive(activeState) || sequence !== activeState.mistakeRefreshSequence) return;
     if (!state?.context.handleAuthError(error)) showToast(getErrorMessage(error, "错题刷新失败"), "error");
   }
 }
@@ -500,15 +514,19 @@ function sortContent(categories: ContentCategory[], items: ContentItem[]): {
 }
 
 async function refreshContentAfterConflict(): Promise<void> {
-  if (!state || state.disposed) return;
+  if (!state || state.disposed || state.contentRefreshing) return;
+  const activeState = state;
+  state.contentRefreshing = true;
+  state.mistakeRefreshSequence += 1;
   state.contentRefreshRequired = true;
   state.pendingAttempt = null;
   state.submitting = false;
+  state.transitioning = false;
   setPracticeInputsDisabled(true);
   setSyncProblem("题库内容已由管理员更新，正在重新加载。当前答案没有计入练习记录。", null);
   try {
     const [content, mistakes] = await Promise.all([api.content(), api.mistakes()]);
-    if (!state || state.disposed) return;
+    if (!isActive(activeState)) return;
     const sorted = sortContent(content.categories, content.items);
     state.categories = sorted.categories;
     state.items = sorted.items;
@@ -527,23 +545,27 @@ async function refreshContentAfterConflict(): Promise<void> {
     if (subtitle) subtitle.textContent = `已载入 ${wordCount} 个单词，${sentenceCount} 条句型 · 学习记录已同步到当前账号`;
     state.contentRefreshRequired = false;
     await rebuildPool();
-    if (!state || state.disposed) return;
+    if (!isActive(activeState)) return;
     if (!state.session) return;
     setSyncProblem("题库已更新并重新加载。请根据当前显示的新内容重新作答。", null);
     showToast("检测到题库版本更新，当前练习内容已刷新", "info", 7000);
   } catch (error) {
-    if (!state || state.disposed) return;
+    if (!isActive(activeState)) return;
     if (state.context.handleAuthError(error)) return;
     state.contentRefreshRequired = true;
     setPracticeInputsDisabled(true);
     setSyncProblem(`${getErrorMessage(error, "题库刷新失败")}。请重新加载题库后继续练习。`, "重新加载题库");
+  } finally {
+    activeState.contentRefreshing = false;
   }
 }
 
 function nextItem(delay = 0, removeCurrent = false): void {
   if (!state) return;
+  const activeState = state;
+  const session = state.session;
   const move = (): void => {
-    if (!state || state.disposed || !state.pool.length) return;
+    if (!isActive(activeState) || state?.session !== session || !state.pool.length) return;
     state.transitioning = false;
     if (removeCurrent) state.pool.splice(state.index, 1);
     else state.index += 1;
@@ -577,6 +599,9 @@ function applyAttemptResponse(response: AttemptResponse, submittedAnswer: string
     state.localStreak = 0;
   }
   state.lifetime.accuracy = state.lifetime.attempts ? state.lifetime.correct / state.lifetime.attempts : 0;
+  // Each accepted submission accounts for only the time spent since the last
+  // accepted submission, not the cumulative time on a repeatedly retried item.
+  state.itemStartedAtMs = Date.now();
   state.lifetime.bestStreak = Math.max(
     state.lifetime.bestStreak,
     metric(response.summary ?? {}, ["streak", "currentStreak"], state.localStreak)
@@ -606,18 +631,19 @@ function applyAttemptResponse(response: AttemptResponse, submittedAnswer: string
 
 async function sendPendingAttempt(): Promise<void> {
   if (!state?.pendingAttempt || state.submitting) return;
+  const activeState = state;
   const pending = state.pendingAttempt;
   state.submitting = true;
   setPracticeInputsDisabled(true);
   clearSyncProblem();
   try {
     const response = await api.attempt(pending.sessionId, pending.payload);
-    if (!state || state.disposed) return;
+    if (!isActive(activeState)) return;
     state.pendingAttempt = null;
     state.submitting = false;
     applyAttemptResponse(response, pending.payload.answer, pending.advanceOnWrong);
   } catch (error) {
-    if (!state || state.disposed) return;
+    if (!isActive(activeState)) return;
     state.submitting = false;
     if (state.context.handleAuthError(error)) return;
     if (error instanceof ApiError && shouldRefreshContentForAttemptError(error.code)) {
@@ -640,7 +666,7 @@ async function submitAnswer(answer: string, advanceOnWrong: boolean): Promise<vo
       itemId: item.id,
       itemRevision: item.revision,
       answer,
-      durationMs: Math.max(0, Date.now() - state.itemStartedAtMs),
+      durationMs: Math.min(3_600_000, Math.max(0, Date.now() - state.itemStartedAtMs)),
       occurredAt: new Date().toISOString()
     },
     advanceOnWrong
@@ -650,26 +676,28 @@ async function submitAnswer(answer: string, advanceOnWrong: boolean): Promise<vo
 
 async function finishOldSession(): Promise<void> {
   if (!state?.session) return;
+  const activeState = state;
   const session = state.session;
-  const durationMs = Math.max(0, Date.now() - state.sessionStartedAtMs);
+  const durationMs = Math.min(86_400_000, Math.max(0, Date.now() - state.sessionStartedAtMs));
   state.session = null;
   try {
     await api.finishPracticeSession(session.id, durationMs);
   } catch (error) {
-    if (state && !state.context.handleAuthError(error)) {
+    if (isActive(activeState) && !activeState.context.handleAuthError(error)) {
       showToast("上一轮练习的结束状态未同步，但已提交的答题记录仍然保留。", "error");
     }
   }
 }
 
 async function startPracticeSession(): Promise<void> {
-  if (!state || state.disposed) return;
+  if (!state || state.disposed || state.pendingSessionStart || state.session) return;
+  const activeState = state;
   state.pendingSessionStart = true;
   setPracticeInputsDisabled(true);
   clearSyncProblem();
   try {
     const response = await api.createPracticeSession(state.categoryId, state.mode);
-    if (!state || state.disposed) return;
+    if (!isActive(activeState)) return;
     state.session = response.session;
     state.sessionStartedAtMs = Date.now();
     state.lifetime.sessions += 1;
@@ -678,7 +706,7 @@ async function startPracticeSession(): Promise<void> {
     renderStats();
     renderCurrent();
   } catch (error) {
-    if (!state || state.disposed) return;
+    if (!isActive(activeState)) return;
     state.pendingSessionStart = false;
     if (state.context.handleAuthError(error)) return;
     setPracticeInputsDisabled(true);
@@ -687,14 +715,17 @@ async function startPracticeSession(): Promise<void> {
 }
 
 async function rebuildPool(): Promise<void> {
-  if (!state) return;
+  if (!state || state.rebuilding || state.pendingSessionStart || state.transitioning) return;
+  const activeState = state;
   if (state.pendingAttempt) {
     setSyncProblem("请先重试同步当前答题，再切换练习设置。");
     return;
   }
+  state.rebuilding = true;
+  setPracticeInputsDisabled(true);
   const oldSession = state.session;
   if (oldSession) await finishOldSession();
-  if (!state || state.disposed) return;
+  if (!isActive(activeState)) return;
   state.pool = buildPracticePool(state.items, state.categoryId, state.mode, state.mistakeIds);
   state.index = 0;
   state.summary = {};
@@ -702,24 +733,28 @@ async function rebuildPool(): Promise<void> {
   state.localCorrect = 0;
   state.localStreak = 0;
   state.transitioning = false;
+  state.rebuilding = false;
   renderStats();
   renderCurrent();
   await startPracticeSession();
 }
 
 async function importLegacyMistakes(button: HTMLButtonElement): Promise<void> {
-  if (!state?.legacyKeys.length) return;
+  if (!state?.legacyKeys.length || button.disabled) return;
+  const activeState = state;
   setBusy(button, true, "正在导入…");
   try {
     const response = await api.importMistakes(state.legacyKeys);
+    if (!isActive(activeState)) return;
     localStorage.removeItem("basicTypingMistakes");
     state.legacyKeys = [];
     mustElement<HTMLElement>("#legacyBanner").hidden = true;
     const unmatched = Array.isArray(response.unmatched) ? response.unmatched.length : response.unmatched;
     showToast(`旧错题导入完成：新增 ${response.imported} 条${unmatched ? `，未匹配 ${unmatched} 条` : ""}`, "success", 7000);
     await refreshMistakes();
-    if (state?.mode === "mistakes") await rebuildPool();
+    if (isActive(activeState) && state?.mode === "mistakes") await rebuildPool();
   } catch (error) {
+    if (!isActive(activeState)) return;
     if (!state?.context.handleAuthError(error)) showToast(getErrorMessage(error, "旧错题导入失败"), "error");
     setBusy(button, false);
   }
@@ -742,17 +777,20 @@ async function sendAccountCode(
   email: string,
   purpose: EmailCodePurpose
 ): Promise<string | null> {
-  const expectedUserId = state?.context.user.id;
-  if (!expectedUserId) return null;
+  const activeState = state;
+  const expectedUserId = activeState?.context.user.id;
+  if (!activeState || !expectedUserId || button.disabled) return null;
   clearAccountMessage(status);
   setBusy(button, true, "发送中…");
   try {
     const response = await api.requestEmailCode(email, purpose, expectedUserId);
+    if (!isActive(activeState) || !button.isConnected) return null;
     setBusy(button, false);
     startVerificationCountdown(button, response.retryAfterSeconds);
     setAccountMessage(status, "如果该邮箱符合条件，验证码将发送，请检查收件箱和垃圾邮件。", "success");
     return response.challengeId;
   } catch (error) {
+    if (!isActive(activeState) || !button.isConnected) return null;
     setBusy(button, false);
     if (state?.context.handleAuthError(error)) return null;
     const retryAfter = retryAfterFromError(error);
@@ -770,13 +808,17 @@ function bindEmailAccountForms(): void {
     const sendButton = mustElement<HTMLButtonElement>("#accountPasswordSendCode");
     const sendStatus = mustElement<HTMLElement>("#accountPasswordSendStatus");
     sendButton.addEventListener("click", () => {
+      if (sendButton.disabled) return;
+      mustElement<HTMLInputElement>('[name="challengeId"]', form).value = "";
       void sendAccountCode(sendButton, sendStatus, boundEmail, "reset_password").then((challengeId) => {
+        if (!form.isConnected) return;
         mustElement<HTMLInputElement>('[name="challengeId"]', form).value = challengeId ?? "";
       });
     });
     form.addEventListener("submit", async (event) => {
       event.preventDefault();
       if (!state) return;
+      const activeState = state;
       const data = new FormData(form);
       const challengeId = String(data.get("challengeId") ?? "");
       const code = String(data.get("code") ?? "").trim();
@@ -799,6 +841,7 @@ function bindEmailAccountForms(): void {
         return;
       }
       const submit = mustElement<HTMLButtonElement>('button[type="submit"]', form);
+      if (submit.disabled) return;
       clearAccountMessage(message);
       setBusy(submit, true, "正在修改…");
       try {
@@ -808,12 +851,14 @@ function bindEmailAccountForms(): void {
           code,
           newPassword
         );
+        if (!isActive(activeState) || !form.isConnected) return;
         if (!response.user) throw new Error("服务器未返回账号信息");
         state.context.user = response.user;
         state.context.onUserChanged(response.user);
         form.reset();
         setAccountMessage(message, "密码已修改，其他登录会话已撤销。", "success");
       } catch (error) {
+        if (!isActive(activeState) || !form.isConnected) return;
         if (!state?.context.handleAuthError(error)) {
           setAccountMessage(message, getErrorMessage(error, "密码修改失败"));
         }
@@ -829,8 +874,14 @@ function bindEmailAccountForms(): void {
   const sendButton = mustElement<HTMLButtonElement>("#bindEmailSendCode");
   const sendStatus = mustElement<HTMLElement>("#bindEmailSendStatus");
   const challengeInput = mustElement<HTMLInputElement>('[name="challengeId"]', form);
-  emailInput.addEventListener("input", () => { challengeInput.value = ""; });
+  let emailVersion = 0;
+  emailInput.addEventListener("input", () => {
+    emailVersion += 1;
+    challengeInput.value = "";
+    clearAccountMessage(sendStatus);
+  });
   sendButton.addEventListener("click", () => {
+    if (sendButton.disabled) return;
     const email = normalizeEmail(emailInput.value);
     const validation = validateEmail(email);
     if (validation) {
@@ -841,13 +892,21 @@ function bindEmailAccountForms(): void {
     }
     emailInput.value = email;
     emailInput.removeAttribute("aria-invalid");
+    const requestedVersion = emailVersion;
+    challengeInput.value = "";
     void sendAccountCode(sendButton, sendStatus, email, "bind_email").then((challengeId) => {
+      if (!form.isConnected) return;
+      if (requestedVersion !== emailVersion) {
+        clearAccountMessage(sendStatus);
+        return;
+      }
       challengeInput.value = challengeId ?? "";
     });
   });
   form.addEventListener("submit", async (event) => {
     event.preventDefault();
     if (!state) return;
+    const activeState = state;
     const email = normalizeEmail(emailInput.value);
     const message = mustElement<HTMLElement>("#bindEmailMessage");
     const validation = validateEmail(email);
@@ -874,21 +933,25 @@ function bindEmailAccountForms(): void {
       return;
     }
     const submit = mustElement<HTMLButtonElement>('button[type="submit"]', form);
+    if (submit.disabled) return;
     clearAccountMessage(message);
     setBusy(submit, true, "正在绑定…");
     try {
       const response = await api.bindEmail(email, challengeId, code, currentPassword);
+      if (!isActive(activeState) || !form.isConnected) return;
       if (!response.user) throw new Error("服务器未返回账号信息");
       state.context.user = response.user;
       state.context.onUserChanged(response.user);
       clearVerificationCountdowns();
-      form.reset();
-      form.querySelectorAll<HTMLInputElement | HTMLButtonElement>("input, button").forEach((control) => {
-        control.disabled = true;
-      });
-      sendButton.textContent = "邮箱已绑定";
-      setAccountMessage(message, "邮箱已绑定，现在可以使用邮箱验证码登录。下次打开此区域时将显示新邮箱。", "success");
+      const panel = mustElement<HTMLDetailsElement>(".account-panel");
+      const wasOpen = panel.open;
+      panel.outerHTML = accountMarkup(response.user, state.context.capabilities.emailAuthEnabled);
+      mustElement<HTMLDetailsElement>(".account-panel").open = wasOpen;
+      bindEmailAccountForms();
+      bindPasswordForm();
+      showToast("邮箱已绑定，现在可以使用邮箱验证码登录和修改密码。", "success");
     } catch (error) {
+      if (!isActive(activeState) || !form.isConnected) return;
       if (!state?.context.handleAuthError(error)) {
         setAccountMessage(message, getErrorMessage(error, "邮箱绑定失败"));
       }
@@ -902,6 +965,7 @@ function bindPasswordForm(): void {
   form.addEventListener("submit", async (event) => {
     event.preventDefault();
     if (!state) return;
+    const activeState = state;
     const data = new FormData(form);
     const currentPassword = String(data.get("currentPassword") ?? "");
     const newPassword = String(data.get("newPassword") ?? "");
@@ -914,16 +978,19 @@ function bindPasswordForm(): void {
       return;
     }
     const submit = mustElement<HTMLButtonElement>('button[type="submit"]', form);
+    if (submit.disabled) return;
     setBusy(submit, true, "正在修改…");
     message.hidden = true;
     try {
       const response = await api.changePassword(currentPassword, newPassword);
+      if (!isActive(activeState) || !form.isConnected) return;
       if (!response.user) throw new Error("服务器未返回账号信息");
       state.context.user = response.user;
       state.context.onUserChanged(response.user);
       form.reset();
       showToast("密码已修改，其他登录会话已撤销", "success");
     } catch (error) {
+      if (!isActive(activeState) || !form.isConnected) return;
       if (!state?.context.handleAuthError(error)) {
         message.textContent = getErrorMessage(error, "密码修改失败");
         message.hidden = false;
@@ -991,7 +1058,8 @@ function bindPracticeEvents(): void {
   mustElement<HTMLButtonElement>("#retrySyncButton").addEventListener("click", () => {
     if (state?.contentRefreshRequired) void refreshContentAfterConflict();
     else if (state?.pendingAttempt) void sendPendingAttempt();
-    else void startPracticeSession();
+    else if (!state?.session) void startPracticeSession();
+    else clearSyncProblem();
   });
   mustElement<HTMLButtonElement>("#refreshMistakesButton").addEventListener("click", () => { void refreshMistakes(); });
   mustElement<HTMLButtonElement>("#dismissLegacyButton").addEventListener("click", () => {
@@ -1022,6 +1090,7 @@ function onVoicesChanged(): void {
 function onOnline(): void {
   if (state?.contentRefreshRequired) setSyncProblem("网络已恢复，请重新加载题库。", "重新加载题库");
   else if (state?.pendingAttempt || state?.pendingSessionStart) setSyncProblem("网络已恢复，请点击“重试同步”。");
+  else if (state?.session) clearSyncProblem();
 }
 
 function onOffline(): void {
@@ -1087,6 +1156,9 @@ export async function renderPractice(context: PageContext): Promise<void> {
       transitioning: false,
       pendingAttempt: null,
       pendingSessionStart: false,
+      rebuilding: false,
+      contentRefreshing: false,
+      mistakeRefreshSequence: 0,
       contentRefreshRequired: false,
       showEnglish: true,
       autoSpeak: false,
@@ -1128,7 +1200,7 @@ export function disposePractice(): void {
   }
   if (state.session && !state.pendingAttempt) {
     const sessionId = state.session.id;
-    const durationMs = Math.max(0, Date.now() - state.sessionStartedAtMs);
+    const durationMs = Math.min(86_400_000, Math.max(0, Date.now() - state.sessionStartedAtMs));
     void api.finishPracticeSession(sessionId, durationMs).catch(() => undefined);
   }
   state = null;

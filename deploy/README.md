@@ -170,6 +170,9 @@ Never type the SMTP password in a command, chat, deployment log, or Git file. Us
 `sudoedit /etc/english-typing-practice/env`; keep every entry as one unquoted literal
 `KEY=value` line, choose an SMTP password without quote/backslash characters or edge
 whitespace, and preserve `root:englishapp` ownership with mode `0640`.
+Mail quota values must be decimal integers within the documented bounds. Validation
+checks significant digits before doing arithmetic, so oversized values cannot wrap
+into an apparently valid quota and then fail when the API restarts.
 
 ### Enable SMTP for existing accounts
 
@@ -296,13 +299,23 @@ systemctl list-timers 'englishapp-backup-*'
 sudo find /var/backups/english-typing-practice -maxdepth 2 -type f -name '*.sqlite3' -ls
 ```
 
+These scheduled copies live on the same host and disk as the database. They protect
+against application-level mistakes, not loss of the server or volume. A disaster
+recovery plan also needs an encrypted copy on an independently controlled destination,
+plus protected environment/deployment state and the matching release commit. No
+off-host service is configured by these scripts. Periodically rehearse recovery on an
+isolated host; an integrity check alone does not demonstrate end-to-end recovery.
+
 Restore accepts only a managed-name backup under the fixed backup root. It first holds
-both deployment and maintenance locks, validates the source with SQLite read-only mode,
+both deployment and maintenance locks, validates the source with SQLite immutable read-only mode,
 creates recovery state, and records the old service status. After stopping the API it
 re-resolves, re-identifies, and re-validates the source, then atomically installs a
 verified copy. Its EXIT/signal trap reinstates the old database/WAL files and exact
 prior service state if any step or health check fails. Displaced files are quarantined,
-not deleted:
+not deleted. The final completion marker is published only after the transaction is
+committed and its recovery trap is disarmed. Closed backup snapshots are read with
+`immutable=1` so verification and copying do not create WAL/SHM sidecars. Never use
+that option to inspect the live database, whose WAL may contain committed changes:
 
 ```bash
 sudo /usr/local/libexec/english-typing-practice/restore-sqlite.sh \

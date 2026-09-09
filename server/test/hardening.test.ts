@@ -598,10 +598,18 @@ test("attempts enforce revision, exact idempotency after finish, ordering, rate,
       oldId, randomUUID(), concurrentSession, user.id, item.id, item.revision, "old", Date.now() - 91 * 24 * 60 * 60_000,
       Date.now() - 91 * 24 * 60 * 60_000
     );
+    const activeOldId = randomUUID();
+    insertAttempt.run(
+      activeOldId, randomUUID(), orderedSession, user.id, item.id, item.revision, "active-old",
+      Date.now() - 91 * 24 * 60 * 60_000, Date.now() - 91 * 24 * 60 * 60_000
+    );
     cleanupExpiredSecurityRows(db);
     assert.equal(db.prepare("SELECT 1 FROM attempts WHERE id = ?").get(oldId), undefined);
+    assert.ok(db.prepare("SELECT 1 FROM attempts WHERE id = ?").get(activeOldId), "active-session aggregates still need their attempts");
 
     for (let index = 0; index < 11; index += 1) await createPracticeSession(app, client);
+    cleanupExpiredSecurityRows(db);
+    assert.equal(db.prepare("SELECT 1 FROM attempts WHERE id = ?").get(activeOldId), undefined);
     const activePractice = db.prepare(`
       SELECT COUNT(*) AS active, (SELECT COUNT(*) FROM practice_sessions WHERE user_id = ?) AS total
       FROM practice_sessions WHERE user_id = ? AND finished_at IS NULL

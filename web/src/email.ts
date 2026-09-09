@@ -65,6 +65,7 @@ function stopCountdown(countdown: ActiveCountdown, restore = true): void {
 }
 
 export function startVerificationCountdown(button: HTMLButtonElement, seconds: unknown): void {
+  if (!button.isConnected) return;
   for (const countdown of activeCountdowns) {
     if (countdown.button === button) stopCountdown(countdown, false);
   }
@@ -75,6 +76,10 @@ export function startVerificationCountdown(button: HTMLButtonElement, seconds: u
   const countdown: ActiveCountdown = { button, originalLabel, timer: 0 };
 
   const update = (): void => {
+    if (!button.isConnected) {
+      stopCountdown(countdown, false);
+      return;
+    }
     const remaining = Math.max(0, Math.ceil((endsAt - Date.now()) / 1000));
     if (remaining <= 0) {
       stopCountdown(countdown);

@@ -16,6 +16,7 @@ const disabledEmailCapabilities: AuthCapabilities = {
 let currentUser: User | null = null;
 let authCapabilities = disabledEmailCapabilities;
 let renderSequence = 0;
+let recoveringSession = false;
 
 function disposePage(): void {
   clearVerificationCountdowns();
@@ -30,6 +31,7 @@ function normalisePath(pathname: string): "/login" | "/practice" | "/admin" {
 
 function navigate(path: string, replace = false): void {
   const target = normalisePath(path);
+  if (!replace && location.pathname === target) return;
   if (location.pathname === "/practice" && target !== "/practice" && !confirmDiscardPendingAttempt()) return;
   if (replace) history.replaceState({}, "", target);
   else if (location.pathname !== target) history.pushState({}, "", target);
@@ -77,6 +79,10 @@ function handleAuthError(error: unknown): boolean {
     void recoverLoginSession();
     return true;
   }
+  if (error.code === "AUTH_STATE_CHANGED") {
+    void recoverLoginSession();
+    return true;
+  }
   if (error.status === 403 && error.code === "MUST_CHANGE_PASSWORD" && currentUser) {
     currentUser = { ...currentUser, mustChangePassword: true };
     renderForcedPassword();
@@ -93,6 +99,9 @@ function acceptAuthenticatedSession(response: SessionResponse): void {
 }
 
 async function recoverLoginSession(): Promise<void> {
+  if (recoveringSession) return;
+  recoveringSession = true;
+  const sequence = ++renderSequence;
   const requestedPath = location.pathname;
   currentUser = null;
   disposePage();
@@ -102,16 +111,20 @@ async function recoverLoginSession(): Promise<void> {
   `;
   try {
     const session = await api.session();
+    if (sequence !== renderSequence) return;
     currentUser = session.user;
     authCapabilities = session.capabilities ?? disabledEmailCapabilities;
     if (currentUser) {
-      if (requestedPath === "/login") history.replaceState({}, "", currentUser.role === "admin" ? "/admin" : "/practice");
+      history.replaceState({}, "", requestedPath === "/login" ? (currentUser.role === "admin" ? "/admin" : "/practice") : requestedPath);
       await renderRoute();
     } else {
       renderLogin();
     }
   } catch (error) {
+    if (sequence !== renderSequence) return;
     renderBootFailure(error);
+  } finally {
+    recoveringSession = false;
   }
 }
 
@@ -130,7 +143,7 @@ function renderLogin(): void {
   disposePage();
   if (location.pathname !== "/login") history.replaceState({}, "", "/login");
   document.title = "登录 · 英语打字练习";
-  renderLoginScreen(app, authCapabilities, { onAuthenticated: acceptAuthenticatedSession });
+  renderLoginScreen(app, authCapabilities, { onAuthenticated: acceptAuthenticatedSession, handleAuthError });
 }
 
 function forcedPasswordMarkup(user: User): string {
@@ -184,16 +197,19 @@ function renderForcedPassword(): void {
       return;
     }
     const submit = mustElement<HTMLButtonElement>('button[type="submit"]', form);
+    if (submit.disabled) return;
     message.hidden = true;
     setBusy(submit, true, "正在保存…");
     try {
       const response = await api.changePassword(currentPassword, newPassword);
+      if (!form.isConnected) return;
       if (!response.user) throw new Error("服务器未返回账号信息");
       currentUser = response.user;
       authCapabilities = response.capabilities ?? authCapabilities;
       showToast("新密码已保存", "success");
       navigate(response.user.role === "admin" ? "/admin" : "/practice", true);
     } catch (error) {
+      if (!form.isConnected || handleAuthError(error)) return;
       message.textContent = getErrorMessage(error, "密码修改失败");
       message.hidden = false;
       setBusy(submit, false);
@@ -217,13 +233,18 @@ async function logout(button: HTMLButtonElement): Promise<void> {
       return;
     }
   }
+  disposePage();
+  const sequence = ++renderSequence;
   currentUser = null;
   history.replaceState({}, "", "/login");
+  app.innerHTML = `<main class="screen-center"><section class="loading-card"><p class="muted">正在退出并重新连接…</p></section></main>`;
   try {
     const session = await api.session();
+    if (sequence !== renderSequence) return;
     authCapabilities = session.capabilities ?? disabledEmailCapabilities;
     renderLogin();
   } catch (error) {
+    if (sequence !== renderSequence) return;
     renderBootFailure(error);
   }
 }
@@ -276,15 +297,19 @@ function renderBootFailure(error: unknown): void {
 }
 
 async function boot(): Promise<void> {
+  disposePage();
+  const sequence = ++renderSequence;
   app.innerHTML = `
     <main class="screen-center"><section class="loading-card"><div class="spinner" aria-hidden="true"></div><p class="muted">正在连接服务器并检查登录状态…</p></section></main>
   `;
   try {
     const session = await api.session();
+    if (sequence !== renderSequence) return;
     currentUser = session.user;
     authCapabilities = session.capabilities ?? disabledEmailCapabilities;
     await renderRoute();
   } catch (error) {
+    if (sequence !== renderSequence) return;
     renderBootFailure(error);
   }
 }

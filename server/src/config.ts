@@ -175,7 +175,7 @@ export function loadConfig(overrides: Partial<AppConfig> = {}): AppConfig {
     environment,
     host: overrides.host ?? process.env.HOST ?? "127.0.0.1",
     port: overrides.port ?? parsePort(process.env.PORT),
-    databasePath: path.resolve(databasePath),
+    databasePath: databasePath === ":memory:" ? databasePath : path.resolve(databasePath),
     appOrigin: normalizeOrigin(overrides.appOrigin ?? process.env.APP_ORIGIN ?? "https://english-47-120-37-63.sslip.io"),
     logLevel: overrides.logLevel ?? process.env.LOG_LEVEL ?? "info",
     trustProxy: overrides.trustProxy ?? parseTrustProxy(process.env.TRUST_PROXY),

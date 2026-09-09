@@ -14,6 +14,7 @@ type AuthMode = "email-login" | "register" | "reset-password" | "password-login"
 
 interface LoginCallbacks {
   onAuthenticated: (response: SessionResponse) => void;
+  handleAuthError: (error: unknown) => boolean;
 }
 
 function setMessage(element: HTMLElement, text: string, kind: "error" | "success" | "info" = "error"): void {
@@ -150,13 +151,19 @@ function bindTabs(): void {
   }
 }
 
-function bindCodeRequest(prefix: string, purpose: EmailCodePurpose): void {
+function bindCodeRequest(prefix: string, purpose: EmailCodePurpose, callbacks: LoginCallbacks): void {
   const emailInput = mustElement<HTMLInputElement>(`#${prefix}Email`);
   const button = mustElement<HTMLButtonElement>(`#${prefix}SendCode`);
   const status = mustElement<HTMLElement>(`#${prefix}SendStatus`);
   const challengeInput = mustElement<HTMLInputElement>(`#${prefix}ChallengeId`);
-  emailInput.addEventListener("input", () => { challengeInput.value = ""; });
+  let emailVersion = 0;
+  emailInput.addEventListener("input", () => {
+    emailVersion += 1;
+    challengeInput.value = "";
+    clearMessage(status);
+  });
   button.addEventListener("click", async () => {
+    if (button.disabled) return;
     const email = normalizeEmail(emailInput.value);
     const validation = validateEmail(email);
     if (validation) {
@@ -168,17 +175,24 @@ function bindCodeRequest(prefix: string, purpose: EmailCodePurpose): void {
     emailInput.value = email;
     emailInput.removeAttribute("aria-invalid");
     clearMessage(status);
+    const requestedVersion = emailVersion;
+    challengeInput.value = "";
     setBusy(button, true, "发送中…");
     try {
       const response = await api.requestEmailCode(email, purpose, null);
-      challengeInput.value = response.challengeId;
+      if (!button.isConnected) return;
       setBusy(button, false);
       startVerificationCountdown(button, response.retryAfterSeconds);
+      if (requestedVersion !== emailVersion) return;
+      challengeInput.value = response.challengeId;
       setMessage(status, "如果该邮箱符合条件，验证码将发送，请检查收件箱和垃圾邮件。", "success");
     } catch (error) {
+      if (!button.isConnected) return;
       setBusy(button, false);
+      if (callbacks.handleAuthError(error)) return;
       const retryAfter = retryAfterFromError(error);
       if (retryAfter !== null) startVerificationCountdown(button, retryAfter);
+      if (requestedVersion !== emailVersion) return;
       setMessage(status, getErrorMessage(error, "验证码发送失败"));
     }
   });
@@ -227,13 +241,16 @@ function bindPasswordLogin(callbacks: LoginCallbacks): void {
     const data = new FormData(form);
     const message = mustElement<HTMLElement>("#passwordLoginMessage");
     const submit = mustElement<HTMLButtonElement>('button[type="submit"]', form);
+    if (submit.disabled) return;
     clearMessage(message);
     setBusy(submit, true, "正在登录…");
     try {
       const response = await api.login(String(data.get("username") ?? "").trim(), String(data.get("password") ?? ""));
+      if (!form.isConnected) return;
       if (!response.user) throw new Error("登录成功但服务器未返回账号信息");
       callbacks.onAuthenticated(response);
     } catch (error) {
+      if (!form.isConnected || callbacks.handleAuthError(error)) return;
       setMessage(message, getErrorMessage(error, "登录失败"));
       setBusy(submit, false);
       mustElement<HTMLInputElement>('[name="password"]', form).select();
@@ -242,7 +259,7 @@ function bindPasswordLogin(callbacks: LoginCallbacks): void {
 }
 
 function bindEmailLogin(callbacks: LoginCallbacks): void {
-  bindCodeRequest("emailLogin", "login");
+  bindCodeRequest("emailLogin", "login", callbacks);
   const form = mustElement<HTMLFormElement>("#emailLoginForm");
   form.addEventListener("submit", async (event) => {
     event.preventDefault();
@@ -254,13 +271,16 @@ function bindEmailLogin(callbacks: LoginCallbacks): void {
     const challengeId = requireChallengeId(form, message);
     if (!challengeId) return;
     const submit = mustElement<HTMLButtonElement>('button[type="submit"]', form);
+    if (submit.disabled) return;
     clearMessage(message);
     setBusy(submit, true, "正在登录…");
     try {
       const response = await api.loginWithEmail(email, challengeId, code);
+      if (!form.isConnected) return;
       if (!response.user) throw new Error("登录成功但服务器未返回账号信息");
       callbacks.onAuthenticated(response);
     } catch (error) {
+      if (!form.isConnected || callbacks.handleAuthError(error)) return;
       setMessage(message, getErrorMessage(error, "登录失败"));
       setBusy(submit, false);
       mustElement<HTMLInputElement>('[name="code"]', form).select();
@@ -271,7 +291,7 @@ function bindEmailLogin(callbacks: LoginCallbacks): void {
 function bindRegistration(callbacks: LoginCallbacks): void {
   const form = document.querySelector<HTMLFormElement>("#registerForm");
   if (!form) return;
-  bindCodeRequest("register", "register");
+  bindCodeRequest("register", "register", callbacks);
   form.addEventListener("submit", async (event) => {
     event.preventDefault();
     const message = mustElement<HTMLElement>("#registerMessage");
@@ -290,6 +310,7 @@ function bindRegistration(callbacks: LoginCallbacks): void {
       return;
     }
     const submit = mustElement<HTMLButtonElement>('button[type="submit"]', form);
+    if (submit.disabled) return;
     clearMessage(message);
     setBusy(submit, true, "正在注册…");
     try {
@@ -301,9 +322,11 @@ function bindRegistration(callbacks: LoginCallbacks): void {
         displayName: String(data.get("displayName") ?? "").trim(),
         password
       });
+      if (!form.isConnected) return;
       if (!response.user) throw new Error("注册成功但服务器未返回账号信息");
       callbacks.onAuthenticated(response);
     } catch (error) {
+      if (!form.isConnected || callbacks.handleAuthError(error)) return;
       setMessage(message, getErrorMessage(error, "注册失败"));
       setBusy(submit, false);
     }
@@ -311,7 +334,7 @@ function bindRegistration(callbacks: LoginCallbacks): void {
 }
 
 function bindPasswordReset(callbacks: LoginCallbacks): void {
-  bindCodeRequest("resetPassword", "reset_password");
+  bindCodeRequest("resetPassword", "reset_password", callbacks);
   const form = mustElement<HTMLFormElement>("#resetPasswordForm");
   form.addEventListener("submit", async (event) => {
     event.preventDefault();
@@ -331,6 +354,7 @@ function bindPasswordReset(callbacks: LoginCallbacks): void {
       return;
     }
     const submit = mustElement<HTMLButtonElement>('button[type="submit"]', form);
+    if (submit.disabled) return;
     clearMessage(message);
     setBusy(submit, true, "正在修改…");
     try {
@@ -340,9 +364,11 @@ function bindPasswordReset(callbacks: LoginCallbacks): void {
         code,
         newPassword
       );
+      if (!form.isConnected) return;
       if (!response.user) throw new Error("密码已修改，但服务器未返回账号信息");
       callbacks.onAuthenticated(response);
     } catch (error) {
+      if (!form.isConnected || callbacks.handleAuthError(error)) return;
       setMessage(message, getErrorMessage(error, "密码修改失败"));
       setBusy(submit, false);
     }

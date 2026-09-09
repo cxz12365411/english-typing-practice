@@ -100,10 +100,18 @@ function sessionSummary(row: PracticeSessionRow, lastAttempt?: AttemptRow) {
   };
 }
 
-function attemptResponse(db: SqliteDatabase, userId: string, session: PracticeSessionRow, attempt: AttemptRow) {
-  const mistakes = (db.prepare("SELECT COUNT(*) AS count FROM progress WHERE user_id = ? AND is_mistake = 1").get(userId) as {
+function availableMistakeCount(db: SqliteDatabase, userId: string): number {
+  return (db.prepare(`
+    SELECT COUNT(*) AS count FROM progress p
+    JOIN items i ON i.id = p.item_id JOIN categories c ON c.id = i.category_id
+    WHERE p.user_id = ? AND p.is_mistake = 1 AND i.status = 'published' AND c.status = 'published'
+  `).get(userId) as {
     count: number;
   }).count;
+}
+
+function attemptResponse(db: SqliteDatabase, userId: string, session: PracticeSessionRow, attempt: AttemptRow) {
+  const mistakes = availableMistakeCount(db, userId);
   return {
     attempt: {
       clientAttemptId: attempt.client_attempt_id,
@@ -395,6 +403,15 @@ export async function registerPracticeRoutes(app: FastifyInstance, db: SqliteDat
         correct ? null : occurredAt,
         now
       );
+      // Timestamp ties must use the same ordering as first-try and streak aggregates,
+      // rather than whichever equal-time request happened to arrive last.
+      const latestAtTimestamp = db.prepare(`
+        SELECT correct FROM attempts WHERE user_id = ? AND item_id = ? AND occurred_at = ?
+        ORDER BY client_attempt_id DESC, id DESC LIMIT 1
+      `).get(user.id, itemId, occurredAt) as { correct: number };
+      db.prepare(`
+        UPDATE progress SET is_mistake = ? WHERE user_id = ? AND item_id = ? AND last_attempt_at = ?
+      `).run(latestAtTimestamp.correct ? 0 : 1, user.id, itemId, occurredAt);
       session = recomputeSessionAggregates(db, sessionId, user.id);
       const recomputedAttempt = db.prepare("SELECT * FROM attempts WHERE id = ?").get(attempt.id) as AttemptRow;
       return { attempt: recomputedAttempt, session };
@@ -422,7 +439,7 @@ export async function registerPracticeRoutes(app: FastifyInstance, db: SqliteDat
     let session = getOwnedSession(db, sessionId, user.id);
     if (!session.finished_at) {
       const now = Date.now();
-      const duration = providedDuration ?? Math.max(session.duration_ms, now - session.started_at);
+      const duration = Math.max(session.duration_ms, providedDuration ?? now - session.started_at);
       db.prepare("UPDATE practice_sessions SET finished_at = ?, duration_ms = ? WHERE id = ?").run(now, duration, sessionId);
       session = getOwnedSession(db, sessionId, user.id);
     }
@@ -448,9 +465,7 @@ export async function registerPracticeRoutes(app: FastifyInstance, db: SqliteDat
       best_streak: number;
       duration_ms: number;
     };
-    const mistakes = (db.prepare("SELECT COUNT(*) AS count FROM progress WHERE user_id = ? AND is_mistake = 1").get(user.id) as {
-      count: number;
-    }).count;
+    const mistakes = availableMistakeCount(db, user.id);
     const recent = db.prepare(`
       SELECT * FROM practice_sessions WHERE user_id = ? ORDER BY started_at DESC LIMIT 20
     `).all(user.id) as PracticeSessionRow[];
@@ -473,8 +488,8 @@ export async function registerPracticeRoutes(app: FastifyInstance, db: SqliteDat
     const user = requireUser(request);
     const rows = db.prepare(`
       SELECT i.*, p.wrong_count, p.last_wrong_at
-      FROM progress p JOIN items i ON i.id = p.item_id
-      WHERE p.user_id = ? AND p.is_mistake = 1
+      FROM progress p JOIN items i ON i.id = p.item_id JOIN categories c ON c.id = i.category_id
+      WHERE p.user_id = ? AND p.is_mistake = 1 AND i.status = 'published' AND c.status = 'published'
       ORDER BY p.last_wrong_at DESC, i.id
     `).all(user.id) as Array<ContentItemRow & { wrong_count: number; last_wrong_at: number }>;
     return {

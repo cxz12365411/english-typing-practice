@@ -62,7 +62,7 @@ validate_backup() {
 # First validation is already under both locks.
 readonly backup_path="$(validate_backup "$requested_backup")"
 readonly source_identity="$(/usr/bin/stat -Lc '%d:%i:%s:%Y' "$backup_path")"
-readonly source_integrity="$(/usr/bin/sqlite3 -readonly "$backup_path" 'PRAGMA integrity_check;' 2>&1)"
+readonly source_integrity="$(/usr/bin/sqlite3 -readonly "file:${backup_path}?immutable=1" 'PRAGMA integrity_check;' 2>&1)"
 [[ "$source_integrity" == "ok" ]] || die "source backup failed integrity check: ${source_integrity}"
 
 readonly stamp="$(/usr/bin/date -u +%Y%m%dT%H%M%S.%NZ)"
@@ -109,7 +109,7 @@ reinstate_previous_database() {
 }
 
 cleanup() {
-  [[ -z "$restored_temp" || ! -e "$restored_temp" ]] || /usr/bin/rm -f -- "$restored_temp"
+  [[ -z "$restored_temp" ]] || /usr/bin/rm -f -- "$restored_temp" "${restored_temp}-wal" "${restored_temp}-shm"
 }
 
 on_exit() {
@@ -141,14 +141,15 @@ readonly locked_backup_path="$(validate_backup "$requested_backup")"
 [[ "$locked_backup_path" == "$backup_path" ]] || die "backup target changed while restore was preparing"
 [[ "$(/usr/bin/stat -Lc '%d:%i:%s:%Y' "$locked_backup_path")" == "$source_identity" ]] ||
   die "backup identity changed while restore was preparing"
-readonly locked_integrity="$(/usr/bin/sqlite3 -readonly "$locked_backup_path" 'PRAGMA integrity_check;' 2>&1)"
+readonly locked_integrity="$(/usr/bin/sqlite3 -readonly "file:${locked_backup_path}?immutable=1" 'PRAGMA integrity_check;' 2>&1)"
 [[ "$locked_integrity" == "ok" ]] || die "locked source backup failed integrity check: ${locked_integrity}"
 
-# -readonly guarantees that copying cannot create WAL/journal state beside the source backup.
+# Managed backups are complete, closed snapshots. Ordinary -readonly can still
+# create WAL/SHM files; immutable prevents all sidecar writes beside the snapshot.
 restored_temp="$(/usr/bin/mktemp "${DATA_DIR}/.app.db.restore.${stamp}.XXXXXX")"
 /usr/bin/chmod 0600 "$restored_temp"
-/usr/bin/sqlite3 -readonly "$locked_backup_path" ".backup '${restored_temp}'"
-readonly restored_integrity="$(/usr/bin/sqlite3 -readonly "$restored_temp" 'PRAGMA integrity_check;' 2>&1)"
+/usr/bin/sqlite3 -readonly "file:${locked_backup_path}?immutable=1" ".backup '${restored_temp}'"
+readonly restored_integrity="$(/usr/bin/sqlite3 -readonly "file:${restored_temp}?immutable=1" 'PRAGMA integrity_check;' 2>&1)"
 [[ "$restored_integrity" == "ok" ]] || die "restored copy failed integrity check: ${restored_integrity}"
 /usr/bin/chown englishapp:englishapp "$restored_temp"
 /usr/bin/chmod 0600 "$restored_temp"
@@ -181,9 +182,14 @@ if [[ "$start_mode" != "--leave-stopped" ]]; then
   [[ "$healthy" -eq 1 ]] || die "restored database did not pass the API health check"
 fi
 
-/usr/bin/install -m 0600 -o root -g root /dev/null "${quarantine_dir}/restore-complete"
 restore_committed=1
 trap - EXIT HUP INT TERM
 cleanup
+# Publish completion only after recovery has been disarmed. A signal must never
+# leave a success marker alongside a database that the EXIT trap reinstated.
+restore_complete_temp="$(/usr/bin/mktemp "${quarantine_dir}/.restore-complete.XXXXXX")"
+/usr/bin/chown root:root "$restore_complete_temp"
+/usr/bin/chmod 0600 "$restore_complete_temp"
+/usr/bin/mv -Tf -- "$restore_complete_temp" "${quarantine_dir}/restore-complete"
 log "restore complete; displaced files are preserved in ${quarantine_dir}"
 printf '%s\n' "$quarantine_dir"

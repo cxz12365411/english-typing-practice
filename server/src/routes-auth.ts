@@ -159,7 +159,7 @@ export async function registerAuthRoutes(
   app.get("/api/auth/session", async (request, reply) => {
     const existing = request.authSession;
     if (!existing?.user) {
-      const created = createGuestSession(reply, guestSecret);
+      const created = createGuestSession(reply, guestSecret, existing);
       return { user: null, csrfToken: created.csrfToken, capabilities };
     }
     return { user: toUserDto(existing.user), csrfToken: existing.csrfToken, capabilities };
@@ -254,7 +254,14 @@ export async function registerAuthRoutes(
     } catch (error) {
       badRequest("INVALID_PASSWORD", (error as Error).message, { field: "newPassword" });
     }
+    const blocked = reserveLoginAttempt(db, snapshot.username, request.ip);
+    if (blocked) {
+      throw new ApiError(429, "LOGIN_RATE_LIMITED", "Too many password verification attempts", {
+        retryAfterSeconds: Math.max(1, Math.ceil((blocked - Date.now()) / 1000))
+      });
+    }
     if (!(await verifyPassword(snapshot.password_hash, currentPassword))) {
+      recordLoginFailure(db, snapshot.username, request.ip);
       throw new ApiError(401, "CURRENT_PASSWORD_INVALID", "Current password is incorrect");
     }
     if (await verifyPassword(snapshot.password_hash, newPassword!)) {

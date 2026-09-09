@@ -42,6 +42,7 @@ interface SessionJoinRow extends UserRow {
 }
 
 export interface AuthSession {
+  guestNonce?: string;
   persistent: boolean;
   idHash: string;
   csrfToken: string;
@@ -178,19 +179,24 @@ function equalSignature(actual: string, expected: string): boolean {
 
 export function createGuestSession(
   reply: FastifyReply,
-  secret: string
+  secret: string,
+  existing?: AuthSession | null
 ): { csrfToken: string; session: AuthSession } {
   const now = Date.now();
   const expiresAt = now + GUEST_LIFETIME;
-  const csrfToken = randomToken();
-  const payload = Buffer.from(JSON.stringify({ iat: now, exp: expiresAt, csrf: tokenHash(csrfToken) })).toString("base64url");
+  const guestNonce = existing && !existing.persistent && existing.guestNonce
+    ? existing.guestNonce
+    : randomToken(24);
+  const csrfToken = guestSignature(secret, `guest-csrf:${guestNonce}`);
+  const payload = Buffer.from(JSON.stringify({ iat: now, exp: expiresAt, csrf: tokenHash(csrfToken), sid: guestNonce })).toString("base64url");
   const rawToken = `g.${payload}.${guestSignature(secret, payload)}`;
   reply.setCookie(SESSION_COOKIE, rawToken, cookieOptions(GUEST_LIFETIME));
   return {
     csrfToken,
     session: {
       persistent: false,
-      idHash: tokenHash(rawToken),
+      guestNonce,
+      idHash: tokenHash(`guest:${guestNonce}`),
       csrfToken,
       csrfHash: tokenHash(csrfToken),
       userId: null,
@@ -212,21 +218,27 @@ function loadGuestSession(rawToken: string, secret: string): AuthSession | null 
       iat?: unknown;
       exp?: unknown;
       csrf?: unknown;
+      sid?: unknown;
     };
     const now = Date.now();
     if (
       !Number.isSafeInteger(payload.iat) ||
       !Number.isSafeInteger(payload.exp) ||
       typeof payload.csrf !== "string" ||
-      payload.csrf.length !== 64 ||
+      !/^[a-f0-9]{64}$/.test(payload.csrf) ||
+      (payload.sid !== undefined && (typeof payload.sid !== "string" || !/^[A-Za-z0-9_-]{32}$/.test(payload.sid))) ||
       (payload.iat as number) > now + 60_000 ||
       (payload.exp as number) <= now ||
       (payload.exp as number) - (payload.iat as number) !== GUEST_LIFETIME
     ) return null;
+    const guestNonce = typeof payload.sid === "string" ? payload.sid : undefined;
+    const csrfToken = guestNonce ? guestSignature(secret, `guest-csrf:${guestNonce}`) : "";
+    if (guestNonce && !safeTokenEqual(csrfToken, payload.csrf)) return null;
     return {
       persistent: false,
-      idHash: tokenHash(rawToken),
-      csrfToken: "",
+      ...(guestNonce ? { guestNonce } : {}),
+      idHash: guestNonce ? tokenHash(`guest:${guestNonce}`) : tokenHash(rawToken),
+      csrfToken,
       csrfHash: payload.csrf,
       userId: null,
       createdAt: payload.iat as number,
@@ -413,12 +425,15 @@ export function cleanupExpiredSecurityRows(db: SqliteDatabase): void {
   `).run(now - 24 * 60 * 60_000, now - 24 * 60 * 60_000);
   db.prepare("DELETE FROM email_auth_guards WHERE updated_at < ?").run(now - 7 * 24 * 60 * 60_000);
   db.prepare("DELETE FROM email_send_daily WHERE updated_at < ?").run(now - 40 * 24 * 60 * 60_000);
-  db.prepare("DELETE FROM attempts WHERE created_at < ?").run(now - 90 * 24 * 60 * 60_000);
   db.prepare(`
     UPDATE practice_sessions
     SET finished_at = ?, duration_ms = MAX(duration_ms, ? - started_at)
     WHERE finished_at IS NULL AND started_at < ?
   `).run(now, now, now - 24 * 60 * 60_000);
+  db.prepare(`
+    DELETE FROM attempts WHERE created_at < ?
+      AND practice_session_id IN (SELECT id FROM practice_sessions WHERE finished_at IS NOT NULL)
+  `).run(now - 90 * 24 * 60 * 60_000);
 }
 
 export function createId(): string {

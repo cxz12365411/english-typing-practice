@@ -81,7 +81,7 @@ if [[ "$database_before" != "NO_DATABASE" ]]; then
     *) die "database backup path is outside the pre-migration backup directory" ;;
   esac
   [[ -f "$database_before" && ! -L "$database_before" ]] || die "pre-migration backup is unavailable"
-  [[ "$(/usr/bin/sqlite3 -readonly "$database_before" 'PRAGMA integrity_check;' 2>&1)" == "ok" ]] || die "pre-migration backup failed integrity validation"
+  [[ "$(/usr/bin/sqlite3 -readonly "file:${database_before}?immutable=1" 'PRAGMA integrity_check;' 2>&1)" == "ok" ]] || die "pre-migration backup failed integrity validation"
 fi
 
 entry_current_target="NONE"

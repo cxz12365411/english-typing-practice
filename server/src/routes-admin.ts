@@ -139,6 +139,8 @@ interface CsvPreviewRow {
   pronunciation: string;
   sortOrder: number;
   status: "draft" | "published";
+  expectedItemId: string | null;
+  expectedItemRevision: number | null;
 }
 
 interface CsvError {
@@ -150,10 +152,19 @@ interface CsvError {
 function parseImport(db: SqliteDatabase, csv: string, fallbackCategoryId?: string): { rows: CsvPreviewRow[]; errors: CsvError[] } {
   let records: Array<Record<string, string>>;
   try {
-    records = parseCsv(csv, { columns: true, bom: true, skip_empty_lines: true, trim: true, relax_column_count: false });
+    records = parseCsv(csv, {
+      columns: (columns: string[]) => {
+        if (columns.some((column) => !column) || new Set(columns).size !== columns.length) {
+          throw new Error("CSV column names must be nonempty and unique");
+        }
+        return columns;
+      },
+      bom: true, skip_empty_lines: true, trim: true, relax_column_count: false
+    });
   } catch (error) {
     return { rows: [], errors: [{ row: 0, message: (error as Error).message }] };
   }
+  if (!records.length) return { rows: [], errors: [{ row: 0, message: "CSV must contain at least one data row" }] };
   if (records.length > 5_000) return { rows: [], errors: [{ row: 0, message: "CSV may contain at most 5000 rows" }] };
   const rows: CsvPreviewRow[] = [];
   const errors: CsvError[] = [];
@@ -185,8 +196,15 @@ function parseImport(db: SqliteDatabase, csv: string, fallbackCategoryId?: strin
       errors.push({ row: rowNumber, field: "sortOrder", message: "sortOrder must be an integer from 0 to 1000000" });
     }
     if (status !== "draft" && status !== "published") errors.push({ row: rowNumber, field: "status", message: "status must be draft or published" });
+    if (status === "published" && category && category.status !== "published") {
+      errors.push({ row: rowNumber, field: "status", message: "Publish the category before publishing this item" });
+    }
     if (category && (kind === "word" || kind === "sentence") && english && meaning && key && Number.isInteger(sortOrderValue)) {
-      rows.push({ row: rowNumber, key, categoryId, kind, english, meaning, pronunciation, sortOrder: sortOrderValue, status });
+      const existing = db.prepare("SELECT id, revision FROM items WHERE item_key = ?").get(key) as { id: string; revision: number } | undefined;
+      rows.push({
+        row: rowNumber, key, categoryId, kind, english, meaning, pronunciation, sortOrder: sortOrderValue, status,
+        expectedItemId: existing?.id ?? null, expectedItemRevision: existing?.revision ?? null
+      });
     }
   }
   return { rows, errors };
@@ -407,6 +425,9 @@ export async function registerAdminRoutes(app: FastifyInstance, db: SqliteDataba
     if (kind !== category.kind && db.prepare("SELECT 1 FROM items WHERE category_id = ? LIMIT 1").get(id)) {
       conflict("CATEGORY_NOT_EMPTY", "Cannot change the kind of a category that contains items");
     }
+    if (slug === category.slug && name === category.name && kind === category.kind && sortOrder === category.sort_order) {
+      return { category: categoryDto(category) };
+    }
     const now = Date.now();
     db.transaction(() => {
       const nextStatus = category.status === "published" ? "draft" : category.status;
@@ -429,6 +450,7 @@ export async function registerAdminRoutes(app: FastifyInstance, db: SqliteDataba
     requireAdmin(request);
     const id = idParam(request.params);
     const category = getCategory(db, id);
+    if (category.status === status) return { category: categoryDto(category) };
     const now = Date.now();
     db.transaction(() => {
       db.prepare(`
@@ -504,6 +526,10 @@ export async function registerAdminRoutes(app: FastifyInstance, db: SqliteDataba
     const meaning = stringField(body, "meaning", { optional: true, min: 1, max: 1000 }) ?? item.meaning;
     const pronunciation = stringField(body, "pronunciation", { optional: true, max: 500 }) ?? item.pronunciation;
     const sortOrder = integerField(body, "sortOrder", { optional: true, min: 0, max: 1_000_000 }) ?? item.sort_order;
+    if (
+      key === item.item_key && categoryId === item.category_id && kind === item.kind &&
+      english === item.english && meaning === item.meaning && pronunciation === item.pronunciation && sortOrder === item.sort_order
+    ) return { item: itemDto(item) };
     const now = Date.now();
     db.transaction(() => {
       db.prepare(`
@@ -528,6 +554,7 @@ export async function registerAdminRoutes(app: FastifyInstance, db: SqliteDataba
       const category = getCategory(db, item.category_id);
       if (category.status !== "published") conflict("CATEGORY_NOT_PUBLISHED", "Publish the category before publishing this item");
     }
+    if (item.status === status) return { item: itemDto(item) };
     const now = Date.now();
     db.transaction(() => {
       db.prepare(`
@@ -590,7 +617,16 @@ export async function registerAdminRoutes(app: FastifyInstance, db: SqliteDataba
       for (const row of rows) {
         const category = getCategory(db, row.categoryId);
         if (category.kind !== row.kind) conflict("IMPORT_CATEGORY_CHANGED", `Category kind changed for CSV row ${row.row}`);
+        if (row.status === "published" && category.status !== "published") {
+          conflict("CATEGORY_NOT_PUBLISHED", `Publish the category before publishing CSV row ${row.row}`);
+        }
         const existing = db.prepare("SELECT * FROM items WHERE item_key = ?").get(row.key) as ItemRow | undefined;
+        if (row.expectedItemId === undefined || row.expectedItemRevision === undefined) {
+          conflict("IMPORT_PREVIEW_OUTDATED", "Create a new CSV preview before committing this import");
+        }
+        if ((existing?.id ?? null) !== row.expectedItemId || (existing?.revision ?? null) !== row.expectedItemRevision) {
+          conflict("IMPORT_ITEM_CHANGED", `Content changed after preview for CSV row ${row.row}; create a new preview`);
+        }
         if (existing) {
           db.prepare(`
             UPDATE items SET category_id = ?, kind = ?, english = ?, meaning = ?, pronunciation = ?,

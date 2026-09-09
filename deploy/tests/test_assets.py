@@ -186,7 +186,7 @@ english-47-120-37-63.sslip.io {
         self.assertLess(stop_index, second_validation)
         self.assertLess(second_validation, mutation_index)
         self.assertGreaterEqual(restore.count("/usr/bin/sqlite3 -readonly"), 3)
-        self.assertIn('sqlite3 -readonly "$locked_backup_path" ".backup', restore)
+        self.assertIn('sqlite3 -readonly "file:${locked_backup_path}?immutable=1" ".backup', restore)
         self.assertIn("reinstate_previous_database", restore)
 
     def test_caddy_changes_are_atomic_metadata_preserving_and_recoverable(self) -> None:

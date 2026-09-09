@@ -101,6 +101,10 @@ export async function buildApp(options: BuildAppOptions = {}): Promise<FastifyIn
 
   app.setErrorHandler(async (error, request, reply) => {
     if (error instanceof ApiError) {
+      const retryAfter = (error.details as { retryAfterSeconds?: unknown } | undefined)?.retryAfterSeconds;
+      if (error.statusCode === 429 && typeof retryAfter === "number" && Number.isFinite(retryAfter)) {
+        reply.header("Retry-After", Math.max(1, Math.ceil(retryAfter)));
+      }
       return reply.status(error.statusCode).send({
         error: {
           code: error.code,
@@ -139,7 +143,10 @@ export async function buildApp(options: BuildAppOptions = {}): Promise<FastifyIn
     return reply.status(500).send({ error: { code: "INTERNAL_ERROR", message: "Internal server error" } });
   });
 
-  const cleanupTimer = setInterval(() => cleanupExpiredSecurityRows(db), 60 * 60_000);
+  const cleanupTimer = setInterval(() => {
+    try { cleanupExpiredSecurityRows(db); }
+    catch (error) { app.log.error({ err: error }, "Scheduled database cleanup failed; will retry next interval"); }
+  }, 60 * 60_000);
   cleanupTimer.unref();
   app.addHook("onClose", async () => {
     clearInterval(cleanupTimer);

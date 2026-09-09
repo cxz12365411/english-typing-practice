@@ -26,11 +26,26 @@ interface AdminState {
   editingItemId: string | null;
   contentSearch: string;
   importPreview: ImportPreviewResponse | null;
+  csvText: string;
   temporaryPassword: { username: string; password: string } | null;
+  viewVersion: number;
+  usersRequest: number;
+  contentRequest: number;
+  refreshRequest: number;
   disposed: boolean;
 }
 
 let state: AdminState | null = null;
+
+function isActive(activeState: AdminState): boolean {
+  return state === activeState && !activeState.disposed;
+}
+
+function viewGuard(activeState: AdminState): () => boolean {
+  // A route, account, or rendered form change invalidates callbacks bound to the old DOM.
+  const version = activeState.viewVersion;
+  return () => isActive(activeState) && activeState.viewVersion === version;
+}
 
 const tabLabels: Record<AdminTab, string> = {
   overview: "概览",
@@ -359,14 +374,14 @@ function importMarkup(): string {
           <form class="form-stack" id="csvPreviewForm">
             <p class="muted">使用 UTF-8 CSV。第一行为字段名，至少包含 categoryId、english、meaning；可选 kind、pronunciation、sortOrder、key、status。</p>
             <label class="field"><span>选择 CSV 文件</span><input class="input" id="csvFileInput" type="file" accept=".csv,text/csv"></label>
-            <label class="field"><span>CSV 内容</span><textarea class="textarea" id="csvText" name="csv" rows="12" required placeholder="kind,category,english,meaning,pronunciation,sortOrder"></textarea></label>
+            <label class="field"><span>CSV 内容</span><textarea class="textarea" id="csvText" name="csv" rows="12" required placeholder="categoryId,english,meaning,status">${escapeHtml(state.csvText)}</textarea></label>
             <button class="btn primary" type="submit">校验并预览</button>
           </form>
         </div>
       </section>
       <section class="panel">
         <div class="panel-heading"><h2>导入预览</h2></div>
-        <div class="panel-body form-stack">
+        <div class="panel-body form-stack" id="importPreviewContent">
           ${preview ? `
             <div class="message ${preview.errors.length ? "error" : "success"}">
               ${preview.errors.length ? `发现 ${preview.errors.length} 个错误，修正后重新预览。` : `校验通过，共 ${preview.rows.length} 行，可提交导入。`}
@@ -425,6 +440,7 @@ function currentBodyMarkup(): string {
 
 function renderAdminView(): void {
   if (!state || state.disposed) return;
+  ++state.viewVersion;
   state.context.renderShell(adminFrame(currentBodyMarkup()), "/admin");
   bindCommonEvents();
   if (state.tab === "users") bindUserEvents();
@@ -433,49 +449,73 @@ function renderAdminView(): void {
 }
 
 function bindCommonEvents(): void {
+  const activeState = state;
+  if (!activeState) return;
+  const isCurrent = viewGuard(activeState);
   document.querySelectorAll<HTMLButtonElement>("[data-admin-tab]").forEach((button) => {
     button.addEventListener("click", () => {
-      if (!state) return;
-      state.tab = button.dataset.adminTab as AdminTab;
+      if (!isCurrent()) return;
+      const tab = button.dataset.adminTab as AdminTab;
+      if (activeState.tab === tab) return;
+      activeState.temporaryPassword = null;
+      activeState.tab = tab;
       renderAdminView();
     });
   });
   mustElement<HTMLButtonElement>("#refreshAdminButton").addEventListener("click", () => {
-    if (state) void reloadAdminData(state.context, true);
+    if (isCurrent()) void reloadAdminData(activeState.context, true);
   });
 }
 
-async function reloadUsers(): Promise<void> {
-  if (!state) return;
-  const response = await api.adminUsers();
-  state.users = response.users ?? [];
+async function reloadUsers(activeState: AdminState): Promise<boolean> {
+  if (!isActive(activeState)) return false;
+  const request = ++activeState.usersRequest;
+  const isCurrent = (): boolean => isActive(activeState) && request === activeState.usersRequest;
+  try {
+    const response = await api.adminUsers();
+    if (!isCurrent()) return false;
+    activeState.users = response.users ?? [];
+    return true;
+  } catch (error) {
+    if (!isCurrent()) return false;
+    throw error;
+  }
 }
 
 function bindTemporaryPasswordEvents(): void {
+  const activeState = state;
+  if (!activeState) return;
+  const isCurrent = viewGuard(activeState);
   document.querySelector<HTMLButtonElement>("#copyTemporaryPasswordButton")?.addEventListener("click", async () => {
-    if (!state?.temporaryPassword) return;
+    if (!isCurrent() || !activeState.temporaryPassword) return;
     try {
-      await navigator.clipboard.writeText(state.temporaryPassword.password);
+      await navigator.clipboard.writeText(activeState.temporaryPassword.password);
+      if (!isCurrent()) return;
       showToast("临时密码已复制", "success");
     } catch {
+      if (!isCurrent()) return;
       showToast("无法自动复制，请手动选择密码文本", "error");
     }
   });
   document.querySelector<HTMLButtonElement>("#hideTemporaryPasswordButton")?.addEventListener("click", () => {
-    if (!state) return;
-    state.temporaryPassword = null;
+    if (!isCurrent()) return;
+    activeState.temporaryPassword = null;
     renderAdminView();
   });
 }
 
 function bindUserEvents(): void {
+  const activeState = state;
+  if (!activeState) return;
+  const isCurrent = viewGuard(activeState);
   bindTemporaryPasswordEvents();
   const createForm = mustElement<HTMLFormElement>("#createUserForm");
   createForm.addEventListener("submit", async (event) => {
     event.preventDefault();
-    if (!state) return;
+    if (!isCurrent()) return;
     const data = new FormData(createForm);
     const button = mustElement<HTMLButtonElement>('button[type="submit"]', createForm);
+    if (button.disabled) return;
     setBusy(button, true, "正在创建…");
     try {
       const response = await api.createUser({
@@ -483,25 +523,27 @@ function bindUserEvents(): void {
         displayName: String(data.get("displayName") ?? "").trim(),
         role: String(data.get("role") ?? "user") as Role
       });
-      state.temporaryPassword = {
+      if (!isCurrent()) return;
+      activeState.temporaryPassword = {
         username: response.user.username,
         password: response.temporaryPassword ?? "服务器未返回临时密码"
       };
-      await reloadUsers();
+      if (!await reloadUsers(activeState) || !isCurrent()) return;
       renderAdminView();
       showToast("账号已创建", "success");
     } catch (error) {
-      if (!state?.context.handleAuthError(error)) showToast(getErrorMessage(error, "账号创建失败"), "error");
+      if (!isCurrent()) return;
+      if (!activeState.context.handleAuthError(error)) showToast(getErrorMessage(error, "账号创建失败"), "error");
       setBusy(button, false);
     }
   });
 
   document.querySelectorAll<HTMLButtonElement>("[data-user-action]").forEach((button) => {
     button.addEventListener("click", async () => {
-      if (!state) return;
+      if (!isCurrent() || button.disabled) return;
       const id = button.dataset.id ?? "";
       const action = button.dataset.userAction;
-      const user = state.users.find((entry) => entry.id === id);
+      const user = activeState.users.find((entry) => entry.id === id);
       if (!user) return;
       setBusy(button, true);
       try {
@@ -515,6 +557,7 @@ function bindUserEvents(): void {
             return;
           }
           await api.updateUser(id, { displayName, role, active: status === "active" });
+          if (!isCurrent()) return;
           showToast("账号资料已保存", "success");
         } else if (action === "reset") {
           const emailNotice = user.emailVerified && user.email ? "、清除已绑定邮箱" : "";
@@ -523,7 +566,8 @@ function bindUserEvents(): void {
             return;
           }
           const response = await api.resetPassword(id);
-          state.temporaryPassword = {
+          if (!isCurrent()) return;
+          activeState.temporaryPassword = {
             username: user.username,
             password: response.temporaryPassword ?? "服务器未返回临时密码"
           };
@@ -534,23 +578,34 @@ function bindUserEvents(): void {
             return;
           }
           await api.revokeSessions(id);
+          if (!isCurrent()) return;
           showToast("登录会话已撤销", "success");
         }
-        await reloadUsers();
+        if (!await reloadUsers(activeState) || !isCurrent()) return;
         renderAdminView();
       } catch (error) {
-        if (!state?.context.handleAuthError(error)) showToast(getErrorMessage(error), "error", 7000);
+        if (!isCurrent()) return;
+        if (!activeState.context.handleAuthError(error)) showToast(getErrorMessage(error), "error", 7000);
         setBusy(button, false);
       }
     });
   });
 }
 
-async function reloadContent(): Promise<void> {
-  if (!state) return;
-  const [categoryResponse, itemResponse] = await Promise.all([api.adminCategories(), api.adminItems()]);
-  state.categories = categoryResponse.categories ?? [];
-  state.items = itemResponse.items ?? [];
+async function reloadContent(activeState: AdminState): Promise<boolean> {
+  if (!isActive(activeState)) return false;
+  const request = ++activeState.contentRequest;
+  const isCurrent = (): boolean => isActive(activeState) && request === activeState.contentRequest;
+  try {
+    const [categoryResponse, itemResponse] = await Promise.all([api.adminCategories(), api.adminItems()]);
+    if (!isCurrent()) return false;
+    activeState.categories = categoryResponse.categories ?? [];
+    activeState.items = itemResponse.items ?? [];
+    return true;
+  } catch (error) {
+    if (!isCurrent()) return false;
+    throw error;
+  }
 }
 
 function bindItemPreview(form: HTMLFormElement): void {
@@ -563,32 +618,38 @@ function bindItemPreview(form: HTMLFormElement): void {
 }
 
 function bindContentEvents(): void {
+  const activeState = state;
+  if (!activeState) return;
+  const isCurrent = viewGuard(activeState);
   const categoryForm = mustElement<HTMLFormElement>("#createCategoryForm");
   categoryForm.addEventListener("submit", async (event) => {
     event.preventDefault();
-    if (!state) return;
+    if (!isCurrent()) return;
     const data = new FormData(categoryForm);
     const button = mustElement<HTMLButtonElement>('button[type="submit"]', categoryForm);
+    if (button.disabled) return;
     setBusy(button, true, "正在创建…");
     try {
       await api.createCategory({
         slug: String(data.get("slug") ?? "").trim(),
         name: String(data.get("name") ?? "").trim(),
         kind: String(data.get("kind") ?? "word") as ContentKind,
-        sortOrder: numberValue(data.get("sortOrder"), state.categories.length)
+        sortOrder: numberValue(data.get("sortOrder"), activeState.categories.length)
       });
-      await reloadContent();
+      if (!isCurrent()) return;
+      if (!await reloadContent(activeState) || !isCurrent()) return;
       renderAdminView();
       showToast("分类已创建", "success");
     } catch (error) {
-      if (!state?.context.handleAuthError(error)) showToast(getErrorMessage(error, "分类创建失败"), "error");
+      if (!isCurrent()) return;
+      if (!activeState.context.handleAuthError(error)) showToast(getErrorMessage(error, "分类创建失败"), "error");
       setBusy(button, false);
     }
   });
 
   document.querySelectorAll<HTMLButtonElement>("[data-category-action]").forEach((button) => {
     button.addEventListener("click", async () => {
-      if (!state) return;
+      if (!isCurrent() || button.disabled) return;
       const id = button.dataset.id ?? "";
       const action = button.dataset.categoryAction;
       setBusy(button, true);
@@ -610,11 +671,13 @@ function bindContentEvents(): void {
           }
           await api.archiveCategory(id);
         }
-        await reloadContent();
+        if (!isCurrent()) return;
+        if (!await reloadContent(activeState) || !isCurrent()) return;
         renderAdminView();
         showToast(action === "publish" ? "分类已发布" : action === "archive" ? "分类已下架" : "分类已保存", "success");
       } catch (error) {
-        if (!state?.context.handleAuthError(error)) showToast(getErrorMessage(error), "error");
+        if (!isCurrent()) return;
+        if (!activeState.context.handleAuthError(error)) showToast(getErrorMessage(error), "error");
         setBusy(button, false);
       }
     });
@@ -624,7 +687,7 @@ function bindContentEvents(): void {
   bindItemPreview(itemForm);
   itemForm.addEventListener("submit", async (event) => {
     event.preventDefault();
-    if (!state) return;
+    if (!isCurrent()) return;
     const data = new FormData(itemForm);
     const id = String(data.get("id") ?? "");
     const key = String(data.get("key") ?? "").trim();
@@ -635,48 +698,51 @@ function bindContentEvents(): void {
       english: String(data.get("english") ?? "").trim(),
       meaning: String(data.get("meaning") ?? "").trim(),
       pronunciation: String(data.get("pronunciation") ?? "").trim(),
-      sortOrder: numberValue(data.get("sortOrder"), state.items.length)
+      sortOrder: numberValue(data.get("sortOrder"), activeState.items.length)
     };
     const button = mustElement<HTMLButtonElement>('button[type="submit"]', itemForm);
+    if (button.disabled) return;
     setBusy(button, true, "正在保存…");
     try {
       if (id) await api.updateItem(id, payload);
       else await api.createItem(payload);
-      state.editingItemId = null;
-      await reloadContent();
+      if (!isCurrent()) return;
+      activeState.editingItemId = null;
+      if (!await reloadContent(activeState) || !isCurrent()) return;
       renderAdminView();
       showToast(id ? "题目已保存为草稿" : "草稿已创建", "success");
     } catch (error) {
-      if (!state?.context.handleAuthError(error)) showToast(getErrorMessage(error, "题目保存失败"), "error");
+      if (!isCurrent()) return;
+      if (!activeState.context.handleAuthError(error)) showToast(getErrorMessage(error, "题目保存失败"), "error");
       setBusy(button, false);
     }
   });
   document.querySelector<HTMLButtonElement>("#cancelEditItemButton")?.addEventListener("click", () => {
-    if (!state) return;
-    state.editingItemId = null;
+    if (!isCurrent()) return;
+    activeState.editingItemId = null;
     renderAdminView();
   });
 
   const searchForm = mustElement<HTMLFormElement>("#contentSearchForm");
   searchForm.addEventListener("submit", (event) => {
     event.preventDefault();
-    if (!state) return;
-    state.contentSearch = String(new FormData(searchForm).get("query") ?? "");
+    if (!isCurrent()) return;
+    activeState.contentSearch = String(new FormData(searchForm).get("query") ?? "");
     renderAdminView();
   });
   mustElement<HTMLButtonElement>("#clearContentSearchButton").addEventListener("click", () => {
-    if (!state) return;
-    state.contentSearch = "";
+    if (!isCurrent()) return;
+    activeState.contentSearch = "";
     renderAdminView();
   });
 
   document.querySelectorAll<HTMLButtonElement>("[data-item-action]").forEach((button) => {
     button.addEventListener("click", async () => {
-      if (!state) return;
+      if (!isCurrent() || button.disabled) return;
       const id = button.dataset.id ?? "";
       const action = button.dataset.itemAction;
       if (action === "edit") {
-        state.editingItemId = id;
+        activeState.editingItemId = id;
         renderAdminView();
         mustElement<HTMLFormElement>("#itemForm").scrollIntoView({ behavior: "smooth", block: "start" });
         return;
@@ -686,11 +752,13 @@ function bindContentEvents(): void {
       try {
         if (action === "publish") await api.publishItem(id);
         if (action === "archive") await api.archiveItem(id);
-        await reloadContent();
+        if (!isCurrent()) return;
+        if (!await reloadContent(activeState) || !isCurrent()) return;
         renderAdminView();
         showToast(action === "publish" ? "内容已发布" : "内容已下架", "success");
       } catch (error) {
-        if (!state?.context.handleAuthError(error)) showToast(getErrorMessage(error), "error");
+        if (!isCurrent()) return;
+        if (!activeState.context.handleAuthError(error)) showToast(getErrorMessage(error), "error");
         setBusy(button, false);
       }
     });
@@ -698,26 +766,52 @@ function bindContentEvents(): void {
 }
 
 function bindImportEvents(): void {
+  const activeState = state;
+  if (!activeState) return;
+  const isCurrent = viewGuard(activeState);
+  let inputVersion = 0;
   const csvText = mustElement<HTMLTextAreaElement>("#csvText");
+  const invalidatePreview = (): void => {
+    activeState.importPreview = null;
+    mustElement<HTMLElement>("#importPreviewContent").innerHTML = `<div class="empty-state">CSV 内容已修改，请重新校验后再提交。</div>`;
+  };
+  csvText.addEventListener("input", () => {
+    if (!isCurrent()) return;
+    ++inputVersion;
+    activeState.csvText = csvText.value;
+    invalidatePreview();
+  });
   mustElement<HTMLInputElement>("#csvFileInput").addEventListener("change", async (event) => {
+    if (!isCurrent()) return;
     const file = (event.currentTarget as HTMLInputElement).files?.[0];
     if (!file) return;
+    const version = ++inputVersion;
+    invalidatePreview();
     try {
-      csvText.value = await file.text();
+      const text = await file.text();
+      if (!isCurrent() || version !== inputVersion) return;
+      csvText.value = text;
+      activeState.csvText = text;
     } catch {
+      if (!isCurrent() || version !== inputVersion) return;
       showToast("CSV 文件读取失败", "error");
     }
   });
   const form = mustElement<HTMLFormElement>("#csvPreviewForm");
   form.addEventListener("submit", async (event) => {
     event.preventDefault();
-    if (!state) return;
+    if (!isCurrent()) return;
     const button = mustElement<HTMLButtonElement>('button[type="submit"]', form);
+    if (button.disabled) return;
+    const version = ++inputVersion;
+    activeState.csvText = csvText.value;
+    invalidatePreview();
     setBusy(button, true, "正在校验…");
     try {
-      const raw = await api.previewImport(csvText.value);
+      const raw = await api.previewImport(activeState.csvText);
+      if (!isCurrent() || version !== inputVersion) return;
       const preview = raw as ImportPreviewResponse & { previewId?: string };
-      state.importPreview = {
+      activeState.importPreview = {
         ...preview,
         importId: preview.importId || preview.previewId || "",
         rows: preview.rows ?? [],
@@ -726,23 +820,30 @@ function bindImportEvents(): void {
       };
       renderAdminView();
     } catch (error) {
-      if (!state?.context.handleAuthError(error)) showToast(getErrorMessage(error, "CSV 校验失败"), "error");
-      setBusy(button, false);
+      if (!isCurrent() || version !== inputVersion) return;
+      if (!activeState.context.handleAuthError(error)) showToast(getErrorMessage(error, "CSV 校验失败"), "error");
+    } finally {
+      if (isCurrent()) setBusy(button, false);
     }
   });
   document.querySelector<HTMLButtonElement>("#commitImportButton")?.addEventListener("click", async (event) => {
-    if (!state?.importPreview || state.importPreview.errors.length) return;
-    if (!window.confirm(`确定导入这 ${state.importPreview.rows.length} 行内容吗？`)) return;
+    if (!isCurrent()) return;
+    const preview = activeState.importPreview;
+    if (!preview?.importId || preview.errors.length) return;
     const button = event.currentTarget as HTMLButtonElement;
+    if (button.disabled) return;
+    if (!window.confirm(`确定导入这 ${preview.rows.length} 行内容吗？`)) return;
     setBusy(button, true, "正在导入…");
     try {
-      await api.commitImport(state.importPreview.importId);
-      state.importPreview = null;
-      await reloadContent();
+      await api.commitImport(preview.importId);
+      if (!isCurrent()) return;
+      if (activeState.importPreview === preview) activeState.importPreview = null;
+      if (!await reloadContent(activeState) || !isCurrent()) return;
       renderAdminView();
-      showToast("CSV 已整批导入为草稿", "success", 7000);
+      showToast("CSV 已整批导入，内容状态以预览为准", "success", 7000);
     } catch (error) {
-      if (!state?.context.handleAuthError(error)) showToast(getErrorMessage(error, "CSV 导入失败"), "error");
+      if (!isCurrent()) return;
+      if (!activeState.context.handleAuthError(error)) showToast(getErrorMessage(error, "CSV 导入失败"), "error");
       setBusy(button, false);
     }
   });
@@ -755,6 +856,10 @@ function extractAudit(response: { entries?: AuditRecord[]; audit?: AuditRecord[]
 async function reloadAdminData(context: PageContext, notify = false): Promise<void> {
   const activeState = state;
   if (!activeState || activeState.disposed) return;
+  const refresh = ++activeState.refreshRequest;
+  const usersRequest = ++activeState.usersRequest;
+  const contentRequest = ++activeState.contentRequest;
+  const isCurrent = viewGuard(activeState);
   try {
     const [usersResponse, categoryResponse, itemResponse, statsResponse, auditResponse] = await Promise.all([
       api.adminUsers(),
@@ -763,17 +868,21 @@ async function reloadAdminData(context: PageContext, notify = false): Promise<vo
       api.adminStats(),
       api.audit()
     ]);
-    if (state !== activeState || activeState.disposed) return;
-    activeState.users = usersResponse.users ?? [];
-    activeState.categories = categoryResponse.categories ?? [];
-    activeState.items = itemResponse.items ?? [];
+    if (!isActive(activeState) || refresh !== activeState.refreshRequest) return;
+    if (usersRequest === activeState.usersRequest) activeState.users = usersResponse.users ?? [];
+    if (contentRequest === activeState.contentRequest) {
+      activeState.categories = categoryResponse.categories ?? [];
+      activeState.items = itemResponse.items ?? [];
+    }
     activeState.stats = (statsResponse.stats ?? statsResponse) as AdminStats;
     activeState.audit = extractAudit(auditResponse);
+    if (!isCurrent()) return;
     renderAdminView();
     if (notify) showToast("管理数据已刷新", "success");
   } catch (error) {
-    if (state !== activeState || activeState.disposed) return;
+    if (!isCurrent() || refresh !== activeState.refreshRequest) return;
     if (context.handleAuthError(error)) return;
+    ++activeState.viewVersion;
     context.renderShell(errorMarkup("管理数据读取失败", getErrorMessage(error), "retryAdminButton"), "/admin");
     mustElement<HTMLButtonElement>("#retryAdminButton").addEventListener("click", () => { void reloadAdminData(context); });
   }
@@ -792,7 +901,12 @@ export async function renderAdmin(context: PageContext): Promise<void> {
     editingItemId: null,
     contentSearch: "",
     importPreview: null,
+    csvText: "",
     temporaryPassword: null,
+    viewVersion: 0,
+    usersRequest: 0,
+    contentRequest: 0,
+    refreshRequest: 0,
     disposed: false
   };
   context.renderShell(`
@@ -803,6 +917,11 @@ export async function renderAdmin(context: PageContext): Promise<void> {
 }
 
 export function disposeAdmin(): void {
-  if (state) state.disposed = true;
+  if (state) {
+    state.disposed = true;
+    state.temporaryPassword = null;
+    state.importPreview = null;
+    state.csvText = "";
+  }
   state = null;
 }

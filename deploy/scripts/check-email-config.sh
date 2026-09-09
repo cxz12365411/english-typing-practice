@@ -37,6 +37,17 @@ trim_value() {
   printf '%s' "$value"
 }
 
+parse_email_limit() {
+  local value="$1" maximum="$2" key="$3" range_error="$4"
+  [[ "$value" =~ ^[0-9]+$ ]] || die "${key} must be an integer"
+  # Bound the significant decimal digits before Bash arithmetic: otherwise a
+  # value such as 18446744073709551796 wraps to 180 on a 64-bit host.
+  [[ "$value" =~ ^0*([1-9][0-9]{0,4})$ ]] || die "$range_error"
+  local parsed=$((10#${BASH_REMATCH[1]}))
+  (( parsed <= maximum )) || die "$range_error"
+  printf '%s\n' "$parsed"
+}
+
 readonly requested_action="${1:---smtp}"
 if [[ "$requested_action" != "--config-only" && "$requested_action" != "--smtp" ]]; then
   usage
@@ -103,22 +114,16 @@ self_registration="${self_registration,,}"
 [[ "$self_registration" == "true" || "$self_registration" == "false" ]] ||
   die "EMAIL_SELF_REGISTRATION must be true or false"
 daily_send_limit_value="$(trim_value "${EMAIL_DAILY_SEND_LIMIT:-}")"
-[[ "$daily_send_limit_value" =~ ^[0-9]+$ ]] || die "EMAIL_DAILY_SEND_LIMIT must be an integer"
-daily_send_limit=$((10#${daily_send_limit_value}))
-(( daily_send_limit >= 1 && daily_send_limit <= 10000 )) ||
-  die "EMAIL_DAILY_SEND_LIMIT must be between 1 and 10000"
+daily_send_limit="$(parse_email_limit "$daily_send_limit_value" 10000 EMAIL_DAILY_SEND_LIMIT \
+  'EMAIL_DAILY_SEND_LIMIT must be between 1 and 10000')"
 registration_daily_send_limit_value="$(trim_value "${EMAIL_REGISTRATION_DAILY_SEND_LIMIT:-}")"
-[[ "$registration_daily_send_limit_value" =~ ^[0-9]+$ ]] ||
-  die "EMAIL_REGISTRATION_DAILY_SEND_LIMIT must be an integer"
-registration_daily_send_limit=$((10#${registration_daily_send_limit_value}))
-(( registration_daily_send_limit >= 1 && registration_daily_send_limit <= daily_send_limit )) ||
-  die "EMAIL_REGISTRATION_DAILY_SEND_LIMIT must be between 1 and EMAIL_DAILY_SEND_LIMIT"
+registration_daily_send_limit="$(parse_email_limit "$registration_daily_send_limit_value" "$daily_send_limit" \
+  EMAIL_REGISTRATION_DAILY_SEND_LIMIT \
+  'EMAIL_REGISTRATION_DAILY_SEND_LIMIT must be between 1 and EMAIL_DAILY_SEND_LIMIT')"
 registration_ip_daily_limit_value="$(trim_value "${EMAIL_REGISTRATION_IP_DAILY_LIMIT:-}")"
-[[ "$registration_ip_daily_limit_value" =~ ^[0-9]+$ ]] ||
-  die "EMAIL_REGISTRATION_IP_DAILY_LIMIT must be an integer"
-registration_ip_daily_limit=$((10#${registration_ip_daily_limit_value}))
-(( registration_ip_daily_limit >= 1 && registration_ip_daily_limit <= registration_daily_send_limit )) ||
-  die "EMAIL_REGISTRATION_IP_DAILY_LIMIT must be between 1 and EMAIL_REGISTRATION_DAILY_SEND_LIMIT"
+registration_ip_daily_limit="$(parse_email_limit "$registration_ip_daily_limit_value" "$registration_daily_send_limit" \
+  EMAIL_REGISTRATION_IP_DAILY_LIMIT \
+  'EMAIL_REGISTRATION_IP_DAILY_LIMIT must be between 1 and EMAIL_REGISTRATION_DAILY_SEND_LIMIT')"
 
 if [[ "$delivery" == "disabled" ]]; then
   [[ "$self_registration" == "false" ]] ||

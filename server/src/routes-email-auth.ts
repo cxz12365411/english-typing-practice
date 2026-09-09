@@ -190,9 +190,11 @@ function reserveCodeRequest(db: SqliteDatabase, email: string, ip: string): numb
   ]);
 }
 
-function reserveCodeVerification(db: SqliteDatabase, email: string, ip: string): number | null {
+function reserveCodeVerification(
+  db: SqliteDatabase, email: string, ip: string, sessionHash: string
+): number | null {
   return reserveGuardSet(db, [
-    { scope: "verify_email", key: tokenHash(email), limit: EMAIL_VERIFY_WINDOW_LIMIT, windowMs: VERIFY_WINDOW_MS },
+    { scope: "verify_email", key: tokenHash(`${sessionHash}\0${email}`), limit: EMAIL_VERIFY_WINDOW_LIMIT, windowMs: VERIFY_WINDOW_MS },
     { scope: "verify_ip", key: ip, limit: 60, windowMs: VERIFY_WINDOW_MS },
     { scope: "verify_pair", key: tokenHash(`${email}\0${ip}`), limit: 10, windowMs: VERIFY_WINDOW_MS }
   ]);
@@ -586,7 +588,7 @@ export async function registerEmailAuthRoutes(
       badRequest("INVALID_PASSWORD", (error as Error).message, { field: "password" });
     }
     const displayName = stringField(body, "displayName", { min: 1, max: 80 })!;
-    const blocked = reserveCodeVerification(db, email, request.ip);
+    const blocked = reserveCodeVerification(db, email, request.ip, sessionHash);
     if (blocked) throwRateLimit(blocked);
     const candidateCodeId = assertCodeCandidate(
       db,
@@ -629,7 +631,7 @@ export async function registerEmailAuthRoutes(
     const code = codeInput(body);
     const challengeId = challengeInput(body);
     const sessionHash = requestSessionHash(request);
-    const blocked = reserveCodeVerification(db, email, request.ip);
+    const blocked = reserveCodeVerification(db, email, request.ip, sessionHash);
     if (blocked) throwRateLimit(blocked);
     const snapshot = getUserByVerifiedEmail(db, email);
     const response = consumeCode(
@@ -677,7 +679,7 @@ export async function registerEmailAuthRoutes(
     } catch (error) {
       badRequest("INVALID_PASSWORD", (error as Error).message, { field: "newPassword" });
     }
-    const blocked = reserveCodeVerification(db, email, request.ip);
+    const blocked = reserveCodeVerification(db, email, request.ip, sessionHash);
     if (blocked) throwRateLimit(blocked);
     const snapshot = getUserByVerifiedEmail(db, email);
     const candidateCodeId = assertCodeCandidate(
@@ -735,7 +737,7 @@ export async function registerEmailAuthRoutes(
     const challengeId = challengeInput(body);
     const sessionHash = requestSessionHash(request);
     const currentPassword = stringField(body, "currentPassword", { min: 1, max: 128, trim: false })!;
-    const blocked = reserveCodeVerification(db, email, request.ip);
+    const blocked = reserveCodeVerification(db, email, request.ip, sessionHash);
     if (blocked) throwRateLimit(blocked);
     const candidateCodeId = assertCodeCandidate(
       db,
