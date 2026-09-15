@@ -244,34 +244,58 @@
 
 先背熟本组前 3 句，就能连起来完成一个自然的开场。
 
-| English / 中文谐音 | 中文 |
-|---|---|
-| Hi, excuse me. I'm a street photographer.<br>中文谐音：嗨，伊克斯丘兹 米。艾姆 额 斯垂特 佛塔格若弗。 | 你好，打扰一下。我是一名街头摄影师。 |
-| I really like your style.<br>中文谐音：艾 瑞利 赖克 尤尔 斯代尔。 | 我很喜欢你的风格。 |
-| Could I take a photo of you?<br>中文谐音：库德 艾 特诶克 额 佛头 阿夫 优？ | 我可以给你拍张照片吗？ |
-| It'll only take a minute.<br>中文谐音：伊特尔 欧恩利 特诶克 额 米尼特。 | 只需要一分钟。 |
+| English / 中文谐音 | 中文 | Stable ID |
+|---|---|---|
+| Hi, excuse me. I'm a street photographer.<br>中文谐音：嗨，伊克斯丘兹 米。艾姆 额 斯垂特 佛塔格若弗。 | 你好，打扰一下。我是一名街头摄影师。 | sentence-0169 |
+| I really like your style.<br>中文谐音：艾 瑞利 赖克 尤尔 斯代尔。 | 我很喜欢你的风格。 | sentence-0170 |
+| Could I take a photo of you?<br>中文谐音：库德 艾 特诶克 额 佛头 阿夫 优？ | 我可以给你拍张照片吗？ | sentence-0171 |
+| It'll only take a minute.<br>中文谐音：伊特尔 欧恩利 特诶克 额 米尼特。 | 只需要一分钟。 | sentence-0172 |
+| I'm working on a street photography project.<br>中文谐音：艾姆 沃金 昂 额 斯垂特 佛塔格若菲 普拉杰克特。 | 我正在做一个街头摄影项目。 | sentence-0183 |
+| Your outfit really caught my eye.<br>中文谐音：尤尔 奥特菲特 瑞利 考特 买 艾。 | 你的穿搭很吸引我。 | sentence-0184 |
+| I love the colors you're wearing.<br>中文谐音：艾 拉夫 德 卡勒兹 尤尔 韦林。 | 我很喜欢你穿搭的配色。 | sentence-0185 |
+| Would you like to see some of my work first?<br>中文谐音：伍德 优 赖克 特 西 萨姆 阿夫 买 沃克 弗斯特？ | 你想先看看我的一些作品吗？ | sentence-0186 |
+| There's no charge for the photos.<br>中文谐音：戴尔兹 诺 查尔吉 佛 德 佛头兹。 | 这些照片不收费。 | sentence-0187 |
+| No pressure at all. It's completely up to you.<br>中文谐音：诺 普瑞舍尔 艾特 奥尔。伊茨 肯普利特利 阿普 特 优。 | 完全不用有压力，由你决定。 | sentence-0188 |
 
 ## 16. 街头摄影：拍摄时引导动作
 
-| English / 中文谐音 | 中文 |
-|---|---|
-| Could you stand here, please?<br>中文谐音：库德 优 斯坦德 希尔，普利兹？ | 可以请你站在这里吗？ |
-| Turn a little this way, please.<br>中文谐音：特恩 额 利特尔 迪斯 韦，普利兹。 | 请稍微往这边转一点。 |
-| Look over there.<br>中文谐音：卢克 欧弗 戴尔。 | 看向那边。 |
-| Just relax and be yourself.<br>中文谐音：贾斯特 瑞拉克斯 安德 比 尤尔塞尔夫。 | 放轻松，自然一点就好。 |
-| Perfect! That looks great.<br>中文谐音：珀菲克特！戴特 卢克斯 格瑞特。 | 非常好！这样很好看。 |
+| English / 中文谐音 | 中文 | Stable ID |
+|---|---|---|
+| Could you stand here, please?<br>中文谐音：库德 优 斯坦德 希尔，普利兹？ | 可以请你站在这里吗？ | sentence-0173 |
+| Turn a little this way, please.<br>中文谐音：特恩 额 利特尔 迪斯 韦，普利兹。 | 请稍微往这边转一点。 | sentence-0174 |
+| Look over there.<br>中文谐音：卢克 欧弗 戴尔。 | 看向那边。 | sentence-0175 |
+| Just relax and be yourself.<br>中文谐音：贾斯特 瑞拉克斯 安德 比 尤尔塞尔夫。 | 放轻松，自然一点就好。 | sentence-0176 |
+| Perfect! That looks great.<br>中文谐音：珀菲克特！戴特 卢克斯 格瑞特。 | 非常好！这样很好看。 | sentence-0177 |
+| Relax your shoulders.<br>中文谐音：瑞拉克斯 尤尔 舒尔德兹。 | 肩膀放松一点。 | sentence-0189 |
+| Look just past the camera.<br>中文谐音：卢克 贾斯特 派斯特 德 卡梅若。 | 看向镜头旁边一点的位置。 | sentence-0190 |
+| Could you turn slightly to your left?<br>中文谐音：库德 优 特恩 斯莱特利 特 尤尔 莱夫特？ | 可以稍微向你的左边转一点吗？ | sentence-0191 |
+| You can put your hands in your pockets.<br>中文谐音：优 肯 普特 尤尔 汉兹 因 尤尔 帕基茨。 | 你可以把手放进口袋里。 | sentence-0192 |
+| Walk toward me at your normal pace.<br>中文谐音：沃克 特沃德 米 艾特 尤尔 诺尔默尔 佩斯。 | 按平常的速度朝我走过来。 | sentence-0193 |
+| Hold that pose for a second.<br>中文谐音：侯德 戴特 波兹 佛 额 塞肯德。 | 保持这个姿势一秒钟。 | sentence-0194 |
 
 ## 17. 街头摄影：看图和发送照片
 
-| English / 中文谐音 | 中文 |
-|---|---|
-| Would you like to see the photos?<br>中文谐音：伍德 优 赖克 特 西 德 佛头兹？ | 你想看看照片吗？ |
-| How can I send you the photos?<br>中文谐音：豪 肯 艾 森德 优 德 佛头兹？ | 我怎么把照片发给你？ |
-| Is it okay if I post these on Instagram?<br>中文谐音：伊兹 伊特 欧凯 伊夫 艾 波斯特 迪兹 昂 因斯特格拉姆？ | 我可以把这几张照片发到 Instagram 上吗？ |
+| English / 中文谐音 | 中文 | Stable ID |
+|---|---|---|
+| Would you like to see the photos?<br>中文谐音：伍德 优 赖克 特 西 德 佛头兹？ | 你想看看照片吗？ | sentence-0178 |
+| How can I send you the photos?<br>中文谐音：豪 肯 艾 森德 优 德 佛头兹？ | 我怎么把照片发给你？ | sentence-0179 |
+| Is it okay if I post these on Instagram?<br>中文谐音：伊兹 伊特 欧凯 伊夫 艾 波斯特 迪兹 昂 因斯特格拉姆？ | 我可以把这几张照片发到 Instagram 上吗？ | sentence-0180 |
+| Which photo do you like best?<br>中文谐音：威奇 佛头 杜 优 赖克 贝斯特？ | 你最喜欢哪一张？ | sentence-0195 |
+| Would you like me to take another one?<br>中文谐音：伍德 优 赖克 米 特 特诶克 额纳德尔 万？ | 你想让我再拍一张吗？ | sentence-0196 |
+| I can send you the original files.<br>中文谐音：艾 肯 森德 优 德 额瑞吉讷尔 法尔兹。 | 我可以把原图发给你。 | sentence-0197 |
+| Could you type your email address here?<br>中文谐音：库德 优 泰普 尤尔 伊梅尔 额德瑞斯 希尔？ | 可以在这里输入你的邮箱地址吗？ | sentence-0198 |
+| Would you like me to tag you when I post them?<br>中文谐音：伍德 优 赖克 米 特 泰格 优 温 艾 波斯特 德姆？ | 我发布照片时，你希望我标记你的账号吗？ | sentence-0199 |
+| I won't post the photos without your permission.<br>中文谐音：艾 沃恩特 波斯特 德 佛头兹 威道特 尤尔 珀米申。 | 未经你的允许，我不会发布照片。 | sentence-0200 |
 
 ## 18. 街头摄影：礼貌结束
 
-| English / 中文谐音 | 中文 |
-|---|---|
-| Thanks for your time. Have a great day!<br>中文谐音：桑克斯 佛 尤尔 泰姆。海夫 额 格瑞特 得诶！ | 谢谢你抽出时间，祝你今天愉快！ |
-| No worries. Have a nice day!<br>中文谐音：诺 沃瑞兹。海夫 额 奈斯 得诶！ | 没关系，祝你今天愉快！ |
+| English / 中文谐音 | 中文 | Stable ID |
+|---|---|---|
+| Thanks for your time. Have a great day!<br>中文谐音：桑克斯 佛 尤尔 泰姆。海夫 额 格瑞特 得诶！ | 谢谢你抽出时间，祝你今天愉快！ | sentence-0181 |
+| No worries. Have a nice day!<br>中文谐音：诺 沃瑞兹。海夫 额 奈斯 得诶！ | 没关系，祝你今天愉快！ | sentence-0182 |
+| Thank you for being part of my project.<br>中文谐音：桑克 优 佛 比英 帕尔特 阿夫 买 普拉杰克特。 | 谢谢你参与我的项目。 | sentence-0201 |
+| It was lovely meeting you.<br>中文谐音：伊特 沃兹 拉夫利 米廷 优。 | 很高兴认识你。 | sentence-0202 |
+| You made this shoot really fun.<br>中文谐音：优 梅德 迪斯 舒特 瑞利 范。 | 和你一起拍摄很开心。 | sentence-0203 |
+| Of course. I'll delete that photo.<br>中文谐音：阿夫 科尔斯。艾尔 迪利特 戴特 佛头。 | 当然，我会删掉那张照片。 | sentence-0204 |
+| I understand. Thanks anyway.<br>中文谐音：艾 安德斯坦德。桑克斯 艾尼韦。 | 我理解，还是谢谢你。 | sentence-0205 |
+| Feel free to message me if you have any questions.<br>中文谐音：菲尔 弗瑞 特 梅瑟吉 米 伊夫 优 海夫 艾尼 奎斯辰兹。 | 有任何问题，随时给我发消息。 | sentence-0206 |

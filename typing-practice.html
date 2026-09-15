@@ -621,7 +621,7 @@
           continue;
         }
         const cells = line.trim().slice(1, -1).split("|").map((cell) => cell.trim());
-        if (cells.length !== 2) continue;
+        if (cells.length !== 2 && cells.length !== 3) continue;
 
         const englishParts = cells[0].split(/<br>\s*中文谐音：/);
         const sentence = englishParts[0].trim();
