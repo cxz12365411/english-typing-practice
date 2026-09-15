@@ -239,7 +239,7 @@ assert payload.get("error", {}).get("code") == "MUST_CHANGE_PASSWORD"
 import json, sys
 payload = json.load(open(sys.argv[1], encoding="utf-8"))
 assert len(payload["categories"]) == 22, "expected 22 categories, got %d" % len(payload["categories"])
-assert len(payload["items"]) == 1032, "expected 1032 items, got %d" % len(payload["items"])
+assert len(payload["items"]) == 1056, "expected 1056 items, got %d" % len(payload["items"])
 ' "${temp_dir}/content.body" || die "published content count check failed"
   fi
 

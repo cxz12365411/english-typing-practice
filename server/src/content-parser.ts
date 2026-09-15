@@ -68,6 +68,7 @@ export function parseWordMarkdown(markdown: string): ParsedContent {
 export function parseSentenceMarkdown(markdown: string): ParsedContent {
   const categories: ParsedCategory[] = [];
   const items: ParsedItem[] = [];
+  const itemKeys = new Set<string>();
   let current: ParsedCategory | undefined;
 
   for (const rawLine of markdown.replace(/\r\n?/g, "\n").split("\n")) {
@@ -90,8 +91,16 @@ export function parseSentenceMarkdown(markdown: string): ParsedContent {
     const english = (englishParts[0] ?? "").trim();
     const pronunciation = (englishParts.slice(1).join(" ").match(/中文谐音[：:]\s*(.+)/)?.[1] ?? "").trim();
     if (!english) continue;
+    // Existing two-column files retain their positional keys. A third column
+    // lets later additions keep the IDs already used by learning history.
+    const key = cells.length >= 3 ? cells[2]! : `sentence-${String(items.length + 1).padStart(4, "0")}`;
+    if (!/^sentence-[0-9]{4,}$/.test(key) || /^sentence-0+$/.test(key)) {
+      throw new Error(`Invalid sentence item key: ${key}`);
+    }
+    if (itemKeys.has(key)) throw new Error(`Duplicate sentence item key: ${key}`);
+    itemKeys.add(key);
     items.push({
-      key: `sentence-${String(items.length + 1).padStart(4, "0")}`,
+      key,
       categorySlug: current.slug,
       kind: "sentence",
       english,

@@ -366,8 +366,8 @@ function readSeedContent(sourceDir: string): { parsed: ParsedContent; checksum: 
   const sentencesSource = readFileSync(resolve(sourceDir, "daily-english-high-frequency-sentences.md"), "utf8");
   const words = parseWordMarkdown(wordsSource);
   const sentences = parseSentenceMarkdown(sentencesSource);
-  if (words.items.length !== 850 || sentences.items.length !== 182) {
-    throw new Error(`Seed integrity check failed: expected 850 words and 182 sentences, got ${words.items.length} and ${sentences.items.length}`);
+  if (words.items.length !== 850 || sentences.items.length !== 206) {
+    throw new Error(`Seed integrity check failed: expected 850 words and 206 sentences, got ${words.items.length} and ${sentences.items.length}`);
   }
   return {
     parsed: { categories: [...words.categories, ...sentences.categories], items: [...words.items, ...sentences.items] },
@@ -404,9 +404,9 @@ export function seedContent(db: SqliteDatabase, explicitSourceDir?: string): See
 
   const legacyCounts = contentCounts(db);
   if (legacyCounts.total > 0) {
-    if (legacyCounts.words !== 850 || ![168, 182].includes(legacyCounts.sentences)) {
+    if (legacyCounts.words !== 850 || ![168, 182, 206].includes(legacyCounts.sentences)) {
       throw new Error(
-        `Cannot mark legacy seed complete: expected 850 words and 168 or 182 sentences, got ${legacyCounts.words} and ${legacyCounts.sentences}`
+        `Cannot mark legacy seed complete: expected 850 words and 168, 182 or 206 sentences, got ${legacyCounts.words} and ${legacyCounts.sentences}`
       );
     }
     db.transaction(() => {
