@@ -5,6 +5,7 @@ import { createHash, randomUUID } from "node:crypto";
 import Database from "better-sqlite3";
 import type { AppConfig } from "./config.js";
 import { parseSentenceMarkdown, parseWordMarkdown, type ParsedContent } from "./content-parser.js";
+import { applyContentUpdates } from "./content-updates.js";
 
 export type SqliteDatabase = Database.Database;
 
@@ -365,8 +366,8 @@ function readSeedContent(sourceDir: string): { parsed: ParsedContent; checksum: 
   const sentencesSource = readFileSync(resolve(sourceDir, "daily-english-high-frequency-sentences.md"), "utf8");
   const words = parseWordMarkdown(wordsSource);
   const sentences = parseSentenceMarkdown(sentencesSource);
-  if (words.items.length !== 850 || sentences.items.length !== 168) {
-    throw new Error(`Seed integrity check failed: expected 850 words and 168 sentences, got ${words.items.length} and ${sentences.items.length}`);
+  if (words.items.length !== 850 || sentences.items.length !== 182) {
+    throw new Error(`Seed integrity check failed: expected 850 words and 182 sentences, got ${words.items.length} and ${sentences.items.length}`);
   }
   return {
     parsed: { categories: [...words.categories, ...sentences.categories], items: [...words.items, ...sentences.items] },
@@ -403,9 +404,9 @@ export function seedContent(db: SqliteDatabase, explicitSourceDir?: string): See
 
   const legacyCounts = contentCounts(db);
   if (legacyCounts.total > 0) {
-    if (legacyCounts.words !== 850 || legacyCounts.sentences !== 168) {
+    if (legacyCounts.words !== 850 || ![168, 182].includes(legacyCounts.sentences)) {
       throw new Error(
-        `Cannot mark legacy seed complete: expected 850 words and 168 sentences, got ${legacyCounts.words} and ${legacyCounts.sentences}`
+        `Cannot mark legacy seed complete: expected 850 words and 168 or 182 sentences, got ${legacyCounts.words} and ${legacyCounts.sentences}`
       );
     }
     db.transaction(() => {
@@ -482,7 +483,21 @@ export function seedContent(db: SqliteDatabase, explicitSourceDir?: string): See
 
 export function migrateAndSeed(db: SqliteDatabase, explicitSourceDir?: string): SeedResult {
   migrateDatabase(db);
-  return seedContent(db, explicitSourceDir);
+  return db.transaction(() => {
+    const seeded = seedContent(db, explicitSourceDir);
+    const updated = applyContentUpdates(
+      db,
+      () => readSeedContent(locateContentSource(explicitSourceDir)).parsed,
+      () => bumpContentVersion(db)
+    );
+    const counts = contentCounts(db);
+    return {
+      categoriesInserted: seeded.categoriesInserted + updated.categoriesInserted,
+      itemsInserted: seeded.itemsInserted + updated.itemsInserted,
+      words: counts.words,
+      sentences: counts.sentences
+    };
+  }).immediate();
 }
 
 export function bumpContentVersion(db: SqliteDatabase): string {

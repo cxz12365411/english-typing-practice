@@ -274,7 +274,7 @@ sudo --preserve-env=ETP_TEST_USERNAME,ETP_TEST_PASSWORD \
   /usr/local/libexec/english-typing-practice/acceptance-test.sh
 ```
 
-The deeper check asserts the secure session cookie, 18 categories, 1,018 items, CSRF
+The deeper check asserts the secure session cookie, 22 categories, 1,032 items, CSRF
 logout, and session revocation. Browser Playwright tests remain the acceptance source
 for speech synthesis, input interaction, `localStorage` migration, and mobile layout.
 

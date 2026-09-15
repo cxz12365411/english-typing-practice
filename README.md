@@ -76,3 +76,10 @@ Production deployment assets and the rollback/restore runbook are documented in
 
 The original Markdown files are seed inputs. They remain in this public repository,
 but are not served by the authenticated production application.
+
+The bundled corpus contains 850 words and 182 sentences across 22 categories,
+including 14 street-photography phrases in four scenarios. The September 2026
+content update is applied once to existing databases, preserving existing item IDs,
+accounts, progress, and subsequent administrator edits. Merely editing a Markdown
+file does not overwrite an already-seeded database; additions need an explicit,
+transactional content update. See [the content sync notes](docs/content-sync-2026-09-15.md).

@@ -78,7 +78,7 @@ test("seed, auth, CSRF, RBAC, user isolation and final-admin protection", async 
     const counts = db.prepare(`
       SELECT SUM(kind = 'word') AS words, SUM(kind = 'sentence') AS sentences FROM items
     `).get() as { words: number; sentences: number };
-    assert.deepEqual(counts, { words: 850, sentences: 168 });
+    assert.deepEqual(counts, { words: 850, sentences: 182 });
 
     const adminId = await insertUser(db, "admin", "Admin-Temporary-123!", "admin");
     await insertUser(db, "student.a", "Student-Temporary-123!", "user");
@@ -97,7 +97,7 @@ test("seed, auth, CSRF, RBAC, user isolation and final-admin protection", async 
     const contentResponse = await app.inject({ method: "GET", url: "/api/content", headers: { cookie: admin.cookie } });
     assert.equal(contentResponse.statusCode, 200, contentResponse.body);
     const content = contentResponse.json() as { version: string; items: Array<{ id: string; english: string; revision: number }> };
-    assert.equal(content.items.length, 1018);
+    assert.equal(content.items.length, 1032);
     assert.ok(content.version);
 
     const disableLastAdmin = await app.inject({

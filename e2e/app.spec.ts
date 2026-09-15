@@ -85,8 +85,8 @@ test.describe.serial("multi-user application", () => {
     await login(page, "learner1", learnerTemporaryPassword);
     await changeForcedPassword(page, learnerTemporaryPassword, LEARNER_PASSWORD);
     await expect(page).toHaveURL(/\/practice$/);
-    await expect(page.getByText(/已载入 850 个单词，168 条句型/)).toBeVisible();
-    await expect(page.locator("#categorySelect option")).toHaveCount(19);
+    await expect(page.getByText(/已载入 850 个单词，182 条句型/)).toBeVisible();
+    await expect(page.locator("#categorySelect option")).toHaveCount(23);
 
     await expect(page.locator("#legacyBanner")).toBeVisible();
     await page.getByRole("button", { name: "确认导入" }).click();
@@ -117,6 +117,74 @@ test.describe.serial("multi-user application", () => {
     await expect(page).toHaveURL(/\/practice$/);
   });
 
+  test("street photography categories preserve phrases and synchronize a typographic apostrophe answer", async ({ page }) => {
+    await login(page, "learner1", LEARNER_PASSWORD);
+    await expect(page).toHaveURL(/\/practice$/);
+
+    const groups = [
+      {
+        label: "句型：街头摄影：开场与征求同意",
+        count: 4,
+        english: "Hi, excuse me. I'm a street photographer.",
+        meaning: "你好，打扰一下。我是一名街头摄影师。",
+        pronunciation: "嗨，伊克斯丘兹 米。艾姆 额 斯垂特 佛塔格若弗。"
+      },
+      {
+        label: "句型：街头摄影：拍摄时引导动作",
+        count: 5,
+        english: "Could you stand here, please?",
+        meaning: "可以请你站在这里吗？",
+        pronunciation: "库德 优 斯坦德 希尔，普利兹？"
+      },
+      {
+        label: "句型：街头摄影：看图和发送照片",
+        count: 3,
+        english: "Would you like to see the photos?",
+        meaning: "你想看看照片吗？",
+        pronunciation: "伍德 优 赖克 特 西 德 佛头兹？"
+      },
+      {
+        label: "句型：街头摄影：礼貌结束",
+        count: 2,
+        english: "Thanks for your time. Have a great day!",
+        meaning: "谢谢你抽出时间，祝你今天愉快！",
+        pronunciation: "桑克斯 佛 尤尔 泰姆。海夫 额 格瑞特 得诶！"
+      }
+    ];
+    for (const group of groups) {
+      await page.locator("#categorySelect").selectOption({ label: group.label });
+      await expect(page.locator("#answerInput")).toBeEnabled();
+      await expect(page.locator("#targetWord")).toHaveText(group.english);
+      await expect(page.locator("#meaningText")).toHaveText(group.meaning);
+      await expect(page.locator("#pronunciationText")).toHaveText(`中文谐音：${group.pronunciation}`);
+      await expect(page.locator("#positionText")).toHaveText(`1 / ${group.count}`);
+    }
+
+    await page.locator("#categorySelect").selectOption({ label: groups[0].label });
+    await expect(page.locator("#targetWord")).toHaveText(groups[0].english);
+    await expect(page.locator("#answerInput")).toBeEnabled();
+    const before = await (await page.request.get("/api/me/summary")).json();
+    const submitted = page.waitForResponse((response) => (
+      /\/api\/practice\/sessions\/[^/]+\/attempts$/.test(new URL(response.url()).pathname)
+      && response.request().method() === "POST"
+    ));
+    await page.locator("#answerInput").fill("Hi, excuse me. I’m a street photographer.");
+    const response = await submitted;
+    expect(response.ok()).toBeTruthy();
+    const result = await response.json();
+    expect(result.attempt.correct).toBe(true);
+    expect(result.attempt.itemId).toBe(response.request().postDataJSON().itemId);
+    expect(result.summary.done).toBe(1);
+    await expect(page.locator("#targetWord")).toHaveText("I really like your style.");
+
+    await page.reload();
+    await expect(page.locator("#answerInput")).toBeEnabled();
+    const after = await (await page.request.get("/api/me/summary")).json();
+    expect(after.totals.attempts).toBe(before.totals.attempts + 1);
+    expect(after.totals.correct).toBe(before.totals.correct + 1);
+    await expect(page.locator("#lifetimeAttempts")).toHaveText(String(after.totals.attempts));
+  });
+
   test("an existing user can bind a verified email", async ({ page }) => {
     const email = "learner2@example.com";
     await login(page, "learner2", OTHER_PASSWORD);
@@ -144,7 +212,7 @@ test.describe.serial("multi-user application", () => {
     await form.locator('[name="code"]').fill(code);
     await form.getByRole("button", { name: "登录", exact: true }).click();
     await expect(page).toHaveURL(/\/practice$/);
-    await expect(page.getByText(/已载入 850 个单词，168 条句型/)).toBeVisible();
+    await expect(page.getByText(/已载入 850 个单词，182 条句型/)).toBeVisible();
   });
 
   test("email verification code resets a password and revokes the old password", async ({ page }) => {
@@ -259,16 +327,36 @@ test.describe.serial("multi-user application", () => {
   });
 });
 
-test("mobile layout stacks the practice sidebar", async ({ page }) => {
+test("mobile layout stacks the practice sidebar and wraps a street photography phrase", async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await login(page, "learner1", LEARNER_PASSWORD);
   await expect(page).toHaveURL(/\/practice$/);
+  await page.locator("#categorySelect").selectOption({ label: "句型：街头摄影：开场与征求同意" });
+  await expect(page.locator("#targetWord")).toHaveText("Hi, excuse me. I'm a street photographer.");
+  await expect(page.locator("#answerInput")).toBeEnabled();
   const layout = await page.evaluate(() => {
     const main = document.querySelector<HTMLElement>(".practice-main")!.getBoundingClientRect();
     const side = document.querySelector<HTMLElement>(".practice-side")!.getBoundingClientRect();
-    return { mainWidth: main.width, sideWidth: side.width, sideTop: side.top, mainBottom: main.bottom };
+    const target = document.querySelector<HTMLElement>("#targetWord")!;
+    const targetRect = target.getBoundingClientRect();
+    return {
+      mainWidth: main.width,
+      sideWidth: side.width,
+      sideTop: side.top,
+      mainBottom: main.bottom,
+      pageWidth: document.documentElement.scrollWidth,
+      viewportWidth: window.innerWidth,
+      targetLeft: targetRect.left,
+      targetRight: targetRect.right,
+      targetScrollWidth: target.scrollWidth,
+      targetClientWidth: target.clientWidth
+    };
   });
   expect(layout.mainWidth).toBeLessThanOrEqual(390);
   expect(layout.sideWidth).toBeLessThanOrEqual(390);
   expect(layout.sideTop).toBeGreaterThanOrEqual(layout.mainBottom - 1);
+  expect(layout.pageWidth).toBeLessThanOrEqual(layout.viewportWidth);
+  expect(layout.targetLeft).toBeGreaterThanOrEqual(0);
+  expect(layout.targetRight).toBeLessThanOrEqual(layout.viewportWidth);
+  expect(layout.targetScrollWidth).toBeLessThanOrEqual(layout.targetClientWidth);
 });
