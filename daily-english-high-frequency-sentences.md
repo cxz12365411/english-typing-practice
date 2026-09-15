@@ -239,3 +239,39 @@
 | See you tomorrow.<br>中文谐音：西 尤 图莫罗。 | 明天见。 |
 | See you next time.<br>中文谐音：西 尤 内克斯特 泰姆。 | 下次见。 |
 | Goodbye.<br>中文谐音：古德拜。 | 再见。 |
+
+## 15. 街头摄影：开场与征求同意
+
+先背熟本组前 3 句，就能连起来完成一个自然的开场。
+
+| English / 中文谐音 | 中文 |
+|---|---|
+| Hi, excuse me. I'm a street photographer.<br>中文谐音：嗨，伊克斯丘兹 米。艾姆 额 斯垂特 佛塔格若弗。 | 你好，打扰一下。我是一名街头摄影师。 |
+| I really like your style.<br>中文谐音：艾 瑞利 赖克 尤尔 斯代尔。 | 我很喜欢你的风格。 |
+| Could I take a photo of you?<br>中文谐音：库德 艾 特诶克 额 佛头 阿夫 优？ | 我可以给你拍张照片吗？ |
+| It'll only take a minute.<br>中文谐音：伊特尔 欧恩利 特诶克 额 米尼特。 | 只需要一分钟。 |
+
+## 16. 街头摄影：拍摄时引导动作
+
+| English / 中文谐音 | 中文 |
+|---|---|
+| Could you stand here, please?<br>中文谐音：库德 优 斯坦德 希尔，普利兹？ | 可以请你站在这里吗？ |
+| Turn a little this way, please.<br>中文谐音：特恩 额 利特尔 迪斯 韦，普利兹。 | 请稍微往这边转一点。 |
+| Look over there.<br>中文谐音：卢克 欧弗 戴尔。 | 看向那边。 |
+| Just relax and be yourself.<br>中文谐音：贾斯特 瑞拉克斯 安德 比 尤尔塞尔夫。 | 放轻松，自然一点就好。 |
+| Perfect! That looks great.<br>中文谐音：珀菲克特！戴特 卢克斯 格瑞特。 | 非常好！这样很好看。 |
+
+## 17. 街头摄影：看图和发送照片
+
+| English / 中文谐音 | 中文 |
+|---|---|
+| Would you like to see the photos?<br>中文谐音：伍德 优 赖克 特 西 德 佛头兹？ | 你想看看照片吗？ |
+| How can I send you the photos?<br>中文谐音：豪 肯 艾 森德 优 德 佛头兹？ | 我怎么把照片发给你？ |
+| Is it okay if I post these on Instagram?<br>中文谐音：伊兹 伊特 欧凯 伊夫 艾 波斯特 迪兹 昂 因斯特格拉姆？ | 我可以把这几张照片发到 Instagram 上吗？ |
+
+## 18. 街头摄影：礼貌结束
+
+| English / 中文谐音 | 中文 |
+|---|---|
+| Thanks for your time. Have a great day!<br>中文谐音：桑克斯 佛 尤尔 泰姆。海夫 额 格瑞特 得诶！ | 谢谢你抽出时间，祝你今天愉快！ |
+| No worries. Have a nice day!<br>中文谐音：诺 沃瑞兹。海夫 额 奈斯 得诶！ | 没关系，祝你今天愉快！ |
