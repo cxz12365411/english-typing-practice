@@ -204,6 +204,7 @@ test("finishing a refresh after switching tabs preserves the new editor input", 
 test("CSV preview preserves the source, invalidates edited rows, and reports published imports accurately", async ({ page }) => {
   await mockAdmin(page);
   await openAdmin(page, "import");
+  await page.getByRole("button", { name: "CSV", exact: true }).click();
   await page.locator("#csvText").fill(csv);
   await page.locator('#csvPreviewForm button[type="submit"]').click();
   await expect(page.locator("#commitImportButton")).toBeEnabled();
@@ -229,6 +230,7 @@ test("editing CSV while validation is pending discards the outdated preview", as
     await json(route, preview);
   });
   await openAdmin(page, "import");
+  await page.getByRole("button", { name: "CSV", exact: true }).click();
   await page.locator("#csvText").fill(csv);
   await page.locator('#csvPreviewForm button[type="submit"]').click();
   await expect.poll(() => requested).toBeTruthy();

@@ -192,3 +192,80 @@ export interface ImportPreviewResponse {
   errors: Array<string | { row?: number; message?: string }>;
   summary?: Record<string, unknown>;
 }
+
+export interface MarkdownImportMapping {
+  groupId: string;
+  categoryId?: string;
+  name?: string;
+  kind?: ContentKind;
+}
+
+export interface MarkdownImportInput {
+  markdown: string;
+  fileName?: string;
+  defaultCategoryName?: string;
+  mappings?: MarkdownImportMapping[];
+}
+
+export interface MarkdownImportIssue {
+  row: number;
+  field?: string;
+  message: string;
+}
+
+export interface MarkdownImportGroup {
+  groupId: string;
+  row: number;
+  title: string;
+  name: string;
+  kind: ContentKind;
+  action: "existing" | "create" | "ambiguous";
+  categoryId: string | null;
+  candidates?: Array<{ id: string; name: string; kind: ContentKind; status: ContentStatus }>;
+}
+
+export interface MarkdownImportRow {
+  row: number;
+  groupId: string;
+  categoryName: string;
+  categoryId: string | null;
+  kind: ContentKind;
+  english: string;
+  meaning: string;
+  pronunciation: string;
+  action: "create" | "reuse" | "unavailable" | "duplicate";
+  itemId?: string;
+  message?: string;
+}
+
+export interface MarkdownImportPreview {
+  previewId: string;
+  groups: MarkdownImportGroup[];
+  rows: MarkdownImportRow[];
+  errors: MarkdownImportIssue[];
+  warnings: MarkdownImportIssue[];
+  summary: {
+    total: number;
+    created: number;
+    reused: number;
+    unavailable: number;
+    duplicates: number;
+    practiceCount: number;
+    ignoredCount: number;
+  };
+  expiresAt: string;
+}
+
+export interface MarkdownImportCommitResponse {
+  ok: true;
+  batchId: string;
+  created: number;
+  reused: number;
+  skipped: number;
+  practiceCount: number;
+}
+
+export interface ImportBatchContentResponse extends ContentResponse {
+  batch: { id: string; fileName: string; createdAt: string };
+  unavailableCount: number;
+}

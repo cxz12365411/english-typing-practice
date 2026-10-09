@@ -1,4 +1,5 @@
 import { ApiError, api } from "./api";
+import { practiceBatchId } from "./routes";
 import {
   clearVerificationCountdowns,
   normalizeEmail,
@@ -12,6 +13,8 @@ import type {
   AttemptSummary,
   ContentCategory,
   ContentItem,
+  ContentResponse,
+  ImportBatchContentResponse,
   EmailCodePurpose,
   MistakeRecord,
   OrderMode,
@@ -46,6 +49,9 @@ interface PendingAttempt {
 
 interface PracticeState {
   context: PageContext;
+  importBatchId?: string;
+  batch?: ImportBatchContentResponse["batch"];
+  unavailableCount: number;
   categories: ContentCategory[];
   items: ContentItem[];
   mistakes: MistakeRecord[];
@@ -199,7 +205,9 @@ function practiceMarkup(
   sentenceCount: number,
   hasLegacyMistakes: boolean,
   user: User,
-  emailAuthEnabled: boolean
+  emailAuthEnabled: boolean,
+  batch?: ImportBatchContentResponse["batch"],
+  unavailableCount = 0
 ): string {
   return `
     <div class="page-title">
@@ -215,6 +223,10 @@ function practiceMarkup(
       </section>
     </div>
 
+    ${batch ? `<section class="message info" id="importBatchBanner">
+      <div><strong>本次文件：${escapeHtml(batch.fileName)}</strong><p id="batchAvailabilityNote">只练这份文件中的 ${wordCount + sentenceCount} 道已发布题目${unavailableCount ? `，另有 ${unavailableCount} 道已不可练习` : ""}。</p></div>
+      <button class="btn small" id="exitImportBatchButton" type="button">退出本次文件练习</button>
+    </section>` : ""}
     <section class="legacy-banner message info" id="legacyBanner"${hasLegacyMistakes ? "" : " hidden"}>
       <span>发现此浏览器旧版错题记录（<strong id="legacyCount">${hasLegacyMistakes ? "" : "0"}</strong> 条），可一次性导入当前账号。</span>
       <div class="inline-actions">
@@ -227,9 +239,9 @@ function practiceMarkup(
       <section class="practice-controls" aria-label="练习设置">
         <label class="field">
           <span>内容分类</span>
-          <select class="select" id="categorySelect">
-            <option value="all">全部内容</option>
-            ${categoriesMarkup(categories)}
+          <select class="select" id="categorySelect"${batch ? " disabled" : ""}>
+            <option value="all">${batch ? "本次文件全部内容" : "全部内容"}</option>
+            ${batch ? "" : categoriesMarkup(categories)}
           </select>
         </label>
         <label class="field">
@@ -361,7 +373,7 @@ function renderStats(): void {
   const rawAccuracy = metric(state.summary, ["accuracy"], done ? (correct / done) * 100 : 0);
   const accuracy = rawAccuracy <= 1 && rawAccuracy > 0 ? rawAccuracy * 100 : rawAccuracy;
   const streak = metric(state.summary, ["streak", "currentStreak"], state.localStreak);
-  const mistakes = metric(state.summary, ["mistakes", "mistakeCount"], state.mistakes.length);
+  const mistakes = state.importBatchId ? state.mistakes.length : metric(state.summary, ["mistakes", "mistakeCount"], state.mistakes.length);
   mustElement<HTMLElement>("#doneStat").textContent = String(Math.max(0, Math.round(done)));
   mustElement<HTMLElement>("#accuracyStat").textContent = `${Math.max(0, Math.min(100, Math.round(accuracy)))}%`;
   mustElement<HTMLElement>("#streakStat").textContent = String(Math.max(0, Math.round(streak)));
@@ -423,7 +435,7 @@ function clearSyncProblem(): void {
 function setPracticeInputsDisabled(disabled: boolean): void {
   document.querySelectorAll<HTMLButtonElement | HTMLInputElement | HTMLSelectElement>(
     "#answerInput, #nextButton, #resetButton, #categorySelect, #orderSelect"
-  ).forEach((element) => { element.disabled = disabled; });
+  ).forEach((element) => { element.disabled = disabled || (element.id === "categorySelect" && Boolean(state?.importBatchId)); });
 }
 
 function renderCurrent(): void {
@@ -443,7 +455,9 @@ function renderCurrent(): void {
   mustElement<HTMLElement>("#positionText").textContent = total ? `${state.index + 1} / ${total}` : "0 / 0";
   const selectedCategoryId = state.categoryId;
   const category = state.categories.find((entry) => entry.id === selectedCategoryId);
-  mustElement<HTMLElement>("#categoryText").textContent = category?.name ?? "全部内容";
+  const itemCategory = state.categories.find((entry) => entry.id === item?.categoryId);
+  mustElement<HTMLElement>("#categoryText").textContent = state.importBatchId
+    ? `本次文件${itemCategory ? ` · ${itemCategory.name}` : ""}` : category?.name ?? "全部内容";
   progress.max = Math.max(1, total);
   progress.value = total ? state.index : 0;
 
@@ -456,8 +470,10 @@ function renderCurrent(): void {
 
   if (!item) {
     target.className = "target-word";
-    target.textContent = state.mode === "mistakes" ? "错题已练完" : "暂无词条";
-    meaning.textContent = state.mode === "mistakes" ? "当前筛选下没有待复习的错题。" : "当前分类暂时没有已发布内容。";
+    target.textContent = state.importBatchId && !state.items.length ? "本次文件暂无可练习内容" : state.mode === "mistakes" ? "错题已练完" : "暂无词条";
+    meaning.textContent = state.importBatchId && !state.items.length
+      ? "这些题目或所属分类可能已下架。可退出本次文件练习后选择其他内容。"
+      : state.mode === "mistakes" ? "当前筛选下没有待复习的错题。" : "当前分类暂时没有已发布内容。";
     pronunciation.textContent = "";
     pronunciation.hidden = true;
     answerInput.disabled = true;
@@ -489,13 +505,28 @@ async function refreshMistakes(): Promise<void> {
   try {
     const response = await api.mistakes();
     if (!isActive(activeState) || sequence !== activeState.mistakeRefreshSequence) return;
-    state.mistakes = response.items ?? [];
+    state.mistakes = mistakesInScope(response.items ?? [], state.items, state.importBatchId);
     state.mistakeIds = new Set(state.mistakes.map((record) => record.item.id));
     renderMistakes();
   } catch (error) {
     if (!isActive(activeState) || sequence !== activeState.mistakeRefreshSequence) return;
     if (!state?.context.handleAuthError(error)) showToast(getErrorMessage(error, "错题刷新失败"), "error");
   }
+}
+
+function mistakesInScope(mistakes: MistakeRecord[], items: ContentItem[], importBatchId?: string): MistakeRecord[] {
+  if (!importBatchId) return mistakes;
+  const ids = new Set(items.map((item) => item.id));
+  return mistakes.filter((record) => ids.has(record.item.id));
+}
+
+function loadPracticeContent(importBatchId?: string): Promise<ContentResponse | ImportBatchContentResponse> {
+  return importBatchId ? api.importBatchContent(importBatchId) : api.content();
+}
+
+function arrangePracticeContent(content: ContentResponse, importBatchId?: string) {
+  // The batch endpoint returns source-file order, independent of the bank's category order.
+  return importBatchId ? { categories: content.categories, items: content.items } : sortContent(content.categories, content.items);
 }
 
 function sortContent(categories: ContentCategory[], items: ContentItem[]): {
@@ -525,24 +556,29 @@ async function refreshContentAfterConflict(): Promise<void> {
   setPracticeInputsDisabled(true);
   setSyncProblem("题库内容已由管理员更新，正在重新加载。当前答案没有计入练习记录。", null);
   try {
-    const [content, mistakes] = await Promise.all([api.content(), api.mistakes()]);
+    const [content, mistakes] = await Promise.all([loadPracticeContent(activeState.importBatchId), api.mistakes()]);
     if (!isActive(activeState)) return;
-    const sorted = sortContent(content.categories, content.items);
+    const sorted = arrangePracticeContent(content, state.importBatchId);
     state.categories = sorted.categories;
     state.items = sorted.items;
-    state.mistakes = mistakes.items ?? [];
+    state.mistakes = mistakesInScope(mistakes.items ?? [], state.items, state.importBatchId);
     state.mistakeIds = new Set(state.mistakes.map((record) => record.item.id));
     const selectedCategoryId = state.categoryId;
     if (selectedCategoryId !== "all" && !state.categories.some((category) => category.id === selectedCategoryId)) {
       state.categoryId = "all";
     }
     const categorySelect = mustElement<HTMLSelectElement>("#categorySelect");
-    categorySelect.innerHTML = `<option value="all">全部内容</option>${categoriesMarkup(state.categories)}`;
+    categorySelect.innerHTML = `<option value="all">${state.importBatchId ? "本次文件全部内容" : "全部内容"}</option>${state.importBatchId ? "" : categoriesMarkup(state.categories)}`;
     categorySelect.value = state.categoryId;
     const wordCount = state.items.filter((item) => item.kind === "word").length;
     const sentenceCount = state.items.filter((item) => item.kind === "sentence").length;
     const subtitle = document.querySelector<HTMLElement>(".page-title p");
     if (subtitle) subtitle.textContent = `已载入 ${wordCount} 个单词，${sentenceCount} 条句型 · 学习记录已同步到当前账号`;
+    if (state.importBatchId && "batch" in content) {
+      state.unavailableCount = content.unavailableCount;
+      const note = document.querySelector<HTMLElement>("#batchAvailabilityNote");
+      if (note) note.textContent = `只练这份文件中的 ${state.items.length} 道已发布题目${state.unavailableCount ? `，另有 ${state.unavailableCount} 道已不可练习` : ""}。`;
+    }
     state.contentRefreshRequired = false;
     await rebuildPool();
     if (!isActive(activeState)) return;
@@ -691,12 +727,13 @@ async function finishOldSession(): Promise<void> {
 
 async function startPracticeSession(): Promise<void> {
   if (!state || state.disposed || state.pendingSessionStart || state.session) return;
+  if (state.importBatchId && !state.items.length) { renderCurrent(); return; }
   const activeState = state;
   state.pendingSessionStart = true;
   setPracticeInputsDisabled(true);
   clearSyncProblem();
   try {
-    const response = await api.createPracticeSession(state.categoryId, state.mode);
+    const response = await api.createPracticeSession(state.categoryId, state.mode, state.importBatchId);
     if (!isActive(activeState)) return;
     state.session = response.session;
     state.sessionStartedAtMs = Date.now();
@@ -1007,6 +1044,9 @@ function bindPracticeEvents(): void {
   const order = mustElement<HTMLSelectElement>("#orderSelect");
   const showEnglish = mustElement<HTMLInputElement>("#showEnglish");
   const autoSpeak = mustElement<HTMLInputElement>("#autoSpeak");
+  document.querySelector<HTMLButtonElement>("#exitImportBatchButton")?.addEventListener("click", () => {
+    state?.context.navigate("/practice");
+  });
 
   answer.addEventListener("input", () => {
     if (!state || state.submitting || state.transitioning || state.pendingAttempt) return;
@@ -1025,7 +1065,7 @@ function bindPracticeEvents(): void {
     else void submitAnswer(value, false);
   });
   category.addEventListener("change", () => {
-    if (!state) return;
+    if (!state || state.importBatchId) return;
     state.categoryId = category.value;
     void rebuildPool();
   });
@@ -1125,9 +1165,10 @@ export async function renderPractice(context: PageContext): Promise<void> {
   `, "/practice");
 
   try {
-    const [content, mistakes, rawSummary] = await Promise.all([api.content(), api.mistakes(), api.summary()]);
+    const importBatchId = practiceBatchId(location.search);
+    const [content, mistakes, rawSummary] = await Promise.all([loadPracticeContent(importBatchId), api.mistakes(), api.summary()]);
     if (generation !== renderGeneration) return;
-    const sorted = sortContent(content.categories, content.items);
+    const sorted = arrangePracticeContent(content, importBatchId);
     const sortedCategories = sorted.categories;
     const sortedItems = sorted.items;
     const legacyKeys = parseLegacyMistakes(localStorage.getItem("basicTypingMistakes"));
@@ -1135,10 +1176,13 @@ export async function renderPractice(context: PageContext): Promise<void> {
     const sentenceCount = sortedItems.filter((item) => item.kind === "sentence").length;
     state = {
       context,
+      importBatchId,
+      batch: "batch" in content ? content.batch : undefined,
+      unavailableCount: "batch" in content ? content.unavailableCount : 0,
       categories: sortedCategories,
       items: sortedItems,
-      mistakes: mistakes.items ?? [],
-      mistakeIds: new Set((mistakes.items ?? []).map((record) => record.item.id)),
+      mistakes: mistakesInScope(mistakes.items ?? [], sortedItems, importBatchId),
+      mistakeIds: new Set(mistakesInScope(mistakes.items ?? [], sortedItems, importBatchId).map((record) => record.item.id)),
       pool: [],
       index: 0,
       categoryId: "all",
@@ -1173,7 +1217,9 @@ export async function renderPractice(context: PageContext): Promise<void> {
       sentenceCount,
       legacyKeys.length > 0,
       context.user,
-      context.capabilities.emailAuthEnabled
+      context.capabilities.emailAuthEnabled,
+      state.batch,
+      state.unavailableCount
     ), "/practice");
     mustElement<HTMLElement>("#legacyCount").textContent = String(legacyKeys.length);
     bindPracticeEvents();
@@ -1182,7 +1228,10 @@ export async function renderPractice(context: PageContext): Promise<void> {
   } catch (error) {
     if (generation !== renderGeneration) return;
     if (context.handleAuthError(error)) return;
-    context.renderShell(errorMarkup("练习内容读取失败", getErrorMessage(error)), "/practice");
+    const batchError = new URLSearchParams(location.search).has("batch");
+    context.renderShell(errorMarkup(batchError ? "本次文件练习不可用" : "练习内容读取失败", getErrorMessage(error))
+      + (batchError ? `<button class="btn" id="exitImportBatchButton" type="button">退出本次文件练习</button>` : ""), "/practice");
+    document.querySelector<HTMLButtonElement>("#exitImportBatchButton")?.addEventListener("click", () => context.navigate("/practice"));
     mustElement<HTMLButtonElement>("#retryButton").addEventListener("click", () => { void renderPractice(context); });
   }
 }

@@ -1192,3 +1192,29 @@ a {
     font-size: 23px;
   }
 }
+
+.markdown-import { min-width: 0; }
+.markdown-import .panel { min-width: 0; }
+.markdown-drop-zone { display: grid; gap: 8px; border: 2px dashed var(--line); border-radius: 12px; padding: 18px; transition: border-color .15s; }
+.markdown-drop-zone.drag-over { border-color: var(--accent, #1c7a50); background: #edf7f1; }
+.markdown-source { min-height: 220px; font-family: ui-monospace, monospace; }
+.markdown-mappings { display: grid; gap: 16px; margin-top: 12px; }
+.markdown-mapping { display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 2fr) minmax(90px, 1fr); gap: 12px; border: 1px solid var(--line); border-radius: 10px; padding: 14px; }
+.markdown-mapping > strong { grid-column: 1 / -1; overflow-wrap: anywhere; }
+.markdown-mapping .field { min-width: 0; }
+.markdown-import .helper, .markdown-summary, .markdown-issues { overflow-wrap: anywhere; }
+.markdown-issues { max-height: 280px; overflow: auto; border: 1px solid var(--line); border-radius: 8px; padding: 12px; }
+.markdown-issues summary { cursor: pointer; font-weight: 600; }
+.markdown-preview-table { table-layout: fixed; min-width: 900px; }
+.markdown-preview-table td, .markdown-preview-table th { overflow-wrap: anywhere; white-space: normal; }
+.markdown-preview-table th:nth-child(1) { width: 70px; }
+.markdown-preview-table th:nth-child(3) { width: 70px; }
+.markdown-preview-table th:nth-child(4), .markdown-preview-table th:nth-child(5) { width: 22%; }
+.markdown-pagination { flex-wrap: wrap; }
+@media (max-width: 580px) {
+  .markdown-mapping { grid-template-columns: minmax(0, 1fr); }
+  .markdown-drop-zone { padding: 12px; }
+  .markdown-import .panel-heading { flex-wrap: wrap; gap: 10px; }
+  .markdown-import input[type="file"] { width: 100%; min-width: 0; }
+  .markdown-import #commitMarkdownImportButton { width: 100%; white-space: normal; }
+}

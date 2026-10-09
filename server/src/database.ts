@@ -263,6 +263,35 @@ const MIGRATIONS: ReadonlyArray<{ version: number; sql: string }> = [
         updated_at INTEGER NOT NULL
       ) STRICT;
     `
+  },
+  {
+    version: 4,
+    sql: `
+      ALTER TABLE import_previews ADD COLUMN format TEXT NOT NULL DEFAULT 'csv'
+        CHECK (format IN ('csv', 'markdown'));
+
+      CREATE TABLE import_batches (
+        id TEXT PRIMARY KEY,
+        created_by TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+        source_preview_id TEXT NOT NULL UNIQUE,
+        file_name TEXT NOT NULL,
+        result_json TEXT NOT NULL,
+        created_at INTEGER NOT NULL
+      ) STRICT;
+      CREATE INDEX import_batches_owner_idx ON import_batches(created_by, created_at);
+
+      CREATE TABLE import_batch_items (
+        batch_id TEXT NOT NULL REFERENCES import_batches(id) ON DELETE CASCADE,
+        item_id TEXT NOT NULL REFERENCES items(id),
+        sort_order INTEGER NOT NULL,
+        PRIMARY KEY(batch_id, item_id),
+        UNIQUE(batch_id, sort_order)
+      ) STRICT;
+
+      ALTER TABLE practice_sessions ADD COLUMN import_batch_id TEXT REFERENCES import_batches(id);
+      CREATE INDEX practice_sessions_batch_idx ON practice_sessions(import_batch_id);
+      CREATE INDEX items_category_answer_idx ON items(category_id, normalized_answer);
+    `
   }
 ];
 

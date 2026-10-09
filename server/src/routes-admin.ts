@@ -604,9 +604,10 @@ export async function registerAdminRoutes(app: FastifyInstance, db: SqliteDataba
       revalidateAuthenticatedActor(db, request, admin, "admin");
       const now = Date.now();
       const preview = db.prepare("SELECT * FROM import_previews WHERE id = ? AND created_by = ?").get(previewId, admin.id) as
-        | { id: string; payload_json: string; errors_json: string; expires_at: number; committed_at: number | null }
+        | { id: string; payload_json: string; errors_json: string; expires_at: number; committed_at: number | null; format: string }
         | undefined;
       if (!preview) notFound("Import preview not found");
+      if (preview.format !== "csv") conflict("IMPORT_FORMAT_MISMATCH", "This is not a CSV preview");
       if (preview.committed_at) conflict("IMPORT_ALREADY_COMMITTED", "Import preview has already been committed");
       if (preview.expires_at <= now) conflict("IMPORT_EXPIRED", "Import preview has expired");
       const errors = JSON.parse(preview.errors_json) as CsvError[];

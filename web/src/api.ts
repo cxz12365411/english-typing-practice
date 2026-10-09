@@ -13,6 +13,10 @@ import type {
   EmailCodeResponse,
   ImportMistakesResponse,
   ImportPreviewResponse,
+  ImportBatchContentResponse,
+  MarkdownImportInput,
+  MarkdownImportPreview,
+  MarkdownImportCommitResponse,
   MistakesResponse,
   OrderMode,
   PracticeSession,
@@ -61,10 +65,16 @@ const FRIENDLY_ERRORS: Record<string, string> = {
   CATEGORY_NOT_EMPTY: "包含题目的分类不能更改类型",
   CATEGORY_NOT_PUBLISHED: "请先发布题目所属分类",
   ITEM_KEY_EXISTS: "该题目唯一键已存在",
-  IMPORT_HAS_ERRORS: "CSV 仍有错误，不能提交导入",
-  IMPORT_ALREADY_COMMITTED: "这份 CSV 预览已经提交",
-  IMPORT_EXPIRED: "CSV 预览已过期，请重新校验",
-  IMPORT_PREVIEW_OUTDATED: "这份 CSV 预览需要重新校验，请重新生成预览后再导入",
+  IMPORT_HAS_ERRORS: "导入内容仍有错误，请先修正全部错误",
+  IMPORT_ALREADY_COMMITTED: "这份导入预览已经提交",
+  IMPORT_EXPIRED: "导入预览已过期，请重新校验",
+  IMPORT_CONTENT_CHANGED: "题库或分类在预览后已变化，请重新校验后再导入",
+  IMPORT_FORMAT_MISMATCH: "导入预览格式不匹配，请重新校验",
+  IMPORT_NOT_PRACTICEABLE: "这份文件没有可练习的已发布题目，不会创建空分类或批次",
+  MARKDOWN_TOO_LARGE: "Markdown 文件不能超过 1 MiB",
+  BODY_TOO_LARGE: "文件或请求过大，请拆分文件后再试",
+  IMPORT_BATCH_EMPTY: "本次文件已没有可练习的已发布题目",
+  IMPORT_PREVIEW_OUTDATED: "这份导入预览需要重新校验，请重新生成预览后再导入",
   IMPORT_ITEM_CHANGED: "题目在预览后已被修改，请重新校验 CSV，避免覆盖新内容",
   IMPORT_CATEGORY_CHANGED: "分类在预览后已变化，请重新校验 CSV",
   NETWORK_ERROR: "无法连接服务器，请检查网络后重试",
@@ -259,11 +269,15 @@ class ApiClient {
     return this.request<ContentResponse>("/api/content");
   }
 
-  createPracticeSession(categoryId: string, mode: OrderMode): Promise<{ session: PracticeSession }> {
+  importBatchContent(batchId: string): Promise<ImportBatchContentResponse> {
+    return this.request<ImportBatchContentResponse>(`/api/practice/import-batches/${encodeURIComponent(batchId)}`);
+  }
+
+  createPracticeSession(categoryId: string, mode: OrderMode, importBatchId?: string): Promise<{ session: PracticeSession }> {
     const apiMode = mode === "order" ? "sequential" : mode === "shuffle" ? "random" : "mistakes";
     return this.request<{ session: PracticeSession }>("/api/practice/sessions", {
       method: "POST",
-      body: { categoryId: categoryId === "all" ? undefined : categoryId, mode: apiMode }
+      body: { categoryId: categoryId === "all" || importBatchId ? undefined : categoryId, mode: apiMode, importBatchId }
     });
   }
 
@@ -378,6 +392,14 @@ class ApiClient {
 
   commitImport(importId: string): Promise<Record<string, unknown>> {
     return this.request("/api/admin/imports/commit", { method: "POST", body: { previewId: importId } });
+  }
+
+  previewMarkdownImport(input: MarkdownImportInput): Promise<MarkdownImportPreview> {
+    return this.request("/api/admin/markdown-imports/preview", { method: "POST", body: input });
+  }
+
+  commitMarkdownImport(previewId: string): Promise<MarkdownImportCommitResponse> {
+    return this.request("/api/admin/markdown-imports/commit", { method: "POST", body: { previewId } });
   }
 
   audit(): Promise<AuditResponse> {

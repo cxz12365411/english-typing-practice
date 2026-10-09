@@ -6,6 +6,7 @@ readonly HTTP_URL="http://english-47-120-37-63.sslip.io"
 readonly ROBOT_URL="https://robot-47-120-37-63.sslip.io"
 readonly ROBOT_LOCAL_URL="http://127.0.0.1:8080/"
 readonly CURRENT_SERVER="/opt/english-typing-practice/current/server"
+readonly DATABASE_PATH="/var/lib/english-typing-practice/app.db"
 readonly ENV_FILE="/etc/english-typing-practice/env"
 readonly LOCAL_HEALTH_URL="http://127.0.0.1:8091/api/healthz"
 readonly ROBOT_CHECKER="/usr/local/libexec/english-typing-practice/robot-regression.sh"
@@ -236,11 +237,30 @@ assert payload.get("error", {}).get("code") == "MUST_CHANGE_PASSWORD"
   else
     assert_status "$content_status" 200 "published content"
     /usr/bin/python3 -c '
-import json, sys
+# BEGIN_DYNAMIC_CONTENT_CHECK
+import json, sqlite3, sys
+from pathlib import Path
 payload = json.load(open(sys.argv[1], encoding="utf-8"))
-assert len(payload["categories"]) == 22, "expected 22 categories, got %d" % len(payload["categories"])
-assert len(payload["items"]) == 1056, "expected 1056 items, got %d" % len(payload["items"])
-' "${temp_dir}/content.body" || die "published content count check failed"
+db = sqlite3.connect(Path(sys.argv[2]).resolve().as_uri() + "?mode=ro", uri=True)
+db.row_factory = sqlite3.Row
+db.execute("BEGIN")
+version = db.execute("SELECT value FROM app_meta WHERE key = ?", ("content_version",)).fetchone()
+assert str(payload["version"]) == (version[0] if version else "0"), "content changed during validation; retry the check"
+categories = {row["id"]: dict(row) for row in db.execute("SELECT id, name, kind, sort_order FROM categories WHERE status = ?", ("published",))}
+items = {row["id"]: dict(row) for row in db.execute("SELECT i.id, i.item_key, i.category_id, i.kind, i.english, i.meaning, i.pronunciation, i.sort_order, i.revision FROM items i JOIN categories c ON c.id = i.category_id WHERE i.status = ? AND c.status = ?", ("published", "published"))}
+assert len(payload["categories"]) == len(categories), "published category count differs from database"
+assert {row["id"] for row in payload["categories"]} == set(categories), "published category IDs differ from database"
+assert len(payload["items"]) == len(items), "published item count differs from database"
+assert {row["id"] for row in payload["items"]} == set(items), "published item IDs differ from database"
+for row in payload["categories"]:
+    expected = categories[row["id"]]
+    assert all(row[key] == expected[column] for key, column in [("name", "name"), ("kind", "kind"), ("sortOrder", "sort_order")]), "published category content differs from database"
+for row in payload["items"]:
+    expected = items[row["id"]]
+    assert all(row[key] == expected[column] for key, column in [("key", "item_key"), ("categoryId", "category_id"), ("kind", "kind"), ("english", "english"), ("meaning", "meaning"), ("pronunciation", "pronunciation"), ("sortOrder", "sort_order"), ("revision", "revision")]), "published item content differs from database"
+db.close()
+# END_DYNAMIC_CONTENT_CHECK
+' "${temp_dir}/content.body" "$DATABASE_PATH" || die "published content does not match the database"
   fi
 
   logout_status="$(/usr/bin/curl --silent --show-error --max-time 15 \

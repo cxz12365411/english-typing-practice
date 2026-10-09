@@ -76,6 +76,17 @@ for (const fixture of [
     now
   );
 }
+// Separate local-only import fixtures keep browser tests independent of the
+// serial bootstrap-password/account-management workflow.
+for (const fixture of [
+  { username: "md.owner", role: "admin" },
+  { username: "md.other", role: "user" }
+]) {
+  const now = Date.now();
+  seedDatabase.prepare(`INSERT INTO users(id, username, display_name, password_hash, role, active, must_change_password, created_at, updated_at)
+    VALUES (?, ?, ?, ?, ?, 1, 0, ?, ?)`)
+    .run(randomUUID(), fixture.username, fixture.username, await hashPassword("E2eMarkdownOwner!2026"), fixture.role, now, now);
+}
 seedDatabase.close();
 
 const api = spawn(process.execPath, [join(root, "server", "dist", "index.js")], {

@@ -1,7 +1,7 @@
 import { randomUUID } from "node:crypto";
 import type { FastifyInstance } from "fastify";
 import type { SqliteDatabase } from "./database.js";
-import { audit, requireUser } from "./auth.js";
+import { audit, requireUser, revalidateAuthenticatedActor } from "./auth.js";
 import { ApiError, badRequest, conflict, notFound } from "./errors.js";
 import { normalizeAnswer, tokenHash } from "./security.js";
 import { enumField, idParam, integerField, objectBody, stringField } from "./validation.js";
@@ -24,6 +24,7 @@ interface PracticeSessionRow {
   user_id: string;
   mode: "sequential" | "random" | "mistakes";
   category_id: string | null;
+  import_batch_id: string | null;
   started_at: number;
   finished_at: number | null;
   duration_ms: number;
@@ -138,6 +139,13 @@ function getOwnedSession(db: SqliteDatabase, id: string, userId: string): Practi
   return row;
 }
 
+function getOwnedImportBatch(db: SqliteDatabase, id: string, userId: string) {
+  const batch = db.prepare("SELECT id, file_name, created_at FROM import_batches WHERE id = ? AND created_by = ?").get(id, userId) as
+    { id: string; file_name: string; created_at: number } | undefined;
+  if (!batch) notFound("Import batch not found");
+  return batch;
+}
+
 function recomputeSessionAggregates(db: SqliteDatabase, sessionId: string, userId: string): PracticeSessionRow {
   const previousFirst = new Map(
     (db.prepare(`
@@ -209,6 +217,33 @@ function recomputeSessionAggregates(db: SqliteDatabase, sessionId: string, userI
 }
 
 export async function registerPracticeRoutes(app: FastifyInstance, db: SqliteDatabase): Promise<void> {
+  app.get("/api/practice/import-batches/:id", async (request) => {
+    const user = requireUser(request);
+    const batchId = idParam(request.params);
+    return db.transaction(() => {
+      const batch = getOwnedImportBatch(db, batchId, user.id);
+      const items = db.prepare(`
+        SELECT i.* FROM import_batch_items bi JOIN items i ON i.id = bi.item_id
+        JOIN categories c ON c.id = i.category_id
+        WHERE bi.batch_id = ? AND i.status = 'published' AND c.status = 'published'
+        ORDER BY bi.sort_order
+      `).all(batchId) as ContentItemRow[];
+      const categories = db.prepare(`
+        SELECT DISTINCT c.id, c.slug, c.name, c.kind, c.sort_order FROM import_batch_items bi
+        JOIN items i ON i.id = bi.item_id JOIN categories c ON c.id = i.category_id
+        WHERE bi.batch_id = ? AND i.status = 'published' AND c.status = 'published'
+        ORDER BY c.kind, c.sort_order, c.id
+      `).all(batchId) as Array<{ id: string; slug: string; name: string; kind: string; sort_order: number }>;
+      const total = (db.prepare("SELECT COUNT(*) AS count FROM import_batch_items WHERE batch_id = ?").get(batchId) as { count: number }).count;
+      const version = (db.prepare("SELECT value FROM app_meta WHERE key = 'content_version'").get() as { value: string } | undefined)?.value ?? "0";
+      return {
+        batch: { id: batch.id, fileName: batch.file_name, createdAt: new Date(batch.created_at).toISOString() },
+        categories: categories.map((row) => ({ id: row.id, slug: row.slug, name: row.name, kind: row.kind, sortOrder: row.sort_order })),
+        items: items.map(itemDto), unavailableCount: total - items.length, version
+      };
+    })();
+  });
+
   app.get("/api/content", async (request) => {
     requireUser(request);
     const version = (db.prepare("SELECT value FROM app_meta WHERE key = 'content_version'").get() as { value: string } | undefined)
@@ -242,13 +277,23 @@ export async function registerPracticeRoutes(app: FastifyInstance, db: SqliteDat
     const body = objectBody(request.body);
     const mode = enumField(body, "mode", ["sequential", "random", "mistakes"] as const)!;
     const categoryId = stringField(body, "categoryId", { optional: true, min: 1, max: 100 });
-    if (categoryId) {
-      const category = db.prepare("SELECT id FROM categories WHERE id = ? AND status = 'published'").get(categoryId);
-      if (!category) badRequest("INVALID_CATEGORY", "Category is not published", { field: "categoryId" });
-    }
+    const importBatchId = stringField(body, "importBatchId", { optional: true, min: 1, max: 100 });
+    if (categoryId && importBatchId) badRequest("INVALID_PRACTICE_SCOPE", "categoryId and importBatchId are mutually exclusive");
     const id = randomUUID();
     const startedAt = Date.now();
     db.transaction(() => {
+      revalidateAuthenticatedActor(db, request, user);
+      if (categoryId) {
+        const category = db.prepare("SELECT id FROM categories WHERE id = ? AND status = 'published'").get(categoryId);
+        if (!category) badRequest("INVALID_CATEGORY", "Category is not published", { field: "categoryId" });
+      }
+      if (importBatchId) {
+        getOwnedImportBatch(db, importBatchId, user.id);
+        const available = db.prepare(`SELECT 1 FROM import_batch_items bi JOIN items i ON i.id = bi.item_id
+          JOIN categories c ON c.id = i.category_id
+          WHERE bi.batch_id = ? AND i.status = 'published' AND c.status = 'published' LIMIT 1`).get(importBatchId);
+        if (!available) conflict("IMPORT_BATCH_EMPTY", "本次文件中的题目目前均不可练习");
+      }
       const recent = db.prepare(`
         SELECT COUNT(*) AS count FROM practice_sessions WHERE user_id = ? AND started_at >= ?
       `).get(user.id, startedAt - 60_000) as { count: number };
@@ -261,9 +306,9 @@ export async function registerPracticeRoutes(app: FastifyInstance, db: SqliteDat
         WHERE user_id = ? AND finished_at IS NULL
       `).run(startedAt, startedAt, user.id);
       db.prepare(`
-        INSERT INTO practice_sessions(id, user_id, mode, category_id, started_at)
-        VALUES (?, ?, ?, ?, ?)
-      `).run(id, user.id, mode, categoryId ?? null, startedAt);
+        INSERT INTO practice_sessions(id, user_id, mode, category_id, import_batch_id, started_at)
+        VALUES (?, ?, ?, ?, ?, ?)
+      `).run(id, user.id, mode, categoryId ?? null, importBatchId ?? null, startedAt);
     }).immediate();
     return { session: { id, startedAt: new Date(startedAt).toISOString() } };
   });
@@ -305,6 +350,7 @@ export async function registerPracticeRoutes(app: FastifyInstance, db: SqliteDat
     }
 
     const submit = db.transaction((): { attempt: AttemptRow; session: PracticeSessionRow } | { replay: AttemptRow } => {
+      revalidateAuthenticatedActor(db, request, user);
       const raced = readExisting();
       if (raced) return { replay: raced };
       const now = Date.now();
@@ -317,6 +363,12 @@ export async function registerPracticeRoutes(app: FastifyInstance, db: SqliteDat
       }
       let session = getOwnedSession(db, sessionId, user.id);
       if (session.finished_at) conflict("SESSION_FINISHED", "Practice session has already finished");
+      if (session.import_batch_id) {
+        getOwnedImportBatch(db, session.import_batch_id, user.id);
+        if (!db.prepare("SELECT 1 FROM import_batch_items WHERE batch_id = ? AND item_id = ?").get(session.import_batch_id, itemId)) {
+          badRequest("ITEM_OUTSIDE_SESSION", "Item does not belong to this file practice batch");
+        }
+      }
       const itemState = db.prepare(`
         SELECT i.*, c.status AS category_status
         FROM items i JOIN categories c ON c.id = i.category_id

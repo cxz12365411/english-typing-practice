@@ -54,12 +54,28 @@ The Vite development server proxies `/api` to `127.0.0.1:8091`.
 npm run build
 npm test
 npm run test:e2e
-python -m pytest deploy/tests -q
+python -m unittest discover -s deploy/tests -v
 ```
 
 The browser suite uses an isolated temporary SQLite database and local Chrome. It
 covers onboarding, account isolation, synchronized attempts, legacy mistake import,
 navigation races, unsynchronized-answer protection, PWA assets, and mobile layout.
+
+## Markdown imports
+
+Administrators can open **批量导入 → Markdown** (or **题库管理 → 从 MD 导入**),
+upload/drop a UTF-8 `.md` / `.markdown` file, or paste its text. After automatic
+preview and any category adjustments, **导入并发布，开始练习** publishes the new
+content and opens only the file's items. Existing translations, pronunciation,
+item identities and learning records are never overwritten by Markdown imports.
+
+The download template uses `英文 | 中文释义 | 中文谐音` columns. Existing word-list,
+sentence-table and street-photography paragraph documents are also supported.
+English/meaning are required; pronunciation is optional. No AI or external API is
+used. Limits are 1 MiB UTF-8 text and 5000 records per import.
+
+See [the import guide](docs/markdown-import.md). GitHub Pages remains the separate,
+unchanged standalone site; account-site imports are not automatically published there.
 
 ## Production
 

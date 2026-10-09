@@ -6,6 +6,7 @@ import { cleanupExpiredSecurityRows, loadSession, requireCsrf } from "./auth.js"
 import { migrateAndSeed, openDatabase, type SqliteDatabase } from "./database.js";
 import { ApiError } from "./errors.js";
 import { registerAdminRoutes } from "./routes-admin.js";
+import { registerMarkdownImportRoutes } from "./routes-markdown-import.js";
 import { registerAuthRoutes } from "./routes-auth.js";
 import { registerPracticeRoutes } from "./routes-practice.js";
 import { PasswordWorkQueueFullError } from "./security.js";
@@ -94,6 +95,7 @@ export async function buildApp(options: BuildAppOptions = {}): Promise<FastifyIn
   const closeEmailAuth = await registerEmailAuthRoutes(app, db, emailProvider, config.emailCodeSecret, emailOptions);
   await registerPracticeRoutes(app, db);
   await registerAdminRoutes(app, db);
+  await registerMarkdownImportRoutes(app, db);
 
   app.setNotFoundHandler(async (_request, reply) => {
     return reply.status(404).send({ error: { code: "NOT_FOUND", message: "API endpoint not found" } });

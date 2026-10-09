@@ -12,6 +12,7 @@ import type {
 } from "./types";
 import { errorMarkup, mustElement, setBusy, showToast } from "./ui";
 import { escapeHtml, formatDate, getErrorMessage, numberValue } from "./utils";
+import { bindMarkdownImport, createMarkdownImportState, disposeMarkdownImport, markdownImportMarkup, type MarkdownImportState } from "./markdown-import-ui";
 
 type AdminTab = "overview" | "users" | "content" | "import" | "audit";
 
@@ -27,6 +28,8 @@ interface AdminState {
   contentSearch: string;
   importPreview: ImportPreviewResponse | null;
   csvText: string;
+  importMode: "markdown" | "csv";
+  markdownImport: MarkdownImportState;
   temporaryPassword: { username: string; password: string } | null;
   viewVersion: number;
   usersRequest: number;
@@ -51,7 +54,7 @@ const tabLabels: Record<AdminTab, string> = {
   overview: "概览",
   users: "用户管理",
   content: "题库管理",
-  import: "CSV 导入",
+  import: "批量导入",
   audit: "审计日志"
 };
 
@@ -302,6 +305,7 @@ function contentMarkup(): string {
   if (!state) return "";
   return `
     <section class="admin-section">
+      <div class="inline-actions"><button class="btn primary" id="openMarkdownImportButton" type="button">从 MD 导入</button><span class="helper">上传含英文、中文释义和谐音的 Markdown，预览后直接发布并练习。</span></div>
       <div class="admin-grid">
         <section class="panel">
           <div class="panel-heading"><h2>新建 / 编辑题目</h2></div>
@@ -363,7 +367,7 @@ function previewValue(value: unknown): string {
   return String(value);
 }
 
-function importMarkup(): string {
+function csvImportMarkup(): string {
   if (!state) return "";
   const preview = state.importPreview;
   return `
@@ -400,6 +404,17 @@ function importMarkup(): string {
       </section>
     </section>
   `;
+}
+
+function importMarkup(): string {
+  if (!state) return "";
+  return `<section class="admin-section">
+    <div class="inline-actions import-modes" aria-label="导入格式">
+      <button class="btn${state.importMode === "markdown" ? " primary" : ""}" data-import-mode="markdown" type="button" aria-pressed="${state.importMode === "markdown"}">Markdown</button>
+      <button class="btn${state.importMode === "csv" ? " primary" : ""}" data-import-mode="csv" type="button" aria-pressed="${state.importMode === "csv"}">CSV</button>
+    </div>
+    ${state.importMode === "markdown" ? markdownImportMarkup(state.markdownImport) : csvImportMarkup()}
+  </section>`;
 }
 
 function auditMarkup(): string {
@@ -440,12 +455,25 @@ function currentBodyMarkup(): string {
 
 function renderAdminView(): void {
   if (!state || state.disposed) return;
+  disposeMarkdownImport(state.markdownImport);
   ++state.viewVersion;
   state.context.renderShell(adminFrame(currentBodyMarkup()), "/admin");
   bindCommonEvents();
   if (state.tab === "users") bindUserEvents();
   if (state.tab === "content") bindContentEvents();
-  if (state.tab === "import") bindImportEvents();
+  if (state.tab === "import") {
+    const activeState = state;
+    const isCurrent = viewGuard(activeState);
+    document.querySelectorAll<HTMLButtonElement>("[data-import-mode]").forEach((button) => {
+      button.addEventListener("click", () => {
+        if (!isCurrent()) return;
+        activeState.importMode = button.dataset.importMode === "csv" ? "csv" : "markdown";
+        renderAdminView();
+      });
+    });
+    if (state.importMode === "csv") bindImportEvents();
+    else bindMarkdownImport(state.markdownImport, state.categories, state.context, isCurrent);
+  }
 }
 
 function bindCommonEvents(): void {
@@ -621,6 +649,12 @@ function bindContentEvents(): void {
   const activeState = state;
   if (!activeState) return;
   const isCurrent = viewGuard(activeState);
+  mustElement<HTMLButtonElement>("#openMarkdownImportButton").addEventListener("click", () => {
+    if (!isCurrent()) return;
+    activeState.tab = "import";
+    activeState.importMode = "markdown";
+    renderAdminView();
+  });
   const categoryForm = mustElement<HTMLFormElement>("#createCategoryForm");
   categoryForm.addEventListener("submit", async (event) => {
     event.preventDefault();
@@ -902,6 +936,8 @@ export async function renderAdmin(context: PageContext): Promise<void> {
     contentSearch: "",
     importPreview: null,
     csvText: "",
+    importMode: "markdown",
+    markdownImport: createMarkdownImportState(),
     temporaryPassword: null,
     viewVersion: 0,
     usersRequest: 0,
@@ -922,6 +958,7 @@ export function disposeAdmin(): void {
     state.temporaryPassword = null;
     state.importPreview = null;
     state.csvText = "";
+    disposeMarkdownImport(state.markdownImport);
   }
   state = null;
 }

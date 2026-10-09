@@ -6,7 +6,7 @@ import { migrateDatabase, openDatabase } from "../src/database.js";
 test("migration 3 is additive and legacy user inserts remain valid", () => {
   const db = openDatabase({ databasePath: ":memory:" });
   try {
-    assert.equal(migrateDatabase(db), 3);
+    assert.equal(migrateDatabase(db), 4);
     const columns = new Set(
       (db.prepare("PRAGMA table_info(users)").all() as Array<{ name: string }>).map((column) => column.name)
     );

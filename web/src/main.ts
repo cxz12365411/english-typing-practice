@@ -3,6 +3,7 @@ import { renderAdmin, disposeAdmin } from "./admin";
 import { ApiError, api } from "./api";
 import { clearVerificationCountdowns } from "./email";
 import { renderLoginScreen } from "./login";
+import { normaliseAppRoute } from "./routes";
 import { confirmDiscardPendingAttempt, disposePractice, renderPractice } from "./practice";
 import type { AuthCapabilities, PageContext, SessionResponse, User } from "./types";
 import { mustElement, setBusy, shellMarkup, showToast } from "./ui";
@@ -17,6 +18,8 @@ let currentUser: User | null = null;
 let authCapabilities = disabledEmailCapabilities;
 let renderSequence = 0;
 let recoveringSession = false;
+let renderedRouteUrl = `${location.pathname}${location.search}`;
+let pendingReturnRoute: string | null = null;
 
 function disposePage(): void {
   clearVerificationCountdowns();
@@ -30,11 +33,12 @@ function normalisePath(pathname: string): "/login" | "/practice" | "/admin" {
 }
 
 function navigate(path: string, replace = false): void {
-  const target = normalisePath(path);
-  if (!replace && location.pathname === target) return;
-  if (location.pathname === "/practice" && target !== "/practice" && !confirmDiscardPendingAttempt()) return;
+  const target = normaliseAppRoute(path, location.origin, currentUser ? "/practice" : "/login");
+  const current = `${location.pathname}${location.search}`;
+  if (!replace && current === target) return;
+  if (location.pathname === "/practice" && target !== current && !confirmDiscardPendingAttempt()) return;
   if (replace) history.replaceState({}, "", target);
-  else if (location.pathname !== target) history.pushState({}, "", target);
+  else if (current !== target) history.pushState({}, "", target);
   void renderRoute();
 }
 
@@ -43,7 +47,7 @@ function bindRouteLinks(): void {
     link.addEventListener("click", (event) => {
       if (event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) return;
       event.preventDefault();
-      navigate(link.dataset.route ?? link.pathname);
+      navigate(link.dataset.route ?? `${link.pathname}${link.search}`);
     });
   });
 }
@@ -95,14 +99,17 @@ function acceptAuthenticatedSession(response: SessionResponse): void {
   if (!response.user) return;
   currentUser = response.user;
   authCapabilities = response.capabilities ?? authCapabilities;
-  navigate(response.user.role === "admin" ? "/admin" : "/practice", true);
+  const destination = pendingReturnRoute ?? (response.user.role === "admin" ? "/admin" : "/practice");
+  pendingReturnRoute = null;
+  navigate(destination, true);
 }
 
 async function recoverLoginSession(): Promise<void> {
   if (recoveringSession) return;
   recoveringSession = true;
   const sequence = ++renderSequence;
-  const requestedPath = location.pathname;
+  const requestedPath = `${location.pathname}${location.search}`;
+  if (location.pathname === "/practice" && location.search) pendingReturnRoute = requestedPath;
   currentUser = null;
   disposePage();
   history.replaceState({}, "", "/login");
@@ -141,6 +148,9 @@ function pageContext(user: User): PageContext {
 
 function renderLogin(): void {
   disposePage();
+  if (location.pathname === "/practice" && location.search) {
+    pendingReturnRoute = normaliseAppRoute(`${location.pathname}${location.search}`, location.origin, "/login");
+  }
   if (location.pathname !== "/login") history.replaceState({}, "", "/login");
   document.title = "登录 · 英语打字练习";
   renderLoginScreen(app, authCapabilities, { onAuthenticated: acceptAuthenticatedSession, handleAuthError });
@@ -207,7 +217,7 @@ function renderForcedPassword(): void {
       currentUser = response.user;
       authCapabilities = response.capabilities ?? authCapabilities;
       showToast("新密码已保存", "success");
-      navigate(response.user.role === "admin" ? "/admin" : "/practice", true);
+      acceptAuthenticatedSession(response);
     } catch (error) {
       if (!form.isConnected || handleAuthError(error)) return;
       message.textContent = getErrorMessage(error, "密码修改失败");
@@ -236,6 +246,7 @@ async function logout(button: HTMLButtonElement): Promise<void> {
   disposePage();
   const sequence = ++renderSequence;
   currentUser = null;
+  pendingReturnRoute = null;
   history.replaceState({}, "", "/login");
   app.innerHTML = `<main class="screen-center"><section class="loading-card"><p class="muted">正在退出并重新连接…</p></section></main>`;
   try {
@@ -256,12 +267,17 @@ async function renderRoute(): Promise<void> {
     return;
   }
   if (currentUser.mustChangePassword) {
+    if (location.pathname === "/practice" && location.search) {
+      pendingReturnRoute = normaliseAppRoute(`${location.pathname}${location.search}`, location.origin, "/practice");
+    }
     renderForcedPassword();
     return;
   }
 
   const route = normalisePath(location.pathname);
-  if (location.pathname !== route) history.replaceState({}, "", route);
+  const canonical = normaliseAppRoute(`${location.pathname}${location.search}`, location.origin, "/practice");
+  if (`${location.pathname}${location.search}` !== canonical) history.replaceState({}, "", canonical);
+  renderedRouteUrl = canonical;
   if (route === "/login") {
     navigate(currentUser.role === "admin" ? "/admin" : "/practice", true);
     return;
@@ -315,8 +331,10 @@ async function boot(): Promise<void> {
 }
 
 window.addEventListener("popstate", () => {
-  if (location.pathname !== "/practice" && !confirmDiscardPendingAttempt()) {
-    history.pushState({}, "", "/practice");
+  const target = normaliseAppRoute(`${location.pathname}${location.search}`, location.origin, currentUser ? "/practice" : "/login");
+  if (target === renderedRouteUrl) return;
+  if (renderedRouteUrl.startsWith("/practice") && target !== renderedRouteUrl && !confirmDiscardPendingAttempt()) {
+    history.pushState({}, "", renderedRouteUrl);
     return;
   }
   void renderRoute();
