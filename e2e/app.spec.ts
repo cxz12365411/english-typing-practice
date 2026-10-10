@@ -85,7 +85,7 @@ test.describe.serial("multi-user application", () => {
     await login(page, "learner1", learnerTemporaryPassword);
     await changeForcedPassword(page, learnerTemporaryPassword, LEARNER_PASSWORD);
     await expect(page).toHaveURL(/\/practice$/);
-    await expect(page.getByText(/已载入 850 个单词，206 条句型/)).toBeVisible();
+    await expect(page.getByText(/已载入 850 个单词，238 条句型/)).toBeVisible();
     await expect(page.locator("#categorySelect option")).toHaveCount(23);
 
     await expect(page.locator("#legacyBanner")).toBeVisible();
@@ -124,47 +124,63 @@ test.describe.serial("multi-user application", () => {
     const groups = [
       {
         label: "句型：街头摄影：开场与征求同意",
-        count: 10,
+        count: 18,
+        septemberCount: 10,
         originalCount: 4,
         english: "Hi, excuse me. I'm a street photographer.",
         meaning: "你好，打扰一下。我是一名街头摄影师。",
         pronunciation: "嗨，伊克斯丘兹 米。艾姆 额 斯垂特 佛塔格若弗。",
         addition: "I'm working on a street photography project.",
         additionMeaning: "我正在做一个街头摄影项目。",
-        additionPronunciation: "艾姆 沃金 昂 额 斯垂特 佛塔格若菲 普拉杰克特。"
+        additionPronunciation: "艾姆 沃金 昂 额 斯垂特 佛塔格若菲 普拉杰克特。",
+        octoberAddition: "Hi! Do you have a moment?",
+        octoberMeaning: "你好！你现在有空吗？",
+        octoberPronunciation: "嗨！杜 优 海夫 额 莫门特？"
       },
       {
         label: "句型：街头摄影：拍摄时引导动作",
-        count: 11,
+        count: 19,
+        septemberCount: 11,
         originalCount: 5,
         english: "Could you stand here, please?",
         meaning: "可以请你站在这里吗？",
         pronunciation: "库德 优 斯坦德 希尔，普利兹？",
         addition: "Relax your shoulders.",
         additionMeaning: "肩膀放松一点。",
-        additionPronunciation: "瑞拉克斯 尤尔 舒尔德兹。"
+        additionPronunciation: "瑞拉克斯 尤尔 舒尔德兹。",
+        octoberAddition: "Please look at the camera.",
+        octoberMeaning: "请看镜头。",
+        octoberPronunciation: "普利兹 卢克 艾特 德 卡梅若。"
       },
       {
         label: "句型：街头摄影：看图和发送照片",
-        count: 9,
+        count: 17,
+        septemberCount: 9,
         originalCount: 3,
         english: "Would you like to see the photos?",
         meaning: "你想看看照片吗？",
         pronunciation: "伍德 优 赖克 特 西 德 佛头兹？",
         addition: "Which photo do you like best?",
         additionMeaning: "你最喜欢哪一张？",
-        additionPronunciation: "威奇 佛头 杜 优 赖克 贝斯特？"
+        additionPronunciation: "威奇 佛头 杜 优 赖克 贝斯特？",
+        octoberAddition: "Here are the photos.",
+        octoberMeaning: "这些就是拍好的照片。",
+        octoberPronunciation: "希尔 阿尔 德 佛头兹。"
       },
       {
         label: "句型：街头摄影：礼貌结束",
-        count: 8,
+        count: 16,
+        septemberCount: 8,
         originalCount: 2,
         english: "Thanks for your time. Have a great day!",
         meaning: "谢谢你抽出时间，祝你今天愉快！",
         pronunciation: "桑克斯 佛 尤尔 泰姆。海夫 额 格瑞特 得诶！",
         addition: "Thank you for being part of my project.",
         additionMeaning: "谢谢你参与我的项目。",
-        additionPronunciation: "桑克 优 佛 比英 帕尔特 阿夫 买 普拉杰克特。"
+        additionPronunciation: "桑克 优 佛 比英 帕尔特 阿夫 买 普拉杰克特。",
+        octoberAddition: "We're all done.",
+        octoberMeaning: "我们拍好了。",
+        octoberPronunciation: "威尔 奥尔 丹。"
       }
     ];
     for (const group of groups) {
@@ -181,6 +197,13 @@ test.describe.serial("multi-user application", () => {
       await expect(page.locator("#targetWord")).toHaveText(group.addition);
       await expect(page.locator("#meaningText")).toHaveText(group.additionMeaning);
       await expect(page.locator("#pronunciationText")).toHaveText(`中文谐音：${group.additionPronunciation}`);
+      for (let position = group.originalCount + 2; position <= group.septemberCount + 1; position += 1) {
+        await page.locator("#nextButton").click();
+        await expect(page.locator("#positionText")).toHaveText(`${position} / ${group.count}`);
+      }
+      await expect(page.locator("#targetWord")).toHaveText(group.octoberAddition);
+      await expect(page.locator("#meaningText")).toHaveText(group.octoberMeaning);
+      await expect(page.locator("#pronunciationText")).toHaveText(`中文谐音：${group.octoberPronunciation}`);
     }
 
     await page.locator("#categorySelect").selectOption({ label: groups[0].label });
@@ -254,7 +277,7 @@ test.describe.serial("multi-user application", () => {
     await form.locator('[name="code"]').fill(code);
     await form.getByRole("button", { name: "登录", exact: true }).click();
     await expect(page).toHaveURL(/\/practice$/);
-    await expect(page.getByText(/已载入 850 个单词，206 条句型/)).toBeVisible();
+    await expect(page.getByText(/已载入 850 个单词，238 条句型/)).toBeVisible();
   });
 
   test("email verification code resets a password and revokes the old password", async ({ page }) => {
@@ -378,7 +401,7 @@ test("mobile layout stacks the practice sidebar and wraps an expanded street pho
   await expect(page.locator("#answerInput")).toBeEnabled();
   for (let position = 2; position <= 8; position += 1) {
     await page.locator("#nextButton").click();
-    await expect(page.locator("#positionText")).toHaveText(`${position} / 8`);
+    await expect(page.locator("#positionText")).toHaveText(`${position} / 16`);
   }
   await expect(page.locator("#targetWord")).toHaveText("Feel free to message me if you have any questions.");
   await expect(page.locator("#meaningText")).toHaveText("有任何问题，随时给我发消息。");

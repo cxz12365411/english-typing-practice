@@ -8,7 +8,7 @@ administrator console, content publishing, and an installable PWA shell.
 - `/login` — username/password or email-code sign-in, email registration, and
   email-code password reset when email delivery is enabled
 - `/practice` — word/sentence practice, speech, personal statistics, and mistakes
-- `/admin` — users, content, CSV import, publishing, statistics, and audit log
+- `/admin` — users, content, Markdown/CSV import, publishing, statistics, and audit log
 - `/api/healthz` — API readiness check
 
 Email delivery and public registration are fail-closed by default. Administrators can
@@ -74,8 +74,9 @@ sentence-table and street-photography paragraph documents are also supported.
 English/meaning are required; pronunciation is optional. No AI or external API is
 used. Limits are 1 MiB UTF-8 text and 5000 records per import.
 
-See [the import guide](docs/markdown-import.md). GitHub Pages remains the separate,
-unchanged standalone site; account-site imports are not automatically published there.
+See [the import guide](docs/markdown-import.md). GitHub Pages remains a separate
+standalone site; account-site imports are only published there through an explicit,
+reviewed content sync, not automatically.
 
 ## Production
 
@@ -93,12 +94,20 @@ Production deployment assets and the rollback/restore runbook are documented in
 The original Markdown files are seed inputs. They remain in this public repository,
 but are not served by the authenticated production application.
 
-The bundled corpus contains 850 words and 206 sentences across 22 categories,
-including 38 street-photography phrases in four scenarios. The September 2026
+The bundled corpus contains 850 words and 238 sentences across 22 categories,
+including 70 street-photography phrases in four scenarios. The September 2026
 content update is applied once to existing databases, preserving existing item IDs,
 accounts, progress, and subsequent administrator edits. Merely editing a Markdown
 file does not overwrite an already-seeded database; additions need an explicit,
 transactional content update. Street-photography tables use a third `Stable ID`
 column so adding phrases within a category never changes existing item identities.
-See [the initial sync notes](docs/content-sync-2026-09-15.md) and
-[the 24-phrase expansion](docs/content-sync-2026-09-16.md).
+See [the initial sync notes](docs/content-sync-2026-09-15.md),
+[the 24-phrase expansion](docs/content-sync-2026-09-16.md), and
+[the October 32-phrase sync](docs/content-sync-2026-10-10.md).
+
+The October additions were already published to the account site through the
+administrator's Markdown import. This repository update also publishes them to
+the no-login GitHub Pages site and includes them in new-installation seed data.
+It does not add a third automatic content patch or re-import existing databases.
+The reusable three-column [32-phrase Markdown](docs/street-photography-extra-32.md)
+contains only public practice content, not accounts or learning records.

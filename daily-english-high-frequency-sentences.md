@@ -256,6 +256,14 @@
 | Would you like to see some of my work first?<br>中文谐音：伍德 优 赖克 特 西 萨姆 阿夫 买 沃克 弗斯特？ | 你想先看看我的一些作品吗？ | sentence-0186 |
 | There's no charge for the photos.<br>中文谐音：戴尔兹 诺 查尔吉 佛 德 佛头兹。 | 这些照片不收费。 | sentence-0187 |
 | No pressure at all. It's completely up to you.<br>中文谐音：诺 普瑞舍尔 艾特 奥尔。伊茨 肯普利特利 阿普 特 优。 | 完全不用有压力，由你决定。 | sentence-0188 |
+| Hi! Do you have a moment?<br>中文谐音：嗨！杜 优 海夫 额 莫门特？ | 你好！你现在有空吗？ | sentence-0207 |
+| I love your jacket.<br>中文谐音：艾 拉夫 尤尔 杰克特。 | 我很喜欢你的外套。 | sentence-0208 |
+| The light is nice here.<br>中文谐音：德 莱特 伊兹 奈斯 希尔。 | 这里的光线很好看。 | sentence-0209 |
+| Can I take a few photos of you?<br>中文谐音：肯 艾 特诶克 额 菲尤 佛头兹 阿夫 优？ | 我可以给你拍几张照片吗？ | sentence-0210 |
+| Is this spot okay?<br>中文谐音：伊兹 迪斯 斯帕特 欧凯？ | 这个位置可以吗？ | sentence-0211 |
+| Would you like a solo photo?<br>中文谐音：伍德 优 赖克 额 搜罗 佛头？ | 你想单独拍一张吗？ | sentence-0212 |
+| It's okay to say no.<br>中文谐音：伊茨 欧凯 特 塞 诺。 | 不愿意也没关系。 | sentence-0213 |
+| We can stop at any time.<br>中文谐音：威 肯 斯塔普 艾特 艾尼 泰姆。 | 我们随时都可以停下来。 | sentence-0214 |
 
 ## 16. 街头摄影：拍摄时引导动作
 
@@ -272,6 +280,14 @@
 | You can put your hands in your pockets.<br>中文谐音：优 肯 普特 尤尔 汉兹 因 尤尔 帕基茨。 | 你可以把手放进口袋里。 | sentence-0192 |
 | Walk toward me at your normal pace.<br>中文谐音：沃克 特沃德 米 艾特 尤尔 诺尔默尔 佩斯。 | 按平常的速度朝我走过来。 | sentence-0193 |
 | Hold that pose for a second.<br>中文谐音：侯德 戴特 波兹 佛 额 塞肯德。 | 保持这个姿势一秒钟。 | sentence-0194 |
+| Please look at the camera.<br>中文谐音：普利兹 卢克 艾特 德 卡梅若。 | 请看镜头。 | sentence-0215 |
+| Take a small step back.<br>中文谐音：特诶克 额 斯莫尔 斯特普 拜克。 | 往后退一小步。 | sentence-0216 |
+| Move a little to the right.<br>中文谐音：穆夫 额 利特尔 特 德 赖特。 | 稍微往右挪一点。 | sentence-0217 |
+| Please lift your chin a little.<br>中文谐音：普利兹 利夫特 尤尔 钦 额 利特尔。 | 请稍微抬一下下巴。 | sentence-0218 |
+| You can sit on this bench.<br>中文谐音：优 肯 西特 昂 迪斯 本奇。 | 你可以坐在这张长椅上。 | sentence-0219 |
+| Keep your hands relaxed.<br>中文谐音：基普 尤尔 汉兹 瑞拉克斯特。 | 双手放松。 | sentence-0220 |
+| Let's try a natural smile.<br>中文谐音：莱茨 特赖 额 纳彻若尔 斯迈尔。 | 我们试着自然地笑一下。 | sentence-0221 |
+| One more, please.<br>中文谐音：万 莫尔，普利兹。 | 再来一张吧。 | sentence-0222 |
 
 ## 17. 街头摄影：看图和发送照片
 
@@ -286,6 +302,14 @@
 | Could you type your email address here?<br>中文谐音：库德 优 泰普 尤尔 伊梅尔 额德瑞斯 希尔？ | 可以在这里输入你的邮箱地址吗？ | sentence-0198 |
 | Would you like me to tag you when I post them?<br>中文谐音：伍德 优 赖克 米 特 泰格 优 温 艾 波斯特 德姆？ | 我发布照片时，你希望我标记你的账号吗？ | sentence-0199 |
 | I won't post the photos without your permission.<br>中文谐音：艾 沃恩特 波斯特 德 佛头兹 威道特 尤尔 珀米申。 | 未经你的允许，我不会发布照片。 | sentence-0200 |
+| Here are the photos.<br>中文谐音：希尔 阿尔 德 佛头兹。 | 这些就是拍好的照片。 | sentence-0223 |
+| This one looks really nice.<br>中文谐音：迪斯 万 卢克斯 瑞利 奈斯。 | 这张看起来很好看。 | sentence-0224 |
+| Do you like this angle?<br>中文谐音：杜 优 赖克 迪斯 安格尔？ | 你喜欢这个角度吗？ | sentence-0225 |
+| Would you like a black-and-white version?<br>中文谐音：伍德 优 赖克 额 布莱克 安德 怀特 弗尔任？ | 你想要黑白版本吗？ | sentence-0226 |
+| Do you use WeChat?<br>中文谐音：杜 优 尤兹 威恰特？ | 你用微信吗？ | sentence-0227 |
+| Is this your Instagram account?<br>中文谐音：伊兹 迪斯 尤尔 因斯特格拉姆 额考恩特？ | 这是你的 Instagram 账号吗？ | sentence-0228 |
+| Did you get the photos?<br>中文谐音：迪德 优 盖特 德 佛头兹？ | 你收到照片了吗？ | sentence-0229 |
+| May I share this photo online?<br>中文谐音：梅 艾 谢尔 迪斯 佛头 昂莱恩？ | 我可以把这张照片发布到网上吗？ | sentence-0230 |
 
 ## 18. 街头摄影：礼貌结束
 
@@ -299,3 +323,11 @@
 | Of course. I'll delete that photo.<br>中文谐音：阿夫 科尔斯。艾尔 迪利特 戴特 佛头。 | 当然，我会删掉那张照片。 | sentence-0204 |
 | I understand. Thanks anyway.<br>中文谐音：艾 安德斯坦德。桑克斯 艾尼韦。 | 我理解，还是谢谢你。 | sentence-0205 |
 | Feel free to message me if you have any questions.<br>中文谐音：菲尔 弗瑞 特 梅瑟吉 米 伊夫 优 海夫 艾尼 奎斯辰兹。 | 有任何问题，随时给我发消息。 | sentence-0206 |
+| We're all done.<br>中文谐音：威尔 奥尔 丹。 | 我们拍好了。 | sentence-0231 |
+| Thanks for your patience.<br>中文谐音：桑克斯 佛 尤尔 佩申斯。 | 谢谢你的耐心。 | sentence-0232 |
+| Thanks for giving it a try.<br>中文谐音：桑克斯 佛 吉文 伊特 额 特赖。 | 谢谢你愿意试一试。 | sentence-0233 |
+| You look great in these photos.<br>中文谐音：优 卢克 格瑞特 因 迪兹 佛头兹。 | 你在这些照片里很好看。 | sentence-0234 |
+| I won't keep you any longer.<br>中文谐音：艾 沃恩特 基普 优 艾尼 隆格尔。 | 我就不再耽误你了。 | sentence-0235 |
+| Enjoy the rest of your day!<br>中文谐音：因乔伊 德 瑞斯特 阿夫 尤尔 得诶！ | 祝你接下来过得愉快！ | sentence-0236 |
+| I hope you like the photos.<br>中文谐音：艾 霍普 优 赖克 德 佛头兹。 | 希望你喜欢这些照片。 | sentence-0237 |
+| Take care, and goodbye!<br>中文谐音：特诶克 凯尔，安德 古德拜！ | 保重，再见！ | sentence-0238 |

@@ -19,11 +19,19 @@ function snapshot(db: SqliteDatabase): string {
   return JSON.stringify(tables.map((table) => [table, db.prepare(`SELECT * FROM ${table} ORDER BY rowid`).all()]));
 }
 
+function removeOctoberSourceAdditions(db: SqliteDatabase): void {
+  // The October additions are a fresh-install source update, not a v3 database patch.
+  // Remove them from historical fixtures so these tests retain their 168/182/206 semantics.
+  db.prepare("DELETE FROM item_revisions WHERE item_id IN (SELECT id FROM items WHERE item_key BETWEEN 'sentence-0207' AND 'sentence-0238')").run();
+  db.prepare("DELETE FROM items WHERE item_key BETWEEN 'sentence-0207' AND 'sentence-0238'").run();
+}
+
 function legacyDatabase(): SqliteDatabase {
   const db = openDatabase({ databasePath: ":memory:" });
   migrateDatabase(db);
   // Recreate the exact 850/168 seed shape without relying on a second fixture copy of the Markdown.
   seedContent(db, SOURCE);
+  removeOctoberSourceAdditions(db);
   db.prepare("DELETE FROM item_revisions WHERE item_id IN (SELECT id FROM items WHERE item_key BETWEEN 'sentence-0169' AND 'sentence-0206')").run();
   db.prepare("DELETE FROM items WHERE item_key BETWEEN 'sentence-0169' AND 'sentence-0206'").run();
   db.prepare("DELETE FROM categories WHERE slug IN ('sentences-15', 'sentences-16', 'sentences-17', 'sentences-18')").run();
@@ -34,6 +42,7 @@ function legacyDatabase(): SqliteDatabase {
 function streetV1Database(): SqliteDatabase {
   const db = openDatabase({ databasePath: ":memory:" });
   migrateAndSeed(db, SOURCE);
+  removeOctoberSourceAdditions(db);
   db.prepare("DELETE FROM item_revisions WHERE item_id IN (SELECT id FROM items WHERE item_key BETWEEN 'sentence-0183' AND 'sentence-0206')").run();
   db.prepare("DELETE FROM items WHERE item_key BETWEEN 'sentence-0183' AND 'sentence-0206'").run();
   db.prepare("DELETE FROM app_meta WHERE key = ?").run(EXPANSION_MARKER);
@@ -42,12 +51,12 @@ function streetV1Database(): SqliteDatabase {
   return db;
 }
 
-test("fresh installation seeds 850 words and 206 sentences and records both content updates only once", () => {
+test("fresh installation seeds 850 words and 238 sentences and records both historical content updates only once", () => {
   const db = openDatabase({ databasePath: ":memory:" });
   try {
-    assert.deepEqual(migrateAndSeed(db, SOURCE), { categoriesInserted: 22, itemsInserted: 1056, words: 850, sentences: 206 });
-    assert.equal(scalar(db, "SELECT COUNT(*) FROM item_revisions"), 1056);
-    assert.equal(scalar(db, "SELECT COUNT(*) FROM items WHERE status = 'published'"), 1056);
+    assert.deepEqual(migrateAndSeed(db, SOURCE), { categoriesInserted: 22, itemsInserted: 1088, words: 850, sentences: 238 });
+    assert.equal(scalar(db, "SELECT COUNT(*) FROM item_revisions"), 1088);
+    assert.equal(scalar(db, "SELECT COUNT(*) FROM items WHERE status = 'published'"), 1088);
     assert.equal(scalar(db, "SELECT CAST(value AS INTEGER) FROM app_meta WHERE key = 'content_version'"), 1);
     assert.equal((db.prepare("SELECT value FROM app_meta WHERE key = ?").get(MARKER) as { value: string }).value, "1");
     assert.equal((db.prepare("SELECT value FROM app_meta WHERE key = ?").get(EXPANSION_MARKER) as { value: string }).value, "1");
@@ -57,7 +66,7 @@ test("fresh installation seeds 850 words and 206 sentences and records both cont
       { source: "street-photography-english-phrases.md", categories: 4, items: 24, categoriesInserted: 0, itemsInserted: 0 }
     ]);
     const before = snapshot(db);
-    assert.deepEqual(migrateAndSeed(db, "Z:\\missing-source-directory"), { categoriesInserted: 0, itemsInserted: 0, words: 850, sentences: 206 });
+    assert.deepEqual(migrateAndSeed(db, "Z:\\missing-source-directory"), { categoriesInserted: 0, itemsInserted: 0, words: 850, sentences: 238 });
     assert.equal(snapshot(db), before);
   } finally {
     db.close();

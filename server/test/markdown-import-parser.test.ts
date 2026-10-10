@@ -19,12 +19,12 @@ test("Markdown import parses all 850 existing words without changing source text
   assert.ok(parsed.ignoredCount >= 2);
 });
 
-test("Markdown import parses the existing 206 sentence corpus and ignores Stable IDs", () => {
+test("Markdown import parses the existing 238 sentence corpus and ignores Stable IDs", () => {
   const markdown = readFileSync(new URL("../../daily-english-high-frequency-sentences.md", import.meta.url), "utf8");
   const parsed = parseMarkdownImport(markdown);
   assert.deepEqual(parsed.errors, []);
   assert.deepEqual(parsed.warnings, []);
-  assert.equal(parsed.rows.length, 206);
+  assert.equal(parsed.rows.length, 238);
   assert.equal(parsed.groups.length, 18);
   assert.ok(parsed.groups.every((group) => group.kind === "sentence"));
   assert.equal(parsed.rows[0]!.english, "Hi, how are you?");
