@@ -331,3 +331,59 @@
 | Enjoy the rest of your day!<br>中文谐音：因乔伊 德 瑞斯特 阿夫 尤尔 得诶！ | 祝你接下来过得愉快！ | sentence-0236 |
 | I hope you like the photos.<br>中文谐音：艾 霍普 优 赖克 德 佛头兹。 | 希望你喜欢这些照片。 | sentence-0237 |
 | Take care, and goodbye!<br>中文谐音：特诶克 凯尔，安德 古德拜！ | 保重，再见！ | sentence-0238 |
+
+
+## 19. 酒吧社交：开场与轻松夸赞
+
+| English / 中文谐音 | 中文 | Stable ID |
+|---|---|---|
+| Hey, is this seat taken?<br>中文谐音：嘿，伊兹 迪斯 西特 特诶肯？ | 嗨，这个位子有人坐吗？ | sentence-0239 |
+| Mind if I join you?<br>中文谐音：迈恩德 伊夫 艾 乔因 优？ | 介意我坐过来吗？ | sentence-0240 |
+| Are you having a good night?<br>中文谐音：阿尔 优 海文 额 古德 奈特？ | 你今晚玩得开心吗？ | sentence-0241 |
+| I had to come over and say hi.<br>中文谐音：艾 海德 特 卡姆 欧弗 安德 塞 嗨。 | 我忍不住过来打个招呼。 | sentence-0242 |
+| You have a lovely smile.<br>中文谐音：优 海夫 额 拉夫利 斯迈尔。 | 你的笑容很迷人。 | sentence-0243 |
+| I like your earrings.<br>中文谐音：艾 赖克 尤尔 伊尔英兹。 | 我喜欢你的耳环。 | sentence-0244 |
+| You look really nice tonight.<br>中文谐音：优 卢克 瑞利 奈斯 特奈特。 | 你今晚看起来真好看。 | sentence-0245 |
+| Have you been here before?<br>中文谐音：海夫 优 宾 希尔 比佛尔？ | 你以前来过这里吗？ | sentence-0246 |
+
+
+## 20. 酒吧社交：点酒与碰杯
+
+| English / 中文谐音 | 中文 | Stable ID |
+|---|---|---|
+| What are you drinking?<br>中文谐音：沃特 阿尔 优 德林金？ | 你喝的是什么？ | sentence-0247 |
+| What's your favorite cocktail?<br>中文谐音：沃茨 尤尔 费沃里特 卡克特诶尔？ | 你最喜欢哪种鸡尾酒？ | sentence-0248 |
+| Can I buy you a drink?<br>中文谐音：肯 艾 拜 优 额 德林克？ | 我可以请你喝一杯吗？ | sentence-0249 |
+| Would you prefer something non-alcoholic?<br>中文谐音：伍德 优 普瑞弗尔 萨姆辛 南 艾尔克霍利克？ | 你更想喝不含酒精的饮料吗？ | sentence-0250 |
+| I'll have a beer, please.<br>中文谐音：艾尔 海夫 额 比尔，普利兹。 | 请给我一杯啤酒。 | sentence-0251 |
+| Could we have two glasses of water?<br>中文谐音：库德 威 海夫 图 格莱西兹 阿夫 沃特尔？ | 可以给我们两杯水吗？ | sentence-0252 |
+| Cheers! It's nice to meet you.<br>中文谐音：奇尔兹！伊茨 奈斯 特 米特 优。 | 干杯！很高兴认识你。 | sentence-0253 |
+| I'm taking it easy tonight.<br>中文谐音：艾姆 特诶金 伊特 伊兹 特奈特。 | 我今晚打算少喝点。 | sentence-0254 |
+
+
+## 21. 酒吧社交：闲聊与邀请
+
+| English / 中文谐音 | 中文 | Stable ID |
+|---|---|---|
+| What brings you out tonight?<br>中文谐音：沃特 布林兹 优 奥特 特奈特？ | 你今晚怎么想到出来玩？ | sentence-0255 |
+| Do you live around here?<br>中文谐音：杜 优 利夫 额绕恩德 希尔？ | 你住这附近吗？ | sentence-0256 |
+| What kind of music are you into?<br>中文谐音：沃特 凯恩德 阿夫 缪兹克 阿尔 优 因图？ | 你喜欢什么类型的音乐？ | sentence-0257 |
+| I love this song.<br>中文谐音：艾 拉夫 迪斯 桑。 | 我很喜欢这首歌。 | sentence-0258 |
+| You've got a great sense of humor.<br>中文谐音：尤夫 嘎特 额 格瑞特 森斯 阿夫 休默尔。 | 你很有幽默感。 | sentence-0259 |
+| I'm enjoying talking to you.<br>中文谐音：艾姆 因乔英 托金 特 优。 | 我很喜欢和你聊天。 | sentence-0260 |
+| Would you like to dance?<br>中文谐音：伍德 优 赖克 特 丹斯？ | 你想一起跳支舞吗？ | sentence-0261 |
+| Want to grab coffee sometime?<br>中文谐音：旺特 特 格拉布 卡菲 萨姆泰姆？ | 改天一起喝杯咖啡吗？ | sentence-0262 |
+
+
+## 22. 酒吧社交：交换联系方式与礼貌结束
+
+| English / 中文谐音 | 中文 | Stable ID |
+|---|---|---|
+| Would you like to exchange numbers?<br>中文谐音：伍德 优 赖克 特 伊克斯切恩吉 南伯尔兹？ | 你愿意交换电话号码吗？ | sentence-0263 |
+| Can I add you on WeChat?<br>中文谐音：肯 艾 艾德 优 昂 威恰特？ | 我可以加你微信吗？ | sentence-0264 |
+| Can I follow you on Instagram?<br>中文谐音：肯 艾 法罗 优 昂 因斯特格拉姆？ | 我可以关注你的 Instagram 吗？ | sentence-0265 |
+| Can I text you tomorrow?<br>中文谐音：肯 艾 特克斯特 优 特莫罗？ | 我明天可以给你发消息吗？ | sentence-0266 |
+| I'd love to see you again.<br>中文谐音：艾德 拉夫 特 西 优 额盖恩。 | 我很想再见到你。 | sentence-0267 |
+| No problem. Enjoy your night!<br>中文谐音：诺 普拉布勒姆。因乔伊 尤尔 奈特！ | 没问题，祝你今晚玩得开心！ | sentence-0268 |
+| I'll let you get back to your friends.<br>中文谐音：艾尔 莱特 优 盖特 拜克 特 尤尔 弗瑞恩兹。 | 我就不打扰你和朋友聚会了。 | sentence-0269 |
+| Get home safe!<br>中文谐音：盖特 霍姆 塞夫！ | 回家路上注意安全！ | sentence-0270 |
