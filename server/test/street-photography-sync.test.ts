@@ -34,8 +34,9 @@ function snapshot(db: SqliteDatabase): string {
 function original206Database(): SqliteDatabase {
   const db = openDatabase({ databasePath: ":memory:" });
   migrateAndSeed(db, SOURCE);
-  db.prepare("DELETE FROM item_revisions WHERE item_id IN (SELECT id FROM items WHERE item_key BETWEEN 'sentence-0207' AND 'sentence-0238')").run();
-  db.prepare("DELETE FROM items WHERE item_key BETWEEN 'sentence-0207' AND 'sentence-0238'").run();
+  db.prepare("DELETE FROM item_revisions WHERE item_id IN (SELECT id FROM items WHERE item_key BETWEEN 'sentence-0207' AND 'sentence-0270')").run();
+  db.prepare("DELETE FROM items WHERE item_key BETWEEN 'sentence-0207' AND 'sentence-0270'").run();
+  db.prepare("DELETE FROM categories WHERE slug IN ('sentences-19', 'sentences-20', 'sentences-21', 'sentences-22')").run();
   return db;
 }
 
@@ -44,7 +45,7 @@ test("October street source additions preserve all original 206 identities, cont
   const original = parsed.items.filter((item) => Number(item.key.slice(9)) <= 206);
   assert.equal(original.length, 206);
   assert.equal(digest(original), ORIGINAL_ITEMS_SHA256);
-  assert.equal(digest(parsed.categories), ORIGINAL_CATEGORIES_SHA256);
+  assert.equal(digest(parsed.categories.slice(0, 18)), ORIGINAL_CATEGORIES_SHA256);
   assert.deepEqual(original.map((item) => item.key).sort(),
     Array.from({ length: 206 }, (_, index) => `sentence-${String(index + 1).padStart(4, "0")}`));
 });
@@ -57,8 +58,11 @@ test("canonical 32 new street phrases exactly match the published Markdown impor
   assert.equal(extra.groups.length, 4);
   assert.equal(extra.rows.length, 32);
   assert.ok(extra.groups.every((group) => group.kind === "sentence"));
-  const added = parsed.items.filter((item) => Number(item.key.slice(9)) >= 207);
-  assert.equal(parsed.items.length, 238);
+  const added = parsed.items.filter((item) => {
+    const number = Number(item.key.slice(9));
+    return number >= 207 && number <= 238;
+  });
+  assert.equal(parsed.items.length, 270);
   assert.deepEqual(added.map((item) => item.key),
     Array.from({ length: 32 }, (_, index) => `sentence-${String(index + 207).padStart(4, "0")}`));
 
@@ -94,16 +98,16 @@ test("existing 206-item databases never automatically import the 32 fresh-source
   }
 });
 
-test("new 238-item installations seed only once and accept the legacy marker compatibility path", () => {
+test("new 270-item installations seed only once and accept the legacy marker compatibility path", () => {
   const db = openDatabase({ databasePath: ":memory:" });
   try {
-    assert.deepEqual(migrateAndSeed(db, SOURCE), { categoriesInserted: 22, itemsInserted: 1088, words: 850, sentences: 238 });
+    assert.deepEqual(migrateAndSeed(db, SOURCE), { categoriesInserted: 26, itemsInserted: 1120, words: 850, sentences: 270 });
     const before = snapshot(db);
-    assert.deepEqual(migrateAndSeed(db, "Z:\\missing-source-directory"), { categoriesInserted: 0, itemsInserted: 0, words: 850, sentences: 238 });
+    assert.deepEqual(migrateAndSeed(db, "Z:\\missing-source-directory"), { categoriesInserted: 0, itemsInserted: 0, words: 850, sentences: 270 });
     assert.equal(snapshot(db), before);
     const items = db.prepare("SELECT * FROM items ORDER BY id").all();
     db.prepare("DELETE FROM app_meta WHERE key IN ('initial_seed_completed', 'initial_seed_checksum')").run();
-    assert.deepEqual(migrateAndSeed(db, SOURCE), { categoriesInserted: 0, itemsInserted: 0, words: 850, sentences: 238 });
+    assert.deepEqual(migrateAndSeed(db, SOURCE), { categoriesInserted: 0, itemsInserted: 0, words: 850, sentences: 270 });
     assert.deepEqual(db.prepare("SELECT * FROM items ORDER BY id").all(), items);
     assert.deepEqual(db.prepare("SELECT value FROM app_meta WHERE key = 'initial_seed_checksum'").get(), { value: "legacy-v1" });
   } finally {

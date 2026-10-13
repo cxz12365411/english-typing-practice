@@ -94,8 +94,8 @@ Production deployment assets and the rollback/restore runbook are documented in
 The original Markdown files are seed inputs. They remain in this public repository,
 but are not served by the authenticated production application.
 
-The bundled corpus contains 850 words and 238 sentences across 22 categories,
-including 70 street-photography phrases in four scenarios. The September 2026
+The bundled corpus contains 850 words and 270 sentences across 26 categories,
+including 70 street-photography phrases and 32 bar-social phrases. The September 2026
 content update is applied once to existing databases, preserving existing item IDs,
 accounts, progress, and subsequent administrator edits. Merely editing a Markdown
 file does not overwrite an already-seeded database; additions need an explicit,
@@ -111,3 +111,11 @@ the no-login GitHub Pages site and includes them in new-installation seed data.
 It does not add a third automatic content patch or re-import existing databases.
 The reusable three-column [32-phrase Markdown](docs/street-photography-extra-32.md)
 contains only public practice content, not accounts or learning records.
+
+The [32 bar-social phrases](docs/bar-social-extra-32.md) add four scenarios:
+friendly introductions, drinks and toasts, conversation and invitations, and
+exchanging contacts or saying goodbye. Each includes a Chinese meaning and an
+approximate Chinese pronunciation hint, using the existing speech feature.
+See [the bar-social sync notes](docs/content-sync-2026-10-13.md). Existing accounts
+receive the additions through the ordinary administrator Markdown import, not a
+new automatic content patch or database migration.

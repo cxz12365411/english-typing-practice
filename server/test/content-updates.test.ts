@@ -21,9 +21,10 @@ function snapshot(db: SqliteDatabase): string {
 
 function removeOctoberSourceAdditions(db: SqliteDatabase): void {
   // The October additions are a fresh-install source update, not a v3 database patch.
-  // Remove them from historical fixtures so these tests retain their 168/182/206 semantics.
-  db.prepare("DELETE FROM item_revisions WHERE item_id IN (SELECT id FROM items WHERE item_key BETWEEN 'sentence-0207' AND 'sentence-0238')").run();
-  db.prepare("DELETE FROM items WHERE item_key BETWEEN 'sentence-0207' AND 'sentence-0238'").run();
+  // Remove later fresh-source additions so historical fixtures retain their 168/182/206 semantics.
+  db.prepare("DELETE FROM item_revisions WHERE item_id IN (SELECT id FROM items WHERE item_key BETWEEN 'sentence-0207' AND 'sentence-0270')").run();
+  db.prepare("DELETE FROM items WHERE item_key BETWEEN 'sentence-0207' AND 'sentence-0270'").run();
+  db.prepare("DELETE FROM categories WHERE slug IN ('sentences-19', 'sentences-20', 'sentences-21', 'sentences-22')").run();
 }
 
 function legacyDatabase(): SqliteDatabase {
@@ -51,12 +52,12 @@ function streetV1Database(): SqliteDatabase {
   return db;
 }
 
-test("fresh installation seeds 850 words and 238 sentences and records both historical content updates only once", () => {
+test("fresh installation seeds 850 words and 270 sentences and records both historical content updates only once", () => {
   const db = openDatabase({ databasePath: ":memory:" });
   try {
-    assert.deepEqual(migrateAndSeed(db, SOURCE), { categoriesInserted: 22, itemsInserted: 1088, words: 850, sentences: 238 });
-    assert.equal(scalar(db, "SELECT COUNT(*) FROM item_revisions"), 1088);
-    assert.equal(scalar(db, "SELECT COUNT(*) FROM items WHERE status = 'published'"), 1088);
+    assert.deepEqual(migrateAndSeed(db, SOURCE), { categoriesInserted: 26, itemsInserted: 1120, words: 850, sentences: 270 });
+    assert.equal(scalar(db, "SELECT COUNT(*) FROM item_revisions"), 1120);
+    assert.equal(scalar(db, "SELECT COUNT(*) FROM items WHERE status = 'published'"), 1120);
     assert.equal(scalar(db, "SELECT CAST(value AS INTEGER) FROM app_meta WHERE key = 'content_version'"), 1);
     assert.equal((db.prepare("SELECT value FROM app_meta WHERE key = ?").get(MARKER) as { value: string }).value, "1");
     assert.equal((db.prepare("SELECT value FROM app_meta WHERE key = ?").get(EXPANSION_MARKER) as { value: string }).value, "1");
@@ -66,7 +67,7 @@ test("fresh installation seeds 850 words and 238 sentences and records both hist
       { source: "street-photography-english-phrases.md", categories: 4, items: 24, categoriesInserted: 0, itemsInserted: 0 }
     ]);
     const before = snapshot(db);
-    assert.deepEqual(migrateAndSeed(db, "Z:\\missing-source-directory"), { categoriesInserted: 0, itemsInserted: 0, words: 850, sentences: 238 });
+    assert.deepEqual(migrateAndSeed(db, "Z:\\missing-source-directory"), { categoriesInserted: 0, itemsInserted: 0, words: 850, sentences: 270 });
     assert.equal(snapshot(db), before);
   } finally {
     db.close();

@@ -133,7 +133,7 @@ test("existing complete word and sentence source files reuse every published ite
     const admin = f.client();
     const before = f.count("items");
     const version = f.version();
-    for (const [fileName, count] of [["basic-english-850.md", 850], ["daily-english-high-frequency-sentences.md", 238]] as const) {
+    for (const [fileName, count] of [["basic-english-850.md", 850], ["daily-english-high-frequency-sentences.md", 270]] as const) {
       const markdown = readFileSync(resolve(import.meta.dirname, "../..", fileName), "utf8");
       const preview = await f.preview(admin, markdown, { fileName });
       assert.deepEqual(preview.json().errors, []);

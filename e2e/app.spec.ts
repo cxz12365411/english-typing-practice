@@ -85,8 +85,8 @@ test.describe.serial("multi-user application", () => {
     await login(page, "learner1", learnerTemporaryPassword);
     await changeForcedPassword(page, learnerTemporaryPassword, LEARNER_PASSWORD);
     await expect(page).toHaveURL(/\/practice$/);
-    await expect(page.getByText(/已载入 850 个单词，238 条句型/)).toBeVisible();
-    await expect(page.locator("#categorySelect option")).toHaveCount(23);
+    await expect(page.getByText(/已载入 850 个单词，270 条句型/)).toBeVisible();
+    await expect(page.locator("#categorySelect option")).toHaveCount(27);
 
     await expect(page.locator("#legacyBanner")).toBeVisible();
     await page.getByRole("button", { name: "确认导入" }).click();
@@ -115,6 +115,49 @@ test.describe.serial("multi-user application", () => {
     expect(adminStatus).toBe(403);
     await page.goto("/admin");
     await expect(page).toHaveURL(/\/practice$/);
+  });
+
+  test("bar social categories show eight complete phrases each without submitting learner answers", async ({ page }) => {
+    await login(page, "learner1", LEARNER_PASSWORD);
+    await expect(page).toHaveURL(/\/practice$/);
+    const before = await (await page.request.get("/api/me/summary")).json();
+    const content = await (await page.request.get("/api/content")).json();
+    const groups = [
+      { label: "句型：酒吧社交：开场与轻松夸赞", english: "Hey, is this seat taken?", meaning: "嗨，这个位子有人坐吗？" },
+      { label: "句型：酒吧社交：点酒与碰杯", english: "What are you drinking?", meaning: "你喝的是什么？" },
+      { label: "句型：酒吧社交：闲聊与邀请", english: "What brings you out tonight?", meaning: "你今晚怎么想到出来玩？" },
+      { label: "句型：酒吧社交：交换联系方式与礼貌结束", english: "Would you like to exchange numbers?", meaning: "你愿意交换电话号码吗？" }
+    ];
+    for (const group of groups) {
+      const item = content.items.find((entry: { english: string }) => entry.english === group.english);
+      expect(item?.pronunciation).toBeTruthy();
+      await page.locator("#categorySelect").selectOption({ label: group.label });
+      await expect(page.locator("#answerInput")).toBeEnabled();
+      await expect(page.locator("#targetWord")).toHaveText(group.english);
+      await expect(page.locator("#meaningText")).toHaveText(group.meaning);
+      await expect(page.locator("#pronunciationText")).toHaveText(`中文谐音：${item.pronunciation}`);
+      await expect(page.locator("#positionText")).toHaveText("1 / 8");
+      await expect(page.locator("#answerInput")).toHaveValue("");
+    }
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.locator("#categorySelect").selectOption({ label: groups[1]!.label });
+    for (let position = 2; position <= 4; position += 1) {
+      await page.locator("#nextButton").click();
+      await expect(page.locator("#positionText")).toHaveText(`${position} / 8`);
+    }
+    await expect(page.locator("#targetWord")).toHaveText("Would you prefer something non-alcoholic?");
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
+    await page.reload();
+    await expect(page.locator("#answerInput")).toBeEnabled();
+    // Regular practice resets to all content on refresh; only import batches
+    // promise persisted scope. Re-select the public category to verify availability.
+    await page.locator("#categorySelect").selectOption({ label: groups[1]!.label });
+    await expect(page.locator("#targetWord")).toHaveText(groups[1]!.english);
+    await expect(page.locator("#positionText")).toHaveText("1 / 8");
+    const after = await (await page.request.get("/api/me/summary")).json();
+    expect(after.totals.attempts).toBe(before.totals.attempts);
+    expect(after.totals.correct).toBe(before.totals.correct);
+    expect(after.totals.mistakes).toBe(before.totals.mistakes);
   });
 
   test("street photography categories preserve old phrases, expose additions, and synchronize both answers", async ({ page }) => {
@@ -277,7 +320,7 @@ test.describe.serial("multi-user application", () => {
     await form.locator('[name="code"]').fill(code);
     await form.getByRole("button", { name: "登录", exact: true }).click();
     await expect(page).toHaveURL(/\/practice$/);
-    await expect(page.getByText(/已载入 850 个单词，238 条句型/)).toBeVisible();
+    await expect(page.getByText(/已载入 850 个单词，270 条句型/)).toBeVisible();
   });
 
   test("email verification code resets a password and revokes the old password", async ({ page }) => {
