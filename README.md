@@ -77,6 +77,35 @@ Keep both standalone HTML files identical. GitHub Pages publishes from the
 `codex/static-pages` branch; preserve its account-site navigation banner when
 applying standalone updates from `main`.
 
+### English–Chinese alignment arrows
+
+Both standalone pages share `alignment.js`, `alignment.css`, and
+`sentence-alignments.json`. **对应箭头** is enabled by default and saved in the
+current browser. Hover, click, or Tab to an English word to highlight its semantic
+group and explanation; Escape clears the selection. On narrow screens, scroll
+inside the two-line diagram. Hiding English also removes its arrows and hints.
+
+All 850 words link to their existing complete definitions. The 270 sentences have
+reviewed semantic groups: contractions, hyphenated words, numbers, and `____` are
+tokens; punctuation and spaces remain unchanged. Articles, auxiliaries, idioms,
+and omitted words belong to their full expression, with explanatory notes where
+needed. These links describe the supplied translation, not a word-by-word
+dictionary translation.
+
+Each alignment entry contains exact `english` and `meaning` strings, `zhParts`
+whose concatenation must equal `meaning`, and `groups` with zero-based `en` token
+indices, `zh` part indices, and an optional `note`. Every English token belongs to
+exactly one group. Discontiguous Chinese targets receive separate arrows. Lookup
+uses `JSON.stringify([english, meaning])`; practice answers and mistake identities
+are unchanged. Missing, invalid, or mismatched entries fall back to plain text.
+Loading this optional data does not reset an answer in progress.
+
+When editing the corpus, update the matching alignment entry and review its
+meaning. Run `npm run test:static` to check exact coverage, indices, Chinese
+concatenation, DOM geometry, mobile overflow, accessibility interactions, failure
+fallbacks, scoring, mistakes, and speech regressions. Publish all three alignment
+assets alongside both HTML entries on `codex/static-pages`.
+
 ## Markdown imports
 
 Administrators can open **批量导入 → Markdown** (or **题库管理 → 从 MD 导入**),

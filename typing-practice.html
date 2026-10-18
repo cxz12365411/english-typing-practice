@@ -164,6 +164,12 @@
       accent-color: var(--green);
     }
 
+    .toggle-line label {
+      color: inherit;
+      font-size: inherit;
+      cursor: pointer;
+    }
+
     .actions {
       display: flex;
       align-items: end;
@@ -500,7 +506,17 @@
         font-size: 24px;
       }
     }
+    /* Preserve plain-text layout even if the optional alignment assets fail. */
+    .alignment-stage {
+      display: grid;
+      gap: 10px;
+    }
+
+    .alignment-arrows[hidden] {
+      display: none;
+    }
   </style>
+  <link id="alignmentStyles" rel="stylesheet" href="alignment.css?v=20261018-1">
 </head>
 <body>
   <div class="app">
@@ -535,7 +551,11 @@
           <label>辅助</label>
           <div class="toggle-line">
             <input id="showWord" type="checkbox" checked>
-            <span>英文目标</span>
+            <label for="showWord">英文目标</label>
+          </div>
+          <div class="toggle-line">
+            <input id="showAlignment" type="checkbox" checked>
+            <label for="showAlignment">对应箭头</label>
           </div>
           <div class="toggle-line">
             <input id="autoSpeak" type="checkbox">
@@ -577,8 +597,14 @@
           </div>
 
           <div class="prompt">
-            <div class="word" id="targetWord"></div>
-            <div class="meaning" id="meaningText"></div>
+            <div class="alignment-scroll" id="alignmentScroll">
+              <div class="alignment-stage" id="alignmentStage">
+                <div class="word" id="targetWord" lang="en"></div>
+                <svg class="alignment-arrows" id="alignmentArrows" aria-hidden="true" focusable="false" hidden></svg>
+                <div class="meaning" id="meaningText" lang="zh-CN"></div>
+              </div>
+            </div>
+            <p class="alignment-note" id="alignmentNote" role="status" aria-live="polite" hidden></p>
             <div class="sound" id="soundText"></div>
           </div>
 
@@ -600,6 +626,7 @@
     </main>
   </div>
 
+  <script src="alignment.js?v=20261018-1"></script>
   <script>
     const els = {
       loadStatus: document.querySelector("#loadStatus"),
@@ -607,6 +634,7 @@
       categorySelect: document.querySelector("#categorySelect"),
       orderSelect: document.querySelector("#orderSelect"),
       showWord: document.querySelector("#showWord"),
+      showAlignment: document.querySelector("#showAlignment"),
       autoSpeak: document.querySelector("#autoSpeak"),
       resetBtn: document.querySelector("#resetBtn"),
       speakBtn: document.querySelector("#speakBtn"),
@@ -655,6 +683,35 @@
       nextTimer: null,
       canSpeak: "speechSynthesis" in window && "SpeechSynthesisUtterance" in window
     };
+
+    const alignmentStylesReady = getComputedStyle(document.querySelector("#alignmentStage")).position === "relative"
+      && getComputedStyle(document.querySelector("#alignmentArrows")).position === "absolute";
+    const alignmentRenderer = window.WordAlignment && alignmentStylesReady
+      ? window.WordAlignment.create({
+        scroll: document.querySelector("#alignmentScroll"),
+        stage: document.querySelector("#alignmentStage"),
+        english: els.targetWord,
+        meaning: els.meaningText,
+        svg: document.querySelector("#alignmentArrows"),
+        note: document.querySelector("#alignmentNote")
+      })
+      : null;
+    try {
+      els.showAlignment.checked = localStorage.getItem("basicTypingAlignmentEnabled") !== "false";
+    } catch {
+      // The display preference is optional when browser storage is unavailable.
+    }
+    els.showAlignment.disabled = !alignmentRenderer;
+
+    function renderPrompt(item = currentWord()) {
+      els.targetWord.className = `word${item?.kind === "sentence" ? " sentence" : ""}${(item?.word.length || 0) > 42 ? " long" : ""}`;
+      if (alignmentRenderer) {
+        alignmentRenderer.render(item, { enabled: els.showAlignment.checked, showEnglish: els.showWord.checked });
+      } else {
+        els.targetWord.textContent = item ? (els.showWord.checked ? item.word : "•".repeat(item.word.length)) : "暂无词条";
+        els.meaningText.textContent = item?.meaning || "当前筛选没有可练习的内容。";
+      }
+    }
 
     function parseWords(markdown) {
       const words = [];
@@ -1000,9 +1057,7 @@
       els.categoryText.textContent = els.categorySelect.options[els.categorySelect.selectedIndex]?.textContent || "全部";
 
       if (!item) {
-        els.targetWord.className = "word";
-        els.targetWord.textContent = "暂无词条";
-        els.meaningText.textContent = "当前筛选没有可练习的内容。";
+        renderPrompt(null);
         els.soundText.textContent = "";
         els.answerInput.value = "";
         els.answerInput.disabled = true;
@@ -1018,9 +1073,7 @@
       els.answerInput.disabled = false;
       els.nextBtn.disabled = false;
       updateSpeechControls();
-      els.targetWord.className = `word${item.kind === "sentence" ? " sentence" : ""}${item.word.length > 42 ? " long" : ""}`;
-      els.targetWord.textContent = els.showWord.checked ? item.word : "•".repeat(item.word.length);
-      els.meaningText.textContent = item.meaning;
+      renderPrompt(item);
       els.soundText.textContent = `中文谐音：${item.sound || "未填写"}`;
       els.answerInput.value = "";
       els.feedback.textContent = "";
@@ -1146,11 +1199,18 @@
     els.showWord.addEventListener("change", () => {
       const item = currentWord();
       if (item) {
-        els.targetWord.className = `word${item.kind === "sentence" ? " sentence" : ""}${item.word.length > 42 ? " long" : ""}`;
-        els.targetWord.textContent = els.showWord.checked ? item.word : "•".repeat(item.word.length);
+        renderPrompt(item);
         renderLetters();
         els.answerInput.focus();
       }
+    });
+    els.showAlignment.addEventListener("change", () => {
+      try {
+        localStorage.setItem("basicTypingAlignmentEnabled", String(els.showAlignment.checked));
+      } catch {
+        // Keep the current setting even if it cannot be saved across visits.
+      }
+      renderPrompt();
     });
     els.clearMistakesBtn.addEventListener("click", () => {
       saveMistakeKeys([]);
@@ -1198,6 +1258,19 @@
     }
 
     boot();
+    if (alignmentRenderer) {
+      fetch("sentence-alignments.json", { cache: "no-cache" })
+        .then((response) => {
+          if (!response.ok) throw new Error("Alignment data unavailable");
+          return response.json();
+        })
+        .then((data) => {
+          alignmentRenderer.setData(data);
+          // Only update the prompt: an answer in progress must remain untouched.
+          renderPrompt();
+        })
+        .catch(() => { /* Practice and speech remain usable without sentence links. */ });
+    }
   </script>
 </body>
 </html>

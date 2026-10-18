@@ -2,7 +2,7 @@ import { defineConfig } from "@playwright/test";
 
 export default defineConfig({
   testDir: "./tests",
-  testMatch: "static-speech.spec.ts",
+  testMatch: "static-*.spec.ts",
   fullyParallel: true,
   workers: 2,
   timeout: 30_000,
