@@ -1,3 +1,5 @@
+import { createPracticeAlignment } from "./alignment";
+import { createSpeechController, speechSettingsMarkup } from "./speech";
 import { ApiError, api } from "./api";
 import { practiceBatchId } from "./routes";
 import {
@@ -86,14 +88,14 @@ interface PracticeState {
   contentRefreshRequired: boolean;
   showEnglish: boolean;
   autoSpeak: boolean;
-  canSpeak: boolean;
-  voice: SpeechSynthesisVoice | null;
   legacyKeys: string[];
   disposed: boolean;
 }
 
 let state: PracticeState | null = null;
 let renderGeneration = 0;
+let alignmentController: ReturnType<typeof createPracticeAlignment> | null = null;
+let speechController: ReturnType<typeof createSpeechController> | null = null;
 
 function isActive(activeState: PracticeState): boolean {
   return state === activeState && !activeState.disposed;
@@ -254,6 +256,7 @@ function practiceMarkup(
         </label>
         <div class="toggle-group" aria-label="辅助设置">
           <label class="toggle-line"><input id="showEnglish" type="checkbox" checked> 显示英文</label>
+          <label class="toggle-line"><input id="showAlignment" type="checkbox" checked> 对应箭头</label>
           <label class="toggle-line"><input id="autoSpeak" type="checkbox"> 自动朗读</label>
         </div>
         <div class="practice-actions">
@@ -262,6 +265,8 @@ function practiceMarkup(
           <button class="btn primary" id="nextButton" type="button">下一个</button>
         </div>
       </section>
+
+      ${speechSettingsMarkup()}
 
       <div class="sync-strip" id="syncStrip" hidden>
         <span id="syncMessage">本次答题尚未同步，请检查网络。</span>
@@ -279,8 +284,14 @@ function practiceMarkup(
           </div>
 
           <div class="prompt">
-            <div class="target-word" id="targetWord">正在准备练习…</div>
-            <div class="meaning" id="meaningText"></div>
+            <div class="alignment-scroll" id="alignmentScroll">
+              <div class="alignment-stage" id="alignmentStage">
+                <div class="target-word word" id="targetWord" lang="en">正在准备练习…</div>
+                <svg class="alignment-arrows" id="alignmentArrows" aria-hidden="true" focusable="false" hidden></svg>
+                <div class="meaning" id="meaningText" lang="zh-CN"></div>
+              </div>
+            </div>
+            <p class="alignment-note" id="alignmentNote" role="status" aria-live="polite" hidden></p>
             <div class="pronunciation" id="pronunciationText"></div>
           </div>
 
@@ -320,32 +331,19 @@ function currentItem(): ContentItem | null {
   return state.pool[state.index] ?? null;
 }
 
-function chooseVoice(): SpeechSynthesisVoice | null {
-  if (!state?.canSpeak) return null;
-  const voices = window.speechSynthesis.getVoices();
-  return voices.find((voice) => /^en[-_]?US/i.test(voice.lang))
-    ?? voices.find((voice) => /^en/i.test(voice.lang))
-    ?? voices[0]
-    ?? null;
-}
-
-function speakCurrent(): void {
+function renderPrompt(): void {
   if (!state) return;
   const item = currentItem();
-  const feedback = mustElement<HTMLElement>("#feedback");
-  if (!state.canSpeak || !item) {
-    feedback.textContent = "当前浏览器不支持英文朗读";
-    feedback.className = "feedback bad";
-    return;
+  const target = mustElement<HTMLElement>("#targetWord");
+  const meaning = mustElement<HTMLElement>("#meaningText");
+  target.className = `target-word word${item?.kind === "sentence" ? " sentence" : ""}${(item?.english.length ?? 0) > 42 ? " long" : ""}`;
+  alignmentController?.render(item, { showEnglish: state.showEnglish });
+  if (!item) {
+    target.textContent = state.importBatchId && !state.items.length ? "本次文件暂无可练习内容" : state.mode === "mistakes" ? "错题已练完" : "暂无词条";
+    meaning.textContent = state.importBatchId && !state.items.length
+      ? "这些题目或所属分类可能已下架。可退出本次文件练习后选择其他内容。"
+      : state.mode === "mistakes" ? "当前筛选下没有待复习的错题。" : "当前分类暂时没有已发布内容。";
   }
-  window.speechSynthesis.cancel();
-  const utterance = new SpeechSynthesisUtterance(item.english.replace(/____/g, "blank"));
-  utterance.lang = "en-US";
-  utterance.rate = item.english.length > 30 ? 0.82 : 0.9;
-  utterance.pitch = 1;
-  state.voice = state.voice ?? chooseVoice();
-  if (state.voice) utterance.voice = state.voice;
-  window.speechSynthesis.speak(utterance);
 }
 
 function renderLetters(): void {
@@ -441,13 +439,12 @@ function setPracticeInputsDisabled(disabled: boolean): void {
 function renderCurrent(): void {
   if (!state) return;
   const activeState = state;
+  speechController?.stop();
   const item = currentItem();
   const total = state.pool.length;
   const answerInput = mustElement<HTMLInputElement>("#answerInput");
   const nextButton = mustElement<HTMLButtonElement>("#nextButton");
   const speakButton = mustElement<HTMLButtonElement>("#speakButton");
-  const target = mustElement<HTMLElement>("#targetWord");
-  const meaning = mustElement<HTMLElement>("#meaningText");
   const pronunciation = mustElement<HTMLElement>("#pronunciationText");
   const feedback = mustElement<HTMLElement>("#feedback");
   const progress = mustElement<HTMLProgressElement>("#progressBar");
@@ -468,12 +465,9 @@ function renderCurrent(): void {
   state.itemStartedAtMs = Date.now();
   setPracticeInputsDisabled(!state.session || state.submitting || state.transitioning || state.rebuilding || Boolean(state.pendingAttempt));
 
+  renderPrompt();
+  speechController?.refresh();
   if (!item) {
-    target.className = "target-word";
-    target.textContent = state.importBatchId && !state.items.length ? "本次文件暂无可练习内容" : state.mode === "mistakes" ? "错题已练完" : "暂无词条";
-    meaning.textContent = state.importBatchId && !state.items.length
-      ? "这些题目或所属分类可能已下架。可退出本次文件练习后选择其他内容。"
-      : state.mode === "mistakes" ? "当前筛选下没有待复习的错题。" : "当前分类暂时没有已发布内容。";
     pronunciation.textContent = "";
     pronunciation.hidden = true;
     answerInput.disabled = true;
@@ -483,19 +477,13 @@ function renderCurrent(): void {
     return;
   }
 
-  target.className = `target-word${item.kind === "sentence" ? " sentence" : ""}${item.english.length > 42 ? " long" : ""}`;
-  target.textContent = state.showEnglish ? item.english : "•".repeat(item.english.length);
-  meaning.textContent = item.meaning;
   pronunciation.textContent = item.pronunciation ? `中文谐音：${item.pronunciation}` : "";
   pronunciation.hidden = !item.pronunciation;
   answerInput.disabled = !state.session || state.submitting || state.transitioning || Boolean(state.pendingAttempt);
   nextButton.disabled = !state.session || state.submitting || state.transitioning || Boolean(state.pendingAttempt);
-  speakButton.disabled = !state.canSpeak;
   renderLetters();
   window.setTimeout(() => { if (isActive(activeState)) answerInput.focus(); }, 0);
-  if (state.autoSpeak) window.setTimeout(() => {
-    if (isActive(activeState) && currentItem() === item && state?.autoSpeak) speakCurrent();
-  }, 180);
+  if (state.autoSpeak && state.session) speechController?.scheduleCurrent();
 }
 
 async function refreshMistakes(): Promise<void> {
@@ -547,6 +535,7 @@ function sortContent(categories: ContentCategory[], items: ContentItem[]): {
 async function refreshContentAfterConflict(): Promise<void> {
   if (!state || state.disposed || state.contentRefreshing) return;
   const activeState = state;
+  speechController?.stop();
   state.contentRefreshing = true;
   state.mistakeRefreshSequence += 1;
   state.contentRefreshRequired = true;
@@ -758,6 +747,7 @@ async function rebuildPool(): Promise<void> {
     setSyncProblem("请先重试同步当前答题，再切换练习设置。");
     return;
   }
+  speechController?.stop();
   state.rebuilding = true;
   setPracticeInputsDisabled(true);
   const oldSession = state.session;
@@ -1077,17 +1067,16 @@ function bindPracticeEvents(): void {
   showEnglish.addEventListener("change", () => {
     if (!state) return;
     state.showEnglish = showEnglish.checked;
-    const item = currentItem();
-    if (item) mustElement<HTMLElement>("#targetWord").textContent = state.showEnglish ? item.english : "•".repeat(item.english.length);
+    renderPrompt();
     renderLetters();
     answer.focus();
   });
   autoSpeak.addEventListener("change", () => {
     if (!state) return;
     state.autoSpeak = autoSpeak.checked;
-    if (state.autoSpeak) speakCurrent();
+    if (state.autoSpeak) speechController?.speakCurrent();
+    else speechController?.stop();
   });
-  mustElement<HTMLButtonElement>("#speakButton").addEventListener("click", speakCurrent);
   mustElement<HTMLButtonElement>("#nextButton").addEventListener("click", () => {
     if (!state || state.submitting || state.transitioning || state.pendingAttempt) return;
     const value = answer.value.trim();
@@ -1111,20 +1100,10 @@ function bindPracticeEvents(): void {
   bindEmailAccountForms();
   bindPasswordForm();
 
-  if (state?.canSpeak) {
-    state.voice = chooseVoice();
-    window.speechSynthesis.addEventListener("voiceschanged", onVoicesChanged);
-  } else {
-    mustElement<HTMLButtonElement>("#speakButton").disabled = true;
-    autoSpeak.disabled = true;
-  }
+  autoSpeak.disabled = !speechController?.supported;
   window.addEventListener("online", onOnline);
   window.addEventListener("offline", onOffline);
   window.addEventListener("beforeunload", onBeforeUnload);
-}
-
-function onVoicesChanged(): void {
-  if (state) state.voice = chooseVoice();
 }
 
 function onOnline(): void {
@@ -1206,8 +1185,6 @@ export async function renderPractice(context: PageContext): Promise<void> {
       contentRefreshRequired: false,
       showEnglish: true,
       autoSpeak: false,
-      canSpeak: "speechSynthesis" in window && "SpeechSynthesisUtterance" in window,
-      voice: null,
       legacyKeys,
       disposed: false
     };
@@ -1222,11 +1199,20 @@ export async function renderPractice(context: PageContext): Promise<void> {
       state.unavailableCount
     ), "/practice");
     mustElement<HTMLElement>("#legacyCount").textContent = String(legacyKeys.length);
+    const activeState = state;
+    alignmentController = createPracticeAlignment({ isActive: () => isActive(activeState), onDataReady: renderPrompt });
+    speechController = createSpeechController({
+      speakButton: mustElement<HTMLButtonElement>("#speakButton"),
+      isActive: () => isActive(activeState),
+      getText: () => currentItem()?.english ?? null,
+      autoEnabled: () => Boolean(state?.autoSpeak && state.session)
+    });
     bindPracticeEvents();
     renderMistakes();
     await rebuildPool();
   } catch (error) {
     if (generation !== renderGeneration) return;
+    disposePractice();
     if (context.handleAuthError(error)) return;
     const batchError = new URLSearchParams(location.search).has("batch");
     context.renderShell(errorMarkup(batchError ? "本次文件练习不可用" : "练习内容读取失败", getErrorMessage(error))
@@ -1243,10 +1229,10 @@ export function disposePractice(): void {
   window.removeEventListener("online", onOnline);
   window.removeEventListener("offline", onOffline);
   window.removeEventListener("beforeunload", onBeforeUnload);
-  if (state.canSpeak) {
-    window.speechSynthesis.cancel();
-    window.speechSynthesis.removeEventListener("voiceschanged", onVoicesChanged);
-  }
+  speechController?.destroy();
+  speechController = null;
+  alignmentController?.destroy();
+  alignmentController = null;
   if (state.session && !state.pendingAttempt) {
     const sessionId = state.session.id;
     const durationMs = Math.min(86_400_000, Math.max(0, Date.now() - state.sessionStartedAtMs));

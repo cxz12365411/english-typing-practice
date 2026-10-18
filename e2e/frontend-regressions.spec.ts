@@ -59,6 +59,33 @@ async function readyPractice(page: Page): Promise<void> {
   await expect(page.locator("#answerInput")).toBeEnabled();
 }
 
+test("switching login modes does not steal focus after the user reaches the password", async ({ page }) => {
+  await mockApp(page, { anonymous: true });
+  await page.goto("/login");
+  await expect(page.locator("#password-login-tab")).toBeVisible();
+  await page.evaluate(() => {
+    const callbacks: FrameRequestCallback[] = [];
+    const original = window.requestAnimationFrame;
+    window.requestAnimationFrame = (callback) => callbacks.push(callback);
+    try {
+      document.querySelector<HTMLButtonElement>("#password-login-tab")!.click();
+      const username = document.querySelector<HTMLInputElement>('#passwordLoginForm [name="username"]')!;
+      const password = document.querySelector<HTMLInputElement>('#passwordLoginForm [name="password"]')!;
+      username.value = "quick.admin";
+      password.focus();
+      // Force any focus queued by the tab switch to run after the user's next focus.
+      callbacks.splice(0).forEach((callback) => callback(performance.now()));
+    } finally {
+      window.requestAnimationFrame = original;
+    }
+  });
+  const form = page.locator("#passwordLoginForm");
+  await expect(form.locator('[name="password"]')).toBeFocused();
+  await page.keyboard.type("test-password-123");
+  await expect(form.locator('[name="username"]')).toHaveValue("quick.admin");
+  await expect(form.locator('[name="password"]')).toHaveValue("test-password-123");
+});
+
 test("correct answers restore settings and mistakes mode can be exited when empty", async ({ page }) => {
   await mockApp(page, { mistakes: true });
   await readyPractice(page);

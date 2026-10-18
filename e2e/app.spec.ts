@@ -16,9 +16,11 @@ let otherTemporaryPassword = "";
 
 async function login(page: Page, username: string, password: string): Promise<void> {
   await page.goto("/login");
+  const form = page.locator("#passwordLoginForm");
+  // Session capabilities load asynchronously before the available login modes render.
+  await expect(form).toBeAttached();
   const passwordTab = page.getByRole("tab", { name: "账号密码" });
   if (await passwordTab.count()) await passwordTab.click();
-  const form = page.locator("#passwordLoginForm");
   await form.locator('[name="username"]').fill(username);
   await form.locator('[name="password"]').fill(password);
   await form.getByRole("button", { name: "登录", exact: true }).click();
@@ -435,7 +437,7 @@ test.describe.serial("multi-user application", () => {
   });
 });
 
-test("mobile layout stacks the practice sidebar and wraps an expanded street photography phrase", async ({ page }) => {
+test("mobile layout stacks the sidebar, scrolls the alignment diagram and wraps plain text", async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await login(page, "learner1", LEARNER_PASSWORD);
   await expect(page).toHaveURL(/\/practice$/);
@@ -449,6 +451,18 @@ test("mobile layout stacks the practice sidebar and wraps an expanded street pho
   await expect(page.locator("#targetWord")).toHaveText("Feel free to message me if you have any questions.");
   await expect(page.locator("#meaningText")).toHaveText("有任何问题，随时给我发消息。");
   await expect(page.locator("#pronunciationText")).toHaveText("中文谐音：菲尔 弗瑞 特 梅瑟吉 米 伊夫 优 海夫 艾尼 奎斯辰兹。");
+  await expect(page.locator(".alignment-path").first()).toBeAttached();
+  const diagram = await page.locator("#alignmentScroll").evaluate((element) => ({
+    width: element.clientWidth,
+    scroll: element.scrollWidth,
+    right: element.getBoundingClientRect().right,
+    page: document.documentElement.scrollWidth,
+    viewport: innerWidth
+  }));
+  expect(diagram.scroll).toBeGreaterThan(diagram.width);
+  expect(diagram.right).toBeLessThanOrEqual(diagram.viewport);
+  expect(diagram.page).toBeLessThanOrEqual(diagram.viewport);
+  await page.locator("#showAlignment").uncheck();
   const layout = await page.evaluate(() => {
     const main = document.querySelector<HTMLElement>(".practice-main")!.getBoundingClientRect();
     const side = document.querySelector<HTMLElement>(".practice-side")!.getBoundingClientRect();

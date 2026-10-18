@@ -61,9 +61,10 @@ The browser suite uses an isolated temporary SQLite database and local Chrome. I
 covers onboarding, account isolation, synchronized attempts, legacy mistake import,
 navigation races, unsynchronized-answer protection, PWA assets, and mobile layout.
 
-### Standalone GitHub Pages speech
+### Speech settings
 
-The no-login pages (`index.html` and `typing-practice.html`) include **朗读设置**:
+The account practice page and no-login pages (`index.html` and
+`typing-practice.html`) include **朗读设置**:
 choose an English voice, preview it, and adjust speed from 0.75× to 1.25×. Automatic
 selection prefers available Samantha voices (Premium, Enhanced, then standard)
 and excludes known novelty voices. Voice availability depends on the browser;
@@ -79,8 +80,10 @@ applying standalone updates from `main`.
 
 ### English–Chinese alignment arrows
 
-Both standalone pages share `alignment.js`, `alignment.css`, and
-`sentence-alignments.json`. **对应箭头** is enabled by default and saved in the
+The account practice page and both standalone pages share `alignment.js`,
+`alignment.css`, and `sentence-alignments.json`. The account build bundles the
+renderer and styles and publishes the data with a content-hashed asset URL.
+**对应箭头** is enabled by default and saved in the
 current browser. Hover, click, or Tab to an English word to highlight its semantic
 group and explanation; Escape clears the selection. On narrow screens, scroll
 inside the two-line diagram. Hiding English also removes its arrows and hints.
@@ -99,6 +102,12 @@ exactly one group. Discontiguous Chinese targets receive separate arrows. Lookup
 uses `JSON.stringify([english, meaning])`; practice answers and mistake identities
 are unchanged. Missing, invalid, or mismatched entries fall back to plain text.
 Loading this optional data does not reset an answer in progress.
+
+Account-site imports retain their own question IDs, revisions, translations and
+learning records. Single words use their complete definition; imported sentences
+without an exact reviewed alignment remain plain text. This frontend update does
+not replace the server's question bank. Account navigation cancels pending speech
+and alignment loading before a new page takes ownership of the controls.
 
 When editing the corpus, update the matching alignment entry and review its
 meaning. Run `npm run test:static` to check exact coverage, indices, Chinese

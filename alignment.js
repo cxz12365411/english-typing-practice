@@ -1,4 +1,4 @@
-/* Shared by the two standalone practice pages. No translation service is used. */
+/* Shared by the standalone pages and account app. No translation service is used. */
 (function (root) {
   "use strict";
 
@@ -63,32 +63,34 @@
       this.pinned = null;
       this.hovered = null;
       this.focused = null;
-      this.english.addEventListener("pointerover", (event) => {
+      this.destroyed = false;
+      this.listeners = [];
+      this.listen(this.english, "pointerover", (event) => {
         this.hovered = this.groupForNode(event.target);
         this.highlight();
       });
-      this.english.addEventListener("pointerleave", () => {
+      this.listen(this.english, "pointerleave", () => {
         this.hovered = null;
         this.highlight();
       });
-      this.english.addEventListener("focusin", (event) => {
+      this.listen(this.english, "focusin", (event) => {
         // A stationary pointer must not override a new keyboard focus.
         this.hovered = null;
         this.focused = this.groupForNode(event.target);
         this.highlight();
       });
-      this.english.addEventListener("focusout", () => {
+      this.listen(this.english, "focusout", () => {
         this.focused = null;
         this.highlight();
       });
-      this.english.addEventListener("click", (event) => {
+      this.listen(this.english, "click", (event) => {
         const group = this.groupForNode(event.target);
         if (group !== null) {
           this.pinned = group;
           this.highlight();
         }
       });
-      this.scroll.addEventListener("keydown", (event) => {
+      this.listen(this.scroll, "keydown", (event) => {
         if (event.key === "Escape") {
           this.pinned = this.hovered = this.focused = null;
           this.highlight();
@@ -99,12 +101,31 @@
         this.observer.observe(this.stage);
         this.observer.observe(this.scroll);
       }
-      window.addEventListener("resize", () => this.scheduleDraw());
+      this.listen(window, "resize", () => this.scheduleDraw());
       document.fonts?.ready.then(() => this.scheduleDraw());
-      document.fonts?.addEventListener("loadingdone", () => this.scheduleDraw());
+      if (document.fonts) this.listen(document.fonts, "loadingdone", () => this.scheduleDraw());
+    }
+
+    listen(target, type, listener) {
+      target.addEventListener(type, listener);
+      this.listeners.push(() => target.removeEventListener(type, listener));
+    }
+
+    destroy() {
+      if (this.destroyed) return;
+      this.destroyed = true;
+      this.listeners.forEach((remove) => remove());
+      this.listeners = [];
+      this.observer?.disconnect();
+      if (this.frame !== null) cancelAnimationFrame(this.frame);
+      this.frame = null;
+      this.entry = null;
+      this.entries.clear();
+      this.tokenNodes = this.zhNodes = this.paths = [];
     }
 
     setData(data) {
+      if (this.destroyed) return;
       this.entries.clear();
       if (data?.version !== 1 || !Array.isArray(data.entries)) return;
       const duplicates = new Set();
@@ -123,6 +144,7 @@
     }
 
     render(item, { enabled = true, showEnglish = true } = {}) {
+      if (this.destroyed) return;
       const nextKey = item ? key(item.word, item.meaning) : null;
       const changed = this.currentKey !== nextKey;
       this.currentKey = nextKey;
@@ -195,7 +217,7 @@
     }
 
     scheduleDraw() {
-      if (!this.entry || this.frame !== null) return;
+      if (this.destroyed || !this.entry || this.frame !== null) return;
       this.frame = requestAnimationFrame(() => {
         this.frame = null;
         this.draw();
@@ -203,7 +225,7 @@
     }
 
     draw() {
-      if (!this.entry) return;
+      if (this.destroyed || !this.entry) return;
       const bounds = this.stage.getBoundingClientRect();
       if (!bounds.width || !bounds.height) return;
       this.svg.setAttribute("viewBox", `0 0 ${bounds.width} ${bounds.height}`);
@@ -253,7 +275,7 @@
     }
 
     highlight() {
-      if (!this.entry) return;
+      if (this.destroyed || !this.entry) return;
       const active = this.hovered ?? this.focused ?? this.pinned;
       this.stage.classList.toggle("has-highlight", active !== null);
       for (const node of [...this.tokenNodes, ...this.paths]) {

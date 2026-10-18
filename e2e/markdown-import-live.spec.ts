@@ -2,6 +2,8 @@ import { expect, test, type Page } from "@playwright/test";
 
 async function login(page: Page, username = "md.owner") {
   await page.goto("/login");
+  // Wait for session capabilities before checking the optional password tab.
+  await expect(page.locator("#passwordLoginForm")).toBeAttached();
   const passwordTab = page.getByRole("tab", { name: "账号密码" });
   if (await passwordTab.count()) await passwordTab.click();
   await page.locator('#passwordLoginForm [name="username"]').fill(username);

@@ -131,9 +131,8 @@ function switchAuthMode(mode: AuthMode): void {
   document.querySelectorAll<HTMLElement>("[data-auth-panel]").forEach((panel) => {
     panel.hidden = panel.dataset.authPanel !== mode;
   });
-  window.requestAnimationFrame(() => {
-    document.querySelector<HTMLElement>(`[data-auth-panel="${mode}"] input`)?.focus();
-  });
+  // The panel is already visible; a deferred focus could interrupt password entry.
+  document.querySelector<HTMLElement>(`[data-auth-panel="${mode}"] input`)?.focus();
 }
 
 function bindTabs(): void {
