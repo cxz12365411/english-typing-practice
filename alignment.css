@@ -1,0 +1,114 @@
+.main, .prompt, .alignment-scroll {
+  min-width: 0;
+}
+
+.alignment-scroll {
+  max-width: 100%;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+}
+
+.alignment-stage {
+  display: grid;
+  gap: 10px;
+  position: relative;
+}
+
+.alignment-stage.has-alignment {
+  width: max-content;
+  min-width: 100%;
+  padding: 6px 8px;
+  row-gap: 88px;
+}
+
+.has-alignment .word, .has-alignment .meaning {
+  white-space: pre;
+  overflow-wrap: normal;
+}
+
+.alignment-token {
+  font: inherit;
+  color: inherit;
+  letter-spacing: inherit;
+  line-height: inherit;
+  padding: 3px 1px;
+  margin: 0;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  border-radius: 4px;
+  background: transparent;
+  cursor: pointer;
+}
+
+.alignment-token:focus-visible, .alignment-scroll:focus-visible {
+  outline: 2px solid var(--blue, #2667a8);
+  outline-offset: 3px;
+}
+
+.alignment-zh {
+  display: inline-block;
+  padding: 2px 0;
+  border-bottom: 2px solid transparent;
+  border-radius: 3px;
+}
+
+.alignment-arrows {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  overflow: visible;
+}
+
+.alignment-path {
+  fill: none;
+  stroke: var(--link-color);
+  stroke-width: 1.6;
+  opacity: 0.65;
+}
+
+.has-highlight .alignment-path:not(.is-highlighted) {
+  opacity: 0.13;
+}
+
+.has-highlight .alignment-token:not(.is-highlighted) {
+  opacity: 0.5;
+}
+
+.alignment-path.is-highlighted {
+  opacity: 1;
+  stroke-width: 2.3;
+}
+
+.alignment-token.is-highlighted, .alignment-zh.is-highlighted {
+  color: var(--link-color);
+  border-bottom-color: var(--link-color);
+  background: #edf3f8;
+}
+
+.alignment-note {
+  margin: 0;
+  color: var(--muted, #62665f);
+  font-size: 13px;
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+
+.alignment-arrows[hidden], .alignment-note[hidden] {
+  display: none;
+}
+
+@media (max-width: 860px) {
+  .has-alignment .word.sentence {
+    font-size: 26px;
+  }
+
+  .has-alignment .word.sentence.long {
+    font-size: 24px;
+  }
+
+  .alignment-stage.has-alignment {
+    row-gap: 76px;
+  }
+}
