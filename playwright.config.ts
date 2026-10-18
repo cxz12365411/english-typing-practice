@@ -1,5 +1,9 @@
 import { defineConfig } from "@playwright/test";
 
+// Release checks must execute the same bundled files that are deployed. npm run test:e2e
+// builds them first; the development server remains available for explicit debugging.
+const useDevServer = process.env.E2E_WEB_MODE === "development";
+
 export default defineConfig({
   testDir: "./e2e",
   fullyParallel: false,
@@ -21,7 +25,9 @@ export default defineConfig({
       timeout: 120_000
     },
     {
-      command: "npm run dev --workspace web -- --host localhost --port 4173",
+      command: useDevServer
+        ? "npm run dev --workspace web -- --host localhost --port 4173"
+        : "npm run preview --workspace web -- --host localhost --port 4173",
       url: "http://localhost:4173/login",
       reuseExistingServer: false,
       timeout: 120_000

@@ -160,7 +160,17 @@ test("account practice loads the real 270 alignments and highlights the screensh
   await mockApp(page);
   const dataResponse = page.waitForResponse(response => response.request().resourceType() === "fetch" && dataUrl.test(response.url()));
   await readyPractice(page);
-  expect(await (await dataResponse).json()).toEqual(alignmentData);
+  await expect(page.locator("#showAlignment")).toBeEnabled();
+  expect(await page.evaluate(() => typeof (window as unknown as {
+    WordAlignment?: { create: unknown };
+  }).WordAlignment?.create)).toBe("function");
+  const response = await dataResponse;
+  expect(await response.json()).toEqual(alignmentData);
+  if (process.env.E2E_WEB_MODE !== "development") {
+    await expect(page.locator('script[type="module"][src^="/assets/index-"]')).toHaveCount(1);
+    await expect(page.locator('script[src*="/@vite/client"]')).toHaveCount(0);
+    expect(new URL(response.url()).pathname).toMatch(/^\/assets\/sentence-alignments-[^/]+\.json$/);
+  }
   expect(alignmentData.entries).toHaveLength(270);
   await expect(page.locator("#targetWord")).toHaveText(hey.english);
   await expect(page.locator("#meaningText")).toHaveText(hey.meaning);

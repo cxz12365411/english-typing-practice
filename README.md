@@ -57,9 +57,12 @@ npm run test:e2e
 python -m unittest discover -s deploy/tests -v
 ```
 
-The browser suite uses an isolated temporary SQLite database and local Chrome. It
+The browser suite uses the production Vite build, an isolated temporary SQLite
+database and local Chrome. Run `npm run test:e2e` to rebuild before testing. It
 covers onboarding, account isolation, synchronized attempts, legacy mistake import,
-navigation races, unsynchronized-answer protection, PWA assets, and mobile layout.
+navigation races, unsynchronized-answer protection, PWA assets, alignment and
+speech controls, and mobile layout. For development-server diagnosis only, use
+`E2E_WEB_MODE=development npx playwright test`.
 
 ### Speech settings
 

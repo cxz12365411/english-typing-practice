@@ -298,6 +298,8 @@
   }
 
   const api = { tokenize, key, validateEntry, create: (elements) => new Renderer(elements) };
-  if (typeof module !== "undefined" && module.exports) module.exports = api;
-  else root.WordAlignment = api;
+  const commonJS = typeof module !== "undefined" && module.exports;
+  if (commonJS) module.exports = api;
+  // Bundlers can provide module.exports in a browser too; the SPA still needs this global.
+  if (!commonJS || typeof window !== "undefined") root.WordAlignment = api;
 })(globalThis);
