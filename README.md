@@ -61,6 +61,22 @@ The browser suite uses an isolated temporary SQLite database and local Chrome. I
 covers onboarding, account isolation, synchronized attempts, legacy mistake import,
 navigation races, unsynchronized-answer protection, PWA assets, and mobile layout.
 
+### Standalone GitHub Pages speech
+
+The no-login pages (`index.html` and `typing-practice.html`) include **朗读设置**:
+choose an English voice, preview it, and adjust speed from 0.75× to 1.25×. Automatic
+selection prefers available Samantha voices (Premium, Enhanced, then standard)
+and excludes known novelty voices. Voice availability depends on the browser;
+the settings are saved locally and the default speed is 1.0× for all text lengths.
+If a saved voice disappears, a recommended voice is used until it returns.
+
+Run `npm run test:static` for the standalone regression suite. It uses headless
+Chrome with a simulated speech service to exercise loading, preferences and
+cancellation; actual sound quality still needs listening in the target browser.
+Keep both standalone HTML files identical. GitHub Pages publishes from the
+`codex/static-pages` branch; preserve its account-site navigation banner when
+applying standalone updates from `main`.
+
 ## Markdown imports
 
 Administrators can open **批量导入 → Markdown** (or **题库管理 → 从 MD 导入**),

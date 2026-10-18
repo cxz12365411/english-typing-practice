@@ -197,6 +197,50 @@
       min-height: 460px;
     }
 
+    .speech-settings {
+      padding: 14px;
+      border-bottom: 1px solid var(--line);
+      background: #fbfaf7;
+    }
+
+    .speech-settings summary {
+      width: fit-content;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .speech-options {
+      display: grid;
+      grid-template-columns: minmax(0, 2fr) minmax(160px, 1fr) auto;
+      gap: 14px;
+      align-items: end;
+      margin-top: 14px;
+    }
+
+    .speech-options .control {
+      min-width: 0;
+    }
+
+    .speech-options input[type="range"] {
+      width: 100%;
+      height: 40px;
+      margin: 0;
+      accent-color: var(--green);
+    }
+
+    .speech-status {
+      margin: 8px 0 0;
+      min-height: 20px;
+      color: var(--muted);
+      font-size: 13px;
+      overflow-wrap: anywhere;
+    }
+
+    .speech-status.bad {
+      color: var(--red);
+    }
+
     .main {
       padding: 28px;
     }
@@ -422,6 +466,10 @@
         grid-template-columns: 1fr;
       }
 
+      .speech-options {
+        grid-template-columns: minmax(0, 1fr);
+      }
+
       .actions {
         align-items: stretch;
       }
@@ -501,6 +549,23 @@
         </div>
       </section>
 
+      <details class="speech-settings" open>
+        <summary>朗读设置</summary>
+        <div class="speech-options">
+          <div class="control">
+            <label for="voiceSelect">英语音色</label>
+            <select id="voiceSelect"><option value="">自动推荐</option></select>
+          </div>
+          <div class="control">
+            <label for="speechRate">语速 <output id="speechRateValue" for="speechRate">1.00 倍</output></label>
+            <input id="speechRate" type="range" min="0.75" max="1.25" step="0.05" value="1">
+          </div>
+          <button class="btn" id="previewVoiceBtn" type="button">试听声音</button>
+        </div>
+        <p class="speech-status" id="speechStatus" role="status" aria-live="polite"></p>
+        <p class="subtitle">音色由当前浏览器提供，选择和语速会保存在本机。</p>
+      </details>
+
       <section class="workbench">
         <div class="main">
           <div class="progress-wrap">
@@ -545,6 +610,11 @@
       autoSpeak: document.querySelector("#autoSpeak"),
       resetBtn: document.querySelector("#resetBtn"),
       speakBtn: document.querySelector("#speakBtn"),
+      voiceSelect: document.querySelector("#voiceSelect"),
+      speechRate: document.querySelector("#speechRate"),
+      speechRateValue: document.querySelector("#speechRateValue"),
+      previewVoiceBtn: document.querySelector("#previewVoiceBtn"),
+      speechStatus: document.querySelector("#speechStatus"),
       nextBtn: document.querySelector("#nextBtn"),
       answerInput: document.querySelector("#answerInput"),
       targetWord: document.querySelector("#targetWord"),
@@ -563,6 +633,8 @@
       clearMistakesBtn: document.querySelector("#clearMistakesBtn")
     };
 
+    const speechSettingsKey = "basicTypingSpeechSettings";
+    const savedSpeechSettings = loadSpeechSettings();
     const state = {
       words: [],
       pool: [],
@@ -574,6 +646,13 @@
       answeredCurrent: false,
       wrongCurrent: false,
       voice: null,
+      voices: [],
+      voicePreference: savedSpeechSettings.voice,
+      rate: savedSpeechSettings.rate,
+      utterance: null,
+      speechRequest: 0,
+      autoSpeakTimer: null,
+      nextTimer: null,
       canSpeak: "speechSynthesis" in window && "SpeechSynthesisUtterance" in window
     };
 
@@ -680,29 +759,151 @@
       return value.trim().toLowerCase();
     }
 
-    function chooseEnglishVoice() {
-      if (!state.canSpeak) return null;
-      const voices = window.speechSynthesis.getVoices();
-      return voices.find((voice) => /^en[-_]?US/i.test(voice.lang))
-        || voices.find((voice) => /^en/i.test(voice.lang))
-        || voices[0]
-        || null;
+    function loadSpeechSettings() {
+      try {
+        const saved = JSON.parse(localStorage.getItem("basicTypingSpeechSettings") || "null");
+        return {
+          voice: saved && typeof saved.voiceURI === "string" && saved.voiceURI
+            ? { voiceURI: saved.voiceURI, name: saved.name, lang: saved.lang }
+            : null,
+          rate: typeof saved?.rate === "number" && Number.isFinite(saved.rate)
+            ? Math.round(Math.min(1.25, Math.max(0.75, saved.rate)) * 20) / 20
+            : 1
+        };
+      } catch {
+        return { voice: null, rate: 1 };
+      }
+    }
+
+    function saveSpeechSettings() {
+      try {
+        localStorage.setItem(speechSettingsKey, JSON.stringify({
+          voiceURI: state.voicePreference?.voiceURI || "",
+          name: state.voicePreference?.name || "",
+          lang: state.voicePreference?.lang || "",
+          rate: state.rate
+        }));
+      } catch {
+        // Private browsing or blocked storage must not prevent speech.
+      }
+    }
+
+    function isEffectVoice(voice) {
+      return /^(Albert|Bad News|Bahh|Bells|Boing|Bubbles|Cellos|Good News|Wobble|Jester|Junior|Organ|Superstar|Trinoids|Whisper|Zarvox)(?:\s*\(|$)/i.test(voice.name);
+    }
+
+    function voiceRank(voice) {
+      if (isEffectVoice(voice)) return 100;
+      if (/^en[-_]US$/i.test(voice.lang)) {
+        if (/\bSamantha\b/i.test(voice.name)) {
+          const identity = `${voice.name} ${voice.voiceURI}`;
+          if (/premium/i.test(identity)) return 0;
+          if (/enhanced/i.test(identity)) return 1;
+          return 2;
+        }
+        return voice.default ? 3 : 4;
+      }
+      return voice.default ? 5 : 6;
+    }
+
+    function speechStatus(message, error = false) {
+      els.speechStatus.textContent = message;
+      els.speechStatus.className = `speech-status${error ? " bad" : ""}`;
+    }
+
+    function idleSpeechStatus() {
+      if (!state.canSpeak) return "当前浏览器不支持朗读，仍可继续打字练习。";
+      if (!state.voice) return "暂未找到可用的英语声音，请启用英文系统语音后重新打开页面。";
+      if (state.voicePreference && els.voiceSelect.selectedOptions[0]?.disabled) {
+        return `已保存的音色暂不可用，本次使用 ${state.voice.name}。`;
+      }
+      return `当前音色：${state.voice.name}（${state.voice.lang}）`;
+    }
+
+    function updateSpeechControls() {
+      const available = state.canSpeak && Boolean(state.voice);
+      els.speakBtn.disabled = !available || !currentWord();
+      els.previewVoiceBtn.disabled = !available;
+      els.autoSpeak.disabled = !available;
+      els.voiceSelect.disabled = !state.canSpeak || !state.voices.length;
+      els.speechRate.disabled = !state.canSpeak;
+    }
+
+    function refreshVoices() {
+      state.voices = state.canSpeak
+        ? window.speechSynthesis.getVoices().filter((voice) => /^en(?:[-_]|$)/i.test(voice.lang))
+          .sort((a, b) => voiceRank(a) - voiceRank(b) || a.name.localeCompare(b.name))
+        : [];
+      const recommended = state.voices.find((voice) => !isEffectVoice(voice)) || null;
+      const preference = state.voicePreference;
+      const preferred = preference && (state.voices.find((voice) => voice.voiceURI === preference.voiceURI)
+        || state.voices.find((voice) => voice.name === preference.name && voice.lang === preference.lang));
+      state.voice = preferred || recommended;
+
+      els.voiceSelect.replaceChildren(new Option(recommended ? `自动推荐 · ${recommended.name}` : "自动推荐", ""));
+      for (const voice of state.voices) {
+        els.voiceSelect.add(new Option(`${voice.name}（${voice.lang}）${isEffectVoice(voice) ? " · 特效" : ""}`, voice.voiceURI));
+      }
+      if (preference && !preferred) {
+        const missing = new Option(`${preference.name || "已保存的音色"} · 暂不可用`, preference.voiceURI);
+        missing.disabled = true;
+        els.voiceSelect.add(missing);
+      }
+      els.voiceSelect.value = preferred?.voiceURI || preference?.voiceURI || "";
+      updateSpeechControls();
+      if (!state.utterance) speechStatus(idleSpeechStatus());
+    }
+
+    function stopSpeech() {
+      window.clearTimeout(state.autoSpeakTimer);
+      state.autoSpeakTimer = null;
+      state.speechRequest += 1;
+      state.utterance = null;
+      if (state.canSpeak) window.speechSynthesis.cancel();
+      speechStatus(idleSpeechStatus());
     }
 
     function speakText(text) {
-      if (!state.canSpeak || !text) {
-        els.feedback.textContent = "当前浏览器不支持英文朗读";
-        els.feedback.className = "feedback bad";
-        return;
-      }
-      window.speechSynthesis.cancel();
+      stopSpeech();
+      refreshVoices();
+      if (!state.voice || !text) return;
+      const request = state.speechRequest;
       const utterance = new SpeechSynthesisUtterance(text.replace(/____/g, "blank"));
-      utterance.lang = "en-US";
-      utterance.rate = text.length > 30 ? 0.82 : 0.9;
+      utterance.lang = state.voice.lang;
+      utterance.rate = state.rate;
       utterance.pitch = 1;
-      state.voice = state.voice || chooseEnglishVoice();
-      if (state.voice) utterance.voice = state.voice;
-      window.speechSynthesis.speak(utterance);
+      utterance.voice = state.voice;
+      state.utterance = utterance;
+      utterance.onstart = () => {
+        if (request === state.speechRequest) speechStatus(`正在朗读 · ${utterance.voice.name}`);
+      };
+      utterance.onend = () => {
+        if (request !== state.speechRequest) return;
+        state.utterance = null;
+        speechStatus(idleSpeechStatus());
+      };
+      utterance.onerror = (event) => {
+        if (request !== state.speechRequest) return;
+        state.utterance = null;
+        if (event.error === "canceled" || event.error === "interrupted") {
+          speechStatus(idleSpeechStatus());
+          return;
+        }
+        speechStatus(event.error === "not-allowed"
+          ? "请先点击“朗读”或“试听声音”，再使用自动朗读。"
+          : "朗读失败，请重试或选择其他英语音色。", true);
+      };
+      try {
+        window.speechSynthesis.speak(utterance);
+      } catch {
+        state.utterance = null;
+        speechStatus("朗读失败，请重试或选择其他英语音色。", true);
+      }
+    }
+
+    function scheduleNext(delay) {
+      window.clearTimeout(state.nextTimer);
+      state.nextTimer = window.setTimeout(nextWord, delay);
     }
 
     function speakCurrent() {
@@ -789,6 +990,9 @@
     }
 
     function render() {
+      stopSpeech();
+      window.clearTimeout(state.nextTimer);
+      state.nextTimer = null;
       const item = currentWord();
       const total = state.pool.length;
       els.positionText.textContent = total ? `${state.index + 1} / ${total}` : "0 / 0";
@@ -813,7 +1017,7 @@
 
       els.answerInput.disabled = false;
       els.nextBtn.disabled = false;
-      els.speakBtn.disabled = !state.canSpeak;
+      updateSpeechControls();
       els.targetWord.className = `word${item.kind === "sentence" ? " sentence" : ""}${item.word.length > 42 ? " long" : ""}`;
       els.targetWord.textContent = els.showWord.checked ? item.word : "•".repeat(item.word.length);
       els.meaningText.textContent = item.meaning;
@@ -826,8 +1030,11 @@
       renderLetters();
       renderStats();
       window.setTimeout(() => els.answerInput.focus(), 0);
-      if (els.autoSpeak.checked) {
-        window.setTimeout(speakCurrent, 180);
+      if (els.autoSpeak.checked && !document.hidden) {
+        const request = state.speechRequest;
+        state.autoSpeakTimer = window.setTimeout(() => {
+          if (els.autoSpeak.checked && !document.hidden && request === state.speechRequest && currentWord() === item) speakCurrent();
+        }, 180);
       }
     }
 
@@ -858,7 +1065,7 @@
       els.feedback.textContent = "正确";
       els.feedback.className = "feedback good";
       renderStats();
-      window.setTimeout(nextWord, 360);
+      scheduleNext(360);
     }
 
     function markWrong() {
@@ -897,12 +1104,13 @@
     });
 
     els.nextBtn.addEventListener("click", () => {
+      stopSpeech();
       if (!state.answeredCurrent && !state.wrongCurrent && els.answerInput.value.trim()) {
         markWrong();
         state.done += 1;
         state.answeredCurrent = true;
         renderStats();
-        window.setTimeout(nextWord, 500);
+        scheduleNext(500);
       } else if (!state.answeredCurrent && state.wrongCurrent) {
         state.done += 1;
         state.answeredCurrent = true;
@@ -919,6 +1127,21 @@
     els.speakBtn.addEventListener("click", speakCurrent);
     els.autoSpeak.addEventListener("change", () => {
       if (els.autoSpeak.checked) speakCurrent();
+      else stopSpeech();
+    });
+    els.previewVoiceBtn.addEventListener("click", () => speakText("Hello! Let's practice English together."));
+    els.voiceSelect.addEventListener("change", () => {
+      stopSpeech();
+      const voice = state.voices.find((item) => item.voiceURI === els.voiceSelect.value);
+      state.voicePreference = voice ? { voiceURI: voice.voiceURI, name: voice.name, lang: voice.lang } : null;
+      saveSpeechSettings();
+      refreshVoices();
+    });
+    els.speechRate.addEventListener("input", () => {
+      stopSpeech();
+      state.rate = Number(els.speechRate.value);
+      els.speechRateValue.textContent = `${state.rate.toFixed(2)} 倍`;
+      saveSpeechSettings();
     });
     els.showWord.addEventListener("change", () => {
       const item = currentWord();
@@ -935,15 +1158,15 @@
       if (els.orderSelect.value === "mistakes") rebuildPool();
     });
 
-    if (state.canSpeak) {
-      state.voice = chooseEnglishVoice();
-      window.speechSynthesis.addEventListener("voiceschanged", () => {
-        state.voice = chooseEnglishVoice();
-      });
-    } else {
-      els.speakBtn.disabled = true;
-      els.autoSpeak.disabled = true;
-    }
+    els.speechRate.value = String(state.rate);
+    els.speechRateValue.textContent = `${state.rate.toFixed(2)} 倍`;
+    refreshVoices();
+    if (state.canSpeak) window.speechSynthesis.addEventListener("voiceschanged", refreshVoices);
+    window.addEventListener("pagehide", stopSpeech);
+    window.addEventListener("pageshow", refreshVoices);
+    document.addEventListener("visibilitychange", () => {
+      if (document.hidden) stopSpeech();
+    });
 
     async function boot() {
       try {
