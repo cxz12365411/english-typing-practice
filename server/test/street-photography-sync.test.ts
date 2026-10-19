@@ -7,9 +7,11 @@ import type { FastifyReply, FastifyRequest } from "fastify";
 import { buildApp } from "../src/app.js";
 import { createSession, type UserRow } from "../src/auth.js";
 import { parseSentenceMarkdown } from "../src/content-parser.js";
-import { migrateAndSeed, openDatabase, type SqliteDatabase } from "../src/database.js";
+import { openDatabase, type SqliteDatabase } from "../src/database.js";
 import { normalizeMarkdownCategoryTitle, parseMarkdownImport } from "../src/markdown-import-parser.js";
 import { normalizeAnswer } from "../src/security.js";
+
+import { migratePreCet4Fixture } from "./historical-content-fixture.js";
 
 const SOURCE = resolve(import.meta.dirname, "../..");
 const EXTRA_FILE = "docs/street-photography-extra-32.md";
@@ -33,7 +35,7 @@ function snapshot(db: SqliteDatabase): string {
 
 function original206Database(): SqliteDatabase {
   const db = openDatabase({ databasePath: ":memory:" });
-  migrateAndSeed(db, SOURCE);
+  migratePreCet4Fixture(db, SOURCE);
   db.prepare("DELETE FROM item_revisions WHERE item_id IN (SELECT id FROM items WHERE item_key BETWEEN 'sentence-0207' AND 'sentence-0270')").run();
   db.prepare("DELETE FROM items WHERE item_key BETWEEN 'sentence-0207' AND 'sentence-0270'").run();
   db.prepare("DELETE FROM categories WHERE slug IN ('sentences-19', 'sentences-20', 'sentences-21', 'sentences-22')").run();
@@ -89,7 +91,7 @@ test("existing 206-item databases never automatically import the 32 fresh-source
   try {
     const before = snapshot(db);
     for (const source of [SOURCE, "Z:\\missing-source-directory"]) {
-      assert.deepEqual(migrateAndSeed(db, source), { categoriesInserted: 0, itemsInserted: 0, words: 850, sentences: 206 });
+      assert.deepEqual(migratePreCet4Fixture(db, source), { categoriesInserted: 0, itemsInserted: 0, words: 850, sentences: 206 });
       assert.equal(snapshot(db), before);
     }
     assert.equal(db.prepare("SELECT value FROM app_meta WHERE key = 'content_update:street-photography-v3'").get(), undefined);
@@ -101,13 +103,13 @@ test("existing 206-item databases never automatically import the 32 fresh-source
 test("new 270-item installations seed only once and accept the legacy marker compatibility path", () => {
   const db = openDatabase({ databasePath: ":memory:" });
   try {
-    assert.deepEqual(migrateAndSeed(db, SOURCE), { categoriesInserted: 26, itemsInserted: 1120, words: 850, sentences: 270 });
+    assert.deepEqual(migratePreCet4Fixture(db, SOURCE), { categoriesInserted: 26, itemsInserted: 1120, words: 850, sentences: 270 });
     const before = snapshot(db);
-    assert.deepEqual(migrateAndSeed(db, "Z:\\missing-source-directory"), { categoriesInserted: 0, itemsInserted: 0, words: 850, sentences: 270 });
+    assert.deepEqual(migratePreCet4Fixture(db, "Z:\\missing-source-directory"), { categoriesInserted: 0, itemsInserted: 0, words: 850, sentences: 270 });
     assert.equal(snapshot(db), before);
     const items = db.prepare("SELECT * FROM items ORDER BY id").all();
     db.prepare("DELETE FROM app_meta WHERE key IN ('initial_seed_completed', 'initial_seed_checksum')").run();
-    assert.deepEqual(migrateAndSeed(db, SOURCE), { categoriesInserted: 0, itemsInserted: 0, words: 850, sentences: 270 });
+    assert.deepEqual(migratePreCet4Fixture(db, SOURCE), { categoriesInserted: 0, itemsInserted: 0, words: 850, sentences: 270 });
     assert.deepEqual(db.prepare("SELECT * FROM items ORDER BY id").all(), items);
     assert.deepEqual(db.prepare("SELECT value FROM app_meta WHERE key = 'initial_seed_checksum'").get(), { value: "legacy-v1" });
   } finally {
@@ -158,7 +160,7 @@ test("MD-imported street additions retain actual imported IDs and do not duplica
     assert.deepEqual(historyTables.map((table) => db.prepare(`SELECT * FROM ${table} ORDER BY rowid`).all()), history);
     assert.equal((db.prepare("SELECT COUNT(*) AS n FROM items WHERE item_key BETWEEN 'sentence-0207' AND 'sentence-0238'").get() as { n: number }).n, 0);
     const beforeRestart = snapshot(db);
-    assert.deepEqual(migrateAndSeed(db, SOURCE), { categoriesInserted: 0, itemsInserted: 0, words: 850, sentences: 238 });
+    assert.deepEqual(migratePreCet4Fixture(db, SOURCE), { categoriesInserted: 0, itemsInserted: 0, words: 850, sentences: 238 });
     assert.equal(snapshot(db), beforeRestart);
     const retry = await app.inject({ method: "POST", url: "/api/admin/markdown-imports/commit", headers, payload: commitPayload });
     assert.equal(retry.statusCode, 200, retry.body);

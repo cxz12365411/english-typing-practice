@@ -1,4 +1,5 @@
 import { createPracticeAlignment } from "./alignment";
+import { createWritingPreview } from "./cet4-writing";
 import { createSpeechController, speechSettingsMarkup } from "./speech";
 import { ApiError, api } from "./api";
 import { practiceBatchId } from "./routes";
@@ -95,6 +96,7 @@ interface PracticeState {
 let state: PracticeState | null = null;
 let renderGeneration = 0;
 let alignmentController: ReturnType<typeof createPracticeAlignment> | null = null;
+let writingController: ReturnType<typeof createWritingPreview> | null = null;
 let speechController: ReturnType<typeof createSpeechController> | null = null;
 
 function isActive(activeState: PracticeState): boolean {
@@ -283,6 +285,7 @@ function practiceMarkup(
             <progress class="progress-bar" id="progressBar" value="0" max="1">0%</progress>
           </div>
 
+          <section id="cet4Writing" class="cet4-writing" aria-label="四级作文全文" hidden></section>
           <div class="prompt">
             <div class="alignment-scroll" id="alignmentScroll">
               <div class="alignment-stage" id="alignmentStage">
@@ -338,6 +341,7 @@ function renderPrompt(): void {
   const meaning = mustElement<HTMLElement>("#meaningText");
   target.className = `target-word word${item?.kind === "sentence" ? " sentence" : ""}${(item?.english.length ?? 0) > 42 ? " long" : ""}`;
   alignmentController?.render(item, { showEnglish: state.showEnglish });
+  writingController?.render(item, state.items, state.categories, state.showEnglish);
   if (!item) {
     target.textContent = state.importBatchId && !state.items.length ? "本次文件暂无可练习内容" : state.mode === "mistakes" ? "错题已练完" : "暂无词条";
     meaning.textContent = state.importBatchId && !state.items.length
@@ -1201,6 +1205,7 @@ export async function renderPractice(context: PageContext): Promise<void> {
     mustElement<HTMLElement>("#legacyCount").textContent = String(legacyKeys.length);
     const activeState = state;
     alignmentController = createPracticeAlignment({ isActive: () => isActive(activeState), onDataReady: renderPrompt });
+    writingController = createWritingPreview({ isActive: () => isActive(activeState), onDataReady: renderPrompt });
     speechController = createSpeechController({
       speakButton: mustElement<HTMLButtonElement>("#speakButton"),
       isActive: () => isActive(activeState),
@@ -1233,6 +1238,8 @@ export function disposePractice(): void {
   speechController = null;
   alignmentController?.destroy();
   alignmentController = null;
+  writingController?.destroy();
+  writingController = null;
   if (state.session && !state.pendingAttempt) {
     const sessionId = state.session.id;
     const durationMs = Math.min(86_400_000, Math.max(0, Date.now() - state.sessionStartedAtMs));

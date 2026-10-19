@@ -88,6 +88,7 @@ async function openPractice(page: Page, options: {
     };
     w.__speechTest = mock;
   }, { initialVoices: options.voices ?? ordinaryVoices, supported: options.supported ?? true, saved: options.saved });
+  await page.route("**/cet4-writing.json", route => route.fulfill({ status: 404, body: "Not part of this fixture" }));
   await page.route("**/basic-english-850.md", route => route.fulfill({ contentType: "text/markdown", body: words }));
   await page.route("**/daily-english-high-frequency-sentences.md", route => route.fulfill({ contentType: "text/markdown", body: sentences }));
   await page.goto(options.entry ?? "/index.html");

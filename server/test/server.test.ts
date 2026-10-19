@@ -1,14 +1,17 @@
 import assert from "node:assert/strict";
 import { randomUUID } from "node:crypto";
+import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import test from "node:test";
 import type { FastifyInstance } from "fastify";
 import { buildApp } from "../src/app.js";
 import { openDatabase, type SqliteDatabase } from "../src/database.js";
 import { hashPassword } from "../src/security.js";
+import { parseCet4WritingContent } from "../src/cet4-writing.js";
 
 const ORIGIN = "https://english.test";
 const SOURCE = resolve(import.meta.dirname, "../..");
+const WRITING_COUNT = parseCet4WritingContent(JSON.parse(readFileSync(resolve(SOURCE, "cet4-writing.json"), "utf8"))).items.length;
 
 interface Client {
   cookie: string;
@@ -78,7 +81,7 @@ test("seed, auth, CSRF, RBAC, user isolation and final-admin protection", async 
     const counts = db.prepare(`
       SELECT SUM(kind = 'word') AS words, SUM(kind = 'sentence') AS sentences FROM items
     `).get() as { words: number; sentences: number };
-    assert.deepEqual(counts, { words: 850, sentences: 270 });
+    assert.deepEqual(counts, { words: 850, sentences: 270 + WRITING_COUNT });
 
     const adminId = await insertUser(db, "admin", "Admin-Temporary-123!", "admin");
     await insertUser(db, "student.a", "Student-Temporary-123!", "user");
@@ -97,7 +100,7 @@ test("seed, auth, CSRF, RBAC, user isolation and final-admin protection", async 
     const contentResponse = await app.inject({ method: "GET", url: "/api/content", headers: { cookie: admin.cookie } });
     assert.equal(contentResponse.statusCode, 200, contentResponse.body);
     const content = contentResponse.json() as { version: string; items: Array<{ id: string; english: string; revision: number }> };
-    assert.equal(content.items.length, 1120);
+    assert.equal(content.items.length, 1120 + WRITING_COUNT);
     assert.ok(content.version);
 
     const disableLastAdmin = await app.inject({

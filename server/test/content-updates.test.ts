@@ -4,7 +4,9 @@ import { resolve } from "node:path";
 import test from "node:test";
 import { parseSentenceMarkdown, parseWordMarkdown } from "../src/content-parser.js";
 import { applyContentUpdates } from "../src/content-updates.js";
-import { bumpContentVersion, migrateAndSeed, migrateDatabase, openDatabase, seedContent, type SqliteDatabase } from "../src/database.js";
+import { bumpContentVersion, openDatabase, seedContent, type SqliteDatabase } from "../src/database.js";
+
+import { isolatePreCet4Fixture, migratePreCet4Fixture } from "./historical-content-fixture.js";
 
 const SOURCE = resolve(import.meta.dirname, "../..");
 const MARKER = "content_update:street-photography-v1";
@@ -29,7 +31,7 @@ function removeOctoberSourceAdditions(db: SqliteDatabase): void {
 
 function legacyDatabase(): SqliteDatabase {
   const db = openDatabase({ databasePath: ":memory:" });
-  migrateDatabase(db);
+  isolatePreCet4Fixture(db);
   // Recreate the exact 850/168 seed shape without relying on a second fixture copy of the Markdown.
   seedContent(db, SOURCE);
   removeOctoberSourceAdditions(db);
@@ -42,7 +44,7 @@ function legacyDatabase(): SqliteDatabase {
 
 function streetV1Database(): SqliteDatabase {
   const db = openDatabase({ databasePath: ":memory:" });
-  migrateAndSeed(db, SOURCE);
+  migratePreCet4Fixture(db, SOURCE);
   removeOctoberSourceAdditions(db);
   db.prepare("DELETE FROM item_revisions WHERE item_id IN (SELECT id FROM items WHERE item_key BETWEEN 'sentence-0183' AND 'sentence-0206')").run();
   db.prepare("DELETE FROM items WHERE item_key BETWEEN 'sentence-0183' AND 'sentence-0206'").run();
@@ -55,7 +57,7 @@ function streetV1Database(): SqliteDatabase {
 test("fresh installation seeds 850 words and 270 sentences and records both historical content updates only once", () => {
   const db = openDatabase({ databasePath: ":memory:" });
   try {
-    assert.deepEqual(migrateAndSeed(db, SOURCE), { categoriesInserted: 26, itemsInserted: 1120, words: 850, sentences: 270 });
+    assert.deepEqual(migratePreCet4Fixture(db, SOURCE), { categoriesInserted: 26, itemsInserted: 1120, words: 850, sentences: 270 });
     assert.equal(scalar(db, "SELECT COUNT(*) FROM item_revisions"), 1120);
     assert.equal(scalar(db, "SELECT COUNT(*) FROM items WHERE status = 'published'"), 1120);
     assert.equal(scalar(db, "SELECT CAST(value AS INTEGER) FROM app_meta WHERE key = 'content_version'"), 1);
@@ -67,7 +69,7 @@ test("fresh installation seeds 850 words and 270 sentences and records both hist
       { source: "street-photography-english-phrases.md", categories: 4, items: 24, categoriesInserted: 0, itemsInserted: 0 }
     ]);
     const before = snapshot(db);
-    assert.deepEqual(migrateAndSeed(db, "Z:\\missing-source-directory"), { categoriesInserted: 0, itemsInserted: 0, words: 850, sentences: 270 });
+    assert.deepEqual(migratePreCet4Fixture(db, "Z:\\missing-source-directory"), { categoriesInserted: 0, itemsInserted: 0, words: 850, sentences: 270 });
     assert.equal(snapshot(db), before);
   } finally {
     db.close();
@@ -92,7 +94,7 @@ test("upgrading an original corpus appends both street patches and preserves edi
     const history = historyTables.map((table) => db.prepare(`SELECT * FROM ${table}`).all());
     const checksum = db.prepare("SELECT value FROM app_meta WHERE key = 'initial_seed_checksum'").get();
 
-    assert.deepEqual(migrateAndSeed(db, SOURCE), { categoriesInserted: 4, itemsInserted: 38, words: 850, sentences: 206 });
+    assert.deepEqual(migratePreCet4Fixture(db, SOURCE), { categoriesInserted: 4, itemsInserted: 38, words: 850, sentences: 206 });
     assert.deepEqual(db.prepare("SELECT * FROM items WHERE item_key NOT BETWEEN 'sentence-0169' AND 'sentence-0206' ORDER BY item_key").all(), originalRows);
     assert.deepEqual(db.prepare("SELECT * FROM categories WHERE slug NOT IN ('sentences-15', 'sentences-16', 'sentences-17', 'sentences-18') ORDER BY slug").all(), categories);
     assert.deepEqual(historyTables.map((table) => db.prepare(`SELECT * FROM ${table}`).all()), history);
@@ -108,11 +110,11 @@ test("upgrading an original corpus appends both street patches and preserves edi
 test("completed content updates do not resurrect archived phrases or overwrite later administrator changes", () => {
   const db = legacyDatabase();
   try {
-    migrateAndSeed(db, SOURCE);
+    migratePreCet4Fixture(db, SOURCE);
     db.prepare("UPDATE items SET status = 'archived', archived_at = ?, english = 'Administrator archived edit.', revision = 2 WHERE item_key = 'sentence-0169'").run(Date.now());
     db.prepare("UPDATE categories SET status = 'draft', name = 'Administrator renamed category' WHERE slug = 'sentences-16'").run();
     const before = snapshot(db);
-    assert.deepEqual(migrateAndSeed(db, "Z:\\missing-source-directory"), { categoriesInserted: 0, itemsInserted: 0, words: 850, sentences: 206 });
+    assert.deepEqual(migratePreCet4Fixture(db, "Z:\\missing-source-directory"), { categoriesInserted: 0, itemsInserted: 0, words: 850, sentences: 206 });
     assert.equal(snapshot(db), before);
   } finally {
     db.close();
@@ -128,7 +130,7 @@ test("a late item-key collision rolls back every appended category, item, revisi
       VALUES ('admin-existing-item', 'sentence-0182', ?, 'sentence', 'Private administrator draft.', '管理员草稿', 'private administrator draft.', ?, ?)`)
       .run(category.id, now, now);
     const before = snapshot(db);
-    assert.throws(() => migrateAndSeed(db, SOURCE), /update conflict: item sentence-0182/);
+    assert.throws(() => migratePreCet4Fixture(db, SOURCE), /update conflict: item sentence-0182/);
     assert.equal(snapshot(db), before);
     assert.equal(db.prepare("SELECT value FROM app_meta WHERE key = ?").get(MARKER), undefined);
   } finally {
@@ -142,7 +144,7 @@ test("a category-slug collision is not overwritten and the entire update is roll
     const now = Date.now();
     db.prepare("INSERT INTO categories(id, slug, name, kind, sort_order, created_at, updated_at) VALUES ('admin-category', 'sentences-18', 'Existing custom category', 'sentence', 18, ?, ?)").run(now, now);
     const before = snapshot(db);
-    assert.throws(() => migrateAndSeed(db, SOURCE), /update conflict: category sentences-18/);
+    assert.throws(() => migratePreCet4Fixture(db, SOURCE), /update conflict: category sentences-18/);
     assert.equal(snapshot(db), before);
   } finally {
     db.close();
@@ -153,7 +155,7 @@ test("legacy databases without the one-shot seed marker can still upgrade from t
   const db = legacyDatabase();
   try {
     db.prepare("DELETE FROM app_meta WHERE key IN ('initial_seed_completed', 'initial_seed_checksum')").run();
-    assert.deepEqual(migrateAndSeed(db, SOURCE), { categoriesInserted: 4, itemsInserted: 38, words: 850, sentences: 206 });
+    assert.deepEqual(migratePreCet4Fixture(db, SOURCE), { categoriesInserted: 4, itemsInserted: 38, words: 850, sentences: 206 });
     assert.deepEqual(db.prepare("SELECT value FROM app_meta WHERE key = 'initial_seed_checksum'").get(), { value: "legacy-v1" });
   } finally {
     db.close();
@@ -196,7 +198,7 @@ test("v1 to v2 appends 24 phrases without modifying categories, previous street 
     const originalAudit = db.prepare("SELECT * FROM audit_log WHERE target_id = ?").all(MARKER);
     const checksum = db.prepare("SELECT value FROM app_meta WHERE key = 'initial_seed_checksum'").get();
 
-    assert.deepEqual(migrateAndSeed(db, SOURCE), { categoriesInserted: 0, itemsInserted: 24, words: 850, sentences: 206 });
+    assert.deepEqual(migratePreCet4Fixture(db, SOURCE), { categoriesInserted: 0, itemsInserted: 24, words: 850, sentences: 206 });
     assert.deepEqual(db.prepare("SELECT * FROM items WHERE item_key NOT BETWEEN 'sentence-0183' AND 'sentence-0206' ORDER BY item_key").all(), originalRows);
     assert.deepEqual(db.prepare("SELECT * FROM categories ORDER BY slug").all(), categories);
     assert.deepEqual(db.prepare("SELECT * FROM item_revisions WHERE item_id NOT IN (SELECT id FROM items WHERE item_key BETWEEN 'sentence-0183' AND 'sentence-0206') ORDER BY id").all(), revisions);
@@ -211,7 +213,7 @@ test("v1 to v2 appends 24 phrases without modifying categories, previous street 
       source: "street-photography-english-phrases.md", categories: 4, items: 24, categoriesInserted: 0, itemsInserted: 24
     });
     const after = snapshot(db);
-    assert.deepEqual(migrateAndSeed(db, "Z:\\missing-source-directory"), { categoriesInserted: 0, itemsInserted: 0, words: 850, sentences: 206 });
+    assert.deepEqual(migratePreCet4Fixture(db, "Z:\\missing-source-directory"), { categoriesInserted: 0, itemsInserted: 0, words: 850, sentences: 206 });
     assert.equal(snapshot(db), after);
   } finally {
     db.close();
@@ -221,11 +223,11 @@ test("v1 to v2 appends 24 phrases without modifying categories, previous street 
 test("v2 completion does not resurrect archived expansion phrases or revisit edited source/category state", () => {
   const db = streetV1Database();
   try {
-    migrateAndSeed(db, SOURCE);
+    migratePreCet4Fixture(db, SOURCE);
     db.prepare("UPDATE items SET status = 'archived', archived_at = ?, english = 'Archived expansion administrator edit.', revision = 2 WHERE item_key = 'sentence-0206'").run(Date.now());
     db.prepare("UPDATE categories SET status = 'draft', name = 'Renamed after expansion' WHERE slug = 'sentences-18'").run();
     const before = snapshot(db);
-    assert.deepEqual(migrateAndSeed(db, "Z:\\missing-source-directory"), { categoriesInserted: 0, itemsInserted: 0, words: 850, sentences: 206 });
+    assert.deepEqual(migratePreCet4Fixture(db, "Z:\\missing-source-directory"), { categoriesInserted: 0, itemsInserted: 0, words: 850, sentences: 206 });
     assert.equal(snapshot(db), before);
   } finally {
     db.close();
@@ -241,7 +243,7 @@ test("a late v2 collision rolls back the whole expansion but preserves the previ
       VALUES ('v2-admin-existing-item', 'sentence-0206', ?, 'sentence', 'Private expansion collision.', '管理员草稿', 'private expansion collision.', ?, ?)`)
       .run(category.id, now, now);
     const before = snapshot(db);
-    assert.throws(() => migrateAndSeed(db, SOURCE), /update conflict: item sentence-0206/);
+    assert.throws(() => migratePreCet4Fixture(db, SOURCE), /update conflict: item sentence-0206/);
     assert.equal(snapshot(db), before);
     assert.deepEqual(db.prepare("SELECT value FROM app_meta WHERE key = ?").get(MARKER), { value: "1" });
     assert.equal(db.prepare("SELECT value FROM app_meta WHERE key = ?").get(EXPANSION_MARKER), undefined);
@@ -256,7 +258,7 @@ test("v2 refuses renamed or unpublished existing categories instead of overwriti
     try {
       db.prepare(`UPDATE categories SET ${update} WHERE slug = 'sentences-18'`).run();
       const before = snapshot(db);
-      assert.throws(() => migrateAndSeed(db, SOURCE), /update conflict: category sentences-18/);
+      assert.throws(() => migratePreCet4Fixture(db, SOURCE), /update conflict: category sentences-18/);
       assert.equal(snapshot(db), before);
     } finally {
       db.close();
@@ -281,9 +283,9 @@ test("legacy databases without seed markers accept either v1 or expanded corpus 
   for (const alreadyExpanded of [false, true]) {
     const db = streetV1Database();
     try {
-      if (alreadyExpanded) migrateAndSeed(db, SOURCE);
+      if (alreadyExpanded) migratePreCet4Fixture(db, SOURCE);
       db.prepare("DELETE FROM app_meta WHERE key IN ('initial_seed_completed', 'initial_seed_checksum')").run();
-      assert.deepEqual(migrateAndSeed(db, SOURCE), {
+      assert.deepEqual(migratePreCet4Fixture(db, SOURCE), {
         categoriesInserted: 0, itemsInserted: alreadyExpanded ? 0 : 24, words: 850, sentences: 206
       });
       assert.deepEqual(db.prepare("SELECT value FROM app_meta WHERE key = 'initial_seed_checksum'").get(), { value: "legacy-v1" });

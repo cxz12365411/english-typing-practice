@@ -91,7 +91,8 @@ current browser. Hover, click, or Tab to an English word to highlight its semant
 group and explanation; Escape clears the selection. On narrow screens, scroll
 inside the two-line diagram. Hiding English also removes its arrows and hints.
 
-All 850 words link to their existing complete definitions. The 270 sentences have
+All 850 words link to their existing complete definitions. All 400 sentences (270
+original sentences and 130 CET-4 practice sentences) have
 reviewed semantic groups: contractions, hyphenated words, numbers, and `____` are
 tokens; punctuation and spaces remain unchanged. Articles, auxiliaries, idioms,
 and omitted words belong to their full expression, with explanatory notes where
@@ -151,7 +152,7 @@ Production deployment assets and the rollback/restore runbook are documented in
 The original Markdown files are seed inputs. They remain in this public repository,
 but are not served by the authenticated production application.
 
-The bundled corpus contains 850 words and 270 sentences across 26 categories,
+The original bundled corpus contains 850 words and 270 sentences across 26 categories,
 including 70 street-photography phrases and 32 bar-social phrases. The September 2026
 content update is applied once to existing databases, preserving existing item IDs,
 accounts, progress, and subsequent administrator edits. Merely editing a Markdown
@@ -176,3 +177,33 @@ approximate Chinese pronunciation hint, using the existing speech feature.
 See [the bar-social sync notes](docs/content-sync-2026-10-13.md). Existing accounts
 receive the additions through the ordinary administrator Markdown import, not a
 new automatic content patch or database migration.
+
+## CET-4 writing practice
+
+`cet4-writing.json` is the shared source for 10 original reference essays and
+40 writing expressions (opening, argument, transition, conclusion). Each essay
+contains 120–180 body words, three paragraphs, bilingual sentences, a writing
+prompt and a brief Chinese outline. Invitations and letters preserve greetings
+and sign-offs in the preview; only body sentences enter typing practice. The
+chart exercise explicitly uses illustrative data. These are original practice
+materials, not official examination answers. The learning scope follows the
+[official CET syllabus writing requirements](https://cet.neea.edu.cn/res/Home/1704/55b02330ac17274664f06d9d3db8249d.pdf).
+
+Both standalone entries and the account app use `cet4-writing.js` and
+`cet4-writing.css` for the collapsible full-essay preview. Preview changes never
+reset answers or practice sessions. Hiding English also closes the preview.
+The account preview checks the complete current public category against the
+reference essay; administrator edits, moves, additions or removals disable stale
+full-text material while ordinary sentence practice remains available.
+
+The server adds the 14 new categories in an independent, transactional one-time
+content update (`content_update:cet4-writing-v1`). Stable `cet4-*` keys are explicit
+and must not be regenerated when reordering content. Later administrator changes
+are preserved. The original Markdown corpus and its seed checks remain unchanged.
+Both release staging and promotion must include the shared JSON at the release
+root. New sentence alignments extend the existing `sentence-alignments.json`.
+
+Release acceptance includes the static browser suite, production-build account
+browser suite, server content-upgrade tests, and deployment script tests. Publish
+the public learning content to GitHub Pages and the account site together, keeping
+the Pages account-site link and all private learning data on the account server.

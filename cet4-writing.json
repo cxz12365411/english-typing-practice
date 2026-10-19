@@ -1,0 +1,891 @@
+{
+  "version": 1,
+  "essays": [
+    {
+      "id": "cet4-essay-01",
+      "title": "时间管理",
+      "titleEnglish": "Making Better Use of Time",
+      "prompt": "假设你要为校报写一篇短文，讨论大学生如何管理时间。Write an essay on how university students can manage their time. You should write at least 120 words but no more than 180 words.",
+      "outline": [
+        "说明大学生活自由增加，也需要主动安排时间。",
+        "提出明确重点、拆分任务和保留休息时间三个做法。",
+        "总结时间管理帮助人们兼顾学习与生活。"
+      ],
+      "paragraphs": [
+        [
+          {
+            "key": "cet4-e01-s01",
+            "english": "University students often have more freedom than they had at school, but this freedom requires careful planning.",
+            "meaning": "大学生往往拥有比中学时更多的自由，但这份自由需要认真规划。"
+          },
+          {
+            "key": "cet4-e01-s02",
+            "english": "Between classes, club activities, and part-time jobs, it is easy to feel busy without knowing what really matters.",
+            "meaning": "在课程、社团活动和兼职之间，人们很容易感到忙碌，却不知道什么才真正重要。"
+          },
+          {
+            "key": "cet4-e01-s03",
+            "english": "Good time management can help us make room for both important work and a healthy personal life.",
+            "meaning": "良好的时间管理可以帮助我们为重要的任务和健康的个人生活都腾出空间。"
+          }
+        ],
+        [
+          {
+            "key": "cet4-e01-s04",
+            "english": "First, we should list our main tasks and decide which ones need our attention before the others.",
+            "meaning": "首先，我们应该列出主要任务，并确定哪些任务需要关注、应当优先处理。"
+          },
+          {
+            "key": "cet4-e01-s05",
+            "english": "A large assignment becomes easier when we divide it into small steps and set a clear deadline for each step.",
+            "meaning": "当我们把作业分解成几个小步骤，为每一步设定明确的截止时间时，一项大型作业就会变得更容易完成。"
+          },
+          {
+            "key": "cet4-e01-s06",
+            "english": "We also need short breaks because a schedule that leaves no time to rest is difficult to follow.",
+            "meaning": "我们还需要短暂休息，因为没有留出休息时间的日程表很难坚持执行。"
+          }
+        ],
+        [
+          {
+            "key": "cet4-e01-s07",
+            "english": "At the end of each day, a quick review can show us what worked and what needs changing.",
+            "meaning": "每天结束时，一次简短回顾可以让我们看到哪些做法有效，哪些需要调整。"
+          },
+          {
+            "key": "cet4-e01-s08",
+            "english": "The aim is not to fill every minute with work, but to use our energy with purpose.",
+            "meaning": "目标并不是用工作填满每一分钟，而是有目的地运用我们的精力。"
+          },
+          {
+            "key": "cet4-e01-s09",
+            "english": "By building these habits, we can study more steadily and still enjoy a rewarding university life.",
+            "meaning": "通过养成这些习惯，我们可以更稳定地学习，同时仍然享受充实的大学生活。"
+          }
+        ]
+      ]
+    },
+    {
+      "id": "cet4-essay-02",
+      "title": "阅读习惯",
+      "titleEnglish": "Building a Reading Habit",
+      "prompt": "假设你要在班级英语论坛分享阅读经验，讨论如何培养阅读习惯。Write an essay about building a reading habit. You should write at least 120 words but no more than 180 words.",
+      "outline": [
+        "从日常信息碎片化引出持续阅读的价值。",
+        "提出选感兴趣的书、固定时间和简单记录的方法。",
+        "强调持续阅读比追求数量更重要。"
+      ],
+      "paragraphs": [
+        [
+          {
+            "key": "cet4-e02-s01",
+            "english": "Many students read messages throughout the day, yet they rarely spend quiet time with a book.",
+            "meaning": "许多学生一整天都在阅读消息，然而他们很少安静地花些时间读一本书。"
+          },
+          {
+            "key": "cet4-e02-s02",
+            "english": "Short pieces of information are useful, but a longer text allows us to follow an idea in greater depth.",
+            "meaning": "简短的信息片段固然有用，但较长的文章能让我们更加深入地理解一个观点。"
+          },
+          {
+            "key": "cet4-e02-s03",
+            "english": "For this reason, developing a reading habit is a practical way to broaden our understanding of the world.",
+            "meaning": "因此，培养阅读习惯是一种切实可行的方法，可以拓宽我们对世界的认识。"
+          }
+        ],
+        [
+          {
+            "key": "cet4-e02-s04",
+            "english": "To begin, we can choose books about topics that interest us, rather than simply following popular lists.",
+            "meaning": "首先，我们可以选择自己感兴趣的主题书籍，而不是一味跟随热门榜单。"
+          },
+          {
+            "key": "cet4-e02-s05",
+            "english": "Reading for fifteen minutes before bed may be easier to maintain than making an ambitious plan that soon fails.",
+            "meaning": "比起制订一个宏大的计划却很快放弃，睡前阅读十五分钟可能更容易坚持。"
+          },
+          {
+            "key": "cet4-e02-s06",
+            "english": "Keeping a few notes about interesting questions can also help us remember what we have read and form our own opinions.",
+            "meaning": "针对有趣的问题记下几条笔记，也有助于我们记住读过的内容，并形成自己的观点。"
+          }
+        ],
+        [
+          {
+            "key": "cet4-e02-s07",
+            "english": "Reading does not have to be a competition about who can finish the greatest number of books.",
+            "meaning": "阅读不必成为一场比赛，去比谁能读完最多的书。"
+          },
+          {
+            "key": "cet4-e02-s08",
+            "english": "It is more valuable to understand one book well and discuss it with friends than to rush through several.",
+            "meaning": "比起匆匆读完好几本书，深入理解一本书，并与朋友讨论它，更有价值。"
+          },
+          {
+            "key": "cet4-e02-s09",
+            "english": "If we read regularly and remain curious, books can gradually become a natural part of our daily lives.",
+            "meaning": "如果我们经常阅读，并保持好奇心，书籍就能逐渐成为我们日常生活中自然而然的一部分。"
+          }
+        ]
+      ]
+    },
+    {
+      "id": "cet4-essay-03",
+      "title": "在线学习",
+      "titleEnglish": "Learning Well Online",
+      "prompt": "学校英语网站正在征集关于在线学习的短文。请讨论其便利之处及有效学习的方法。Write an essay on the benefits of online learning and how to use it effectively. Write 120 to 180 words.",
+      "outline": [
+        "介绍在线学习的便利和自主性。",
+        "说明设定目标、主动记录和完成练习的重要性。",
+        "建议将线上资源与现实交流相结合。"
+      ],
+      "paragraphs": [
+        [
+          {
+            "key": "cet4-e03-s01",
+            "english": "Online courses give university students access to lessons beyond their own classrooms, often at a convenient time.",
+            "meaning": "在线课程让大学生能够获取本校课堂之外的课程，而且时间往往方便安排。"
+          },
+          {
+            "key": "cet4-e03-s02",
+            "english": "We can pause a video, review a difficult explanation, or choose a course that matches our interests.",
+            "meaning": "我们可以暂停视频、重看难懂的讲解，或者选择符合自己兴趣的课程。"
+          },
+          {
+            "key": "cet4-e03-s03",
+            "english": "However, having many resources does not automatically mean that we will learn well, especially when nobody checks our progress.",
+            "meaning": "然而，拥有丰富资源并不自动意味着我们就能学好，特别是没有人检查学习进度的时候。"
+          }
+        ],
+        [
+          {
+            "key": "cet4-e03-s04",
+            "english": "Before starting a course, we should set a specific goal and decide how much time we can give it each week.",
+            "meaning": "开始一门课程之前，我们应该设定一个具体目标，并确定每周能投入的时间有多少。"
+          },
+          {
+            "key": "cet4-e03-s05",
+            "english": "During a lesson, taking brief notes and writing down questions can keep us actively involved instead of merely watching.",
+            "meaning": "上课时，记简短笔记并写下问题，可以让我们保持积极投入，而非只是在观看。"
+          },
+          {
+            "key": "cet4-e03-s06",
+            "english": "Afterwards, we need to complete the exercises and try to explain the main ideas in our own words.",
+            "meaning": "之后，我们需要完成练习，并尝试用自己的话解释主要观点。"
+          }
+        ],
+        [
+          {
+            "key": "cet4-e03-s07",
+            "english": "It also helps to discuss problems with classmates because another person may notice something we have missed.",
+            "meaning": "与同学讨论问题同样有帮助，因为另一个人可能会注意到我们忽略的地方。"
+          },
+          {
+            "key": "cet4-e03-s08",
+            "english": "Online learning works best when we treat it as serious study and connect it with real practice.",
+            "meaning": "当我们把在线学习看作认真的学习，并将它与实际练习相结合时，在线学习最能发挥作用。"
+          },
+          {
+            "key": "cet4-e03-s09",
+            "english": "With clear goals and consistent effort, a screen can become a useful doorway to new knowledge.",
+            "meaning": "有了明确的目标和持续的努力，一块屏幕就能成为通向新知识的一扇有用的大门。"
+          }
+        ]
+      ]
+    },
+    {
+      "id": "cet4-essay-04",
+      "title": "合理使用手机",
+      "titleEnglish": "Using Smartphones Wisely",
+      "prompt": "请为校园生活专栏写一篇短文，讨论大学生如何合理使用手机。Write an essay on how university students can use smartphones wisely. You should write at least 120 words but no more than 180 words.",
+      "outline": [
+        "承认手机的便利，同时指出分心的可能。",
+        "提出关闭非必要提醒、设定使用时间等方法。",
+        "强调主动选择使用方式，而非完全拒绝技术。"
+      ],
+      "paragraphs": [
+        [
+          {
+            "key": "cet4-e04-s01",
+            "english": "Smartphones make campus life more convenient by helping us check timetables, contact friends, and find information within seconds.",
+            "meaning": "智能手机帮助我们在几秒钟内查看课表、联系朋友和查找信息，让校园生活更加便利。"
+          },
+          {
+            "key": "cet4-e04-s02",
+            "english": "Yet the same device can interrupt our attention when messages and videos keep appearing during study time.",
+            "meaning": "然而，当消息和视频在学习时间里不断出现时，同一台设备也会打断我们的注意力。"
+          },
+          {
+            "key": "cet4-e04-s03",
+            "english": "The real challenge is to use the phone for a clear purpose, rather than letting it control our day.",
+            "meaning": "真正的挑战在于目标明确地使用手机，而不是让它掌控我们的一天。"
+          }
+        ],
+        [
+          {
+            "key": "cet4-e04-s04",
+            "english": "One useful step is to turn off notifications that are not necessary while keeping important calls available.",
+            "meaning": "一个有用的做法是关闭非必要的通知，同时保留接听重要来电的功能。"
+          },
+          {
+            "key": "cet4-e04-s05",
+            "english": "We can also put the phone out of reach during a study session and check it at a planned break.",
+            "meaning": "我们还可以在一段学习时间内把手机放到够不到的地方，等到安排好的休息时间再查看手机。"
+          },
+          {
+            "key": "cet4-e04-s06",
+            "english": "When meeting friends, paying attention to the people in front of us shows respect and makes conversations more enjoyable.",
+            "meaning": "与朋友见面时，关注眼前的人能表达尊重，并让交谈更愉快。"
+          }
+        ],
+        [
+          {
+            "key": "cet4-e04-s07",
+            "english": "These changes do not require us to give up technology or ignore the practical benefits that it brings.",
+            "meaning": "这些改变并不要求我们放弃技术或忽视它带来的实际好处。"
+          },
+          {
+            "key": "cet4-e04-s08",
+            "english": "Instead, they encourage us to choose when and why we use a screen, rather than responding to every alert.",
+            "meaning": "相反，它们鼓励我们主动选择使用屏幕的时机和目的，而不是对每个提醒都作出反应。"
+          },
+          {
+            "key": "cet4-e04-s09",
+            "english": "With a few clear boundaries, we can enjoy the convenience of smartphones while protecting our time and personal relationships.",
+            "meaning": "有了几条明确的界限，我们就能享受智能手机的便利，同时保护我们的时间和人际关系。"
+          }
+        ]
+      ]
+    },
+    {
+      "id": "cet4-essay-05",
+      "title": "体育锻炼",
+      "titleEnglish": "Making Exercise Part of University Life",
+      "prompt": "请为学校英语报写一篇短文，鼓励同学把适量运动融入日常生活。Write an essay encouraging students to make suitable exercise part of university life. Write at least 120 words but no more than 180 words.",
+      "outline": [
+        "指出学习繁忙时运动容易被忽略。",
+        "建议选择喜欢的活动、从小目标开始并与朋友相互鼓励。",
+        "强调适量、持续和享受过程。"
+      ],
+      "paragraphs": [
+        [
+          {
+            "key": "cet4-e05-s01",
+            "english": "When assignments begin to pile up, exercise is often the first activity that students remove from their schedules.",
+            "meaning": "当作业开始堆积时，运动往往是学生从日程表中最先取消的活动。"
+          },
+          {
+            "key": "cet4-e05-s02",
+            "english": "However, spending every spare hour at a desk can leave us feeling tired and less willing to continue studying.",
+            "meaning": "然而，把所有空闲时间都用来坐在书桌前，会让我们感到疲惫，也更不愿意继续学习。"
+          },
+          {
+            "key": "cet4-e05-s03",
+            "english": "Making time for suitable physical activity is therefore a useful part of a balanced university life.",
+            "meaning": "因此，腾出时间进行适合自己的体育活动，是平衡的大学生活中一个有益的部分。"
+          }
+        ],
+        [
+          {
+            "key": "cet4-e05-s04",
+            "english": "Students can start by choosing an activity they enjoy, such as walking, cycling, or playing badminton with friends.",
+            "meaning": "学生可以从选择自己喜欢的活动开始，例如散步、骑车或与朋友一起打羽毛球。"
+          },
+          {
+            "key": "cet4-e05-s05",
+            "english": "A small goal, like taking a walk after dinner several times a week, is easier to keep than an unrealistic promise.",
+            "meaning": "比起不切实际的承诺，像每周晚饭后散步几次这样的小目标更容易坚持。"
+          },
+          {
+            "key": "cet4-e05-s06",
+            "english": "Inviting a classmate to join us can make the activity more enjoyable and help both people stay motivated when enthusiasm fades.",
+            "meaning": "邀请一位同学加入我们，能让这项活动更愉快，并帮助两个人在热情减退时保持动力。"
+          }
+        ],
+        [
+          {
+            "key": "cet4-e05-s07",
+            "english": "We should increase our activity gradually and choose a pace that suits our own condition rather than competing with others.",
+            "meaning": "我们应该循序渐进地增加活动量，并选择适合自己身体状况的节奏，而不是与别人攀比。"
+          },
+          {
+            "key": "cet4-e05-s08",
+            "english": "The purpose is not to become an athlete, but to feel more energetic and enjoy a change from academic work.",
+            "meaning": "目的并非成为运动员，而是感到更有活力，并享受学业之外的调剂。"
+          },
+          {
+            "key": "cet4-e05-s09",
+            "english": "If we build a flexible routine and appreciate small improvements, exercise can become a lasting habit instead of another source of pressure.",
+            "meaning": "如果我们建立灵活的日常安排，并欣赏一点点进步，运动就能成为持久的习惯，而非又一个压力来源。"
+          }
+        ]
+      ]
+    },
+    {
+      "id": "cet4-essay-06",
+      "title": "绿色校园",
+      "titleEnglish": "Building a Greener Campus",
+      "prompt": "写一篇 120–180 词的短文，讨论大学生可以怎样建设绿色校园，并说明持续行动的重要性。Write an essay of 120–180 words on how students can help build a greener campus and why continued action matters.",
+      "outline": [
+        "引入主题：绿色校园来自日常选择。",
+        "提出做法：节电节水、自带水杯、交换旧物。",
+        "总结建议：制定具体目标，并让环保习惯持续下去。"
+      ],
+      "paragraphs": [
+        [
+          {
+            "key": "cet4-e06-s01",
+            "english": "A greener campus begins with small choices that students make during their daily lives at university.",
+            "meaning": "更加绿色的校园始于学生在大学日常生活中做出的小选择。"
+          },
+          {
+            "key": "cet4-e06-s02",
+            "english": "Although large projects are useful, simple habits can also reduce waste and make our surroundings more pleasant.",
+            "meaning": "虽然大型项目很有用，简单的习惯也能减少浪费，并让我们的环境更加宜人。"
+          },
+          {
+            "key": "cet4-e06-s03",
+            "english": "For this reason, environmental protection should become a regular part of student life, rather than an occasional activity.",
+            "meaning": "因此，环境保护应该成为学生生活中的常规部分，而不是偶尔开展的活动。"
+          }
+        ],
+        [
+          {
+            "key": "cet4-e06-s04",
+            "english": "First, we can save electricity by turning off unnecessary lights when we leave classrooms and shared study rooms.",
+            "meaning": "首先，我们可以在离开教室和公共自习室时，通过关闭不必要的灯来节约用电。"
+          },
+          {
+            "key": "cet4-e06-s05",
+            "english": "We should also bring reusable cups and report leaking taps promptly, so that less water is wasted every day.",
+            "meaning": "我们还应该携带可重复使用的杯子，并及时报告漏水的水龙头，这样每天浪费的水就能更少。"
+          },
+          {
+            "key": "cet4-e06-s06",
+            "english": "In addition, a campus exchange corner can give used books and other useful items a second life instead of sending them to the bin.",
+            "meaning": "此外，校园旧物交换角可以让旧书和其他有用的物品得到再次使用的机会，而不是把它们扔进垃圾桶。"
+          }
+        ],
+        [
+          {
+            "key": "cet4-e06-s07",
+            "english": "These actions may seem small, but their value grows when many students take part and continue over time.",
+            "meaning": "这些行动看起来可能微不足道，但当许多学生参与并长期坚持时，它们的价值就会增加。"
+          },
+          {
+            "key": "cet4-e06-s08",
+            "english": "Student groups can set clear monthly goals and share practical tips without making anyone feel guilty about an occasional mistake.",
+            "meaning": "学生社团可以制定明确的月度目标并分享实用建议，同时避免让任何人因偶尔犯错而感到内疚。"
+          },
+          {
+            "key": "cet4-e06-s09",
+            "english": "If we support one another and keep these habits, our campus can become a cleaner, healthier place for everyone.",
+            "meaning": "如果我们相互支持并保持这些习惯，我们的校园就能成为一个对所有人来说都更清洁、更健康的地方。"
+          }
+        ]
+      ]
+    },
+    {
+      "id": "cet4-essay-07",
+      "title": "读书会邀请信",
+      "titleEnglish": "An Invitation to a Reading Club",
+      "prompt": "以学生 Alex 的身份，写一封 120–180 词的信，邀请朋友加入校园读书会，介绍活动安排及参加方式。Write a letter of 120–180 words as Alex, inviting a friend to a campus reading club and explaining the activities and how to join.",
+      "outline": [
+        "说明写信目的，并介绍新成立的读书会。",
+        "交代时间地点、活动内容和准备事项。",
+        "解释参加的好处，邀请回复并友好收尾。"
+      ],
+      "paragraphs": [
+        [
+          {
+            "key": "cet4-e07-s01",
+            "english": "I am writing to invite you to join our new campus reading club, which welcomes students with different interests.",
+            "meaning": "我写信是想邀请你加入我们新成立的校园读书会，读书会欢迎有不同兴趣的学生参加。"
+          },
+          {
+            "key": "cet4-e07-s02",
+            "english": "Our first meeting will take place at three next Saturday afternoon in the small discussion room beside the university library.",
+            "meaning": "我们的首次活动将于下周六下午三点在大学图书馆旁的小讨论室举行。"
+          },
+          {
+            "key": "cet4-e07-s03",
+            "english": "We hope to create a relaxed space where members can exchange ideas and discover books beyond their usual reading choices.",
+            "meaning": "我们希望创造一个轻松的空间，让成员们可以交流想法，并发现自己平常阅读选择之外的书籍。"
+          }
+        ],
+        [
+          {
+            "key": "cet4-e07-s04",
+            "english": "For our opening session, each person will introduce a favorite book and explain why it matters to them personally.",
+            "meaning": "在首次活动中，每个人将介绍一本最喜欢的书，并解释这本书为什么对自己有特别的意义。"
+          },
+          {
+            "key": "cet4-e07-s05",
+            "english": "Afterwards, we will discuss a short story together and choose a shared reading list for the following month.",
+            "meaning": "之后，我们将一起讨论一篇短篇小说，并选出接下来一个月的共同阅读书单。"
+          },
+          {
+            "key": "cet4-e07-s06",
+            "english": "You do not need to prepare a formal speech, but please bring one book that you would enjoy recommending to others.",
+            "meaning": "你不需要准备正式发言，但请带上一本你愿意向别人推荐的书。"
+          }
+        ],
+        [
+          {
+            "key": "cet4-e07-s07",
+            "english": "I believe your enthusiasm for stories would bring fresh ideas to the group and make our discussions more lively.",
+            "meaning": "我相信你对故事的热情会为这个小组带来新想法，并让我们的讨论更加生动。"
+          },
+          {
+            "key": "cet4-e07-s08",
+            "english": "Please let me know by Friday if you can come, so I can reserve a seat and send you the meeting details.",
+            "meaning": "请在周五之前告诉我你是否能来，这样我就能预留一个座位，并把活动详情发给你。"
+          },
+          {
+            "key": "cet4-e07-s09",
+            "english": "I look forward to hearing about your reading experiences and spending an enjoyable afternoon with you and other book lovers.",
+            "meaning": "我期待听你分享阅读经历，并与你和其他爱书人一起度过一个愉快的下午。"
+          }
+        ]
+      ],
+      "greeting": {
+        "english": "Dear Taylor,",
+        "meaning": "亲爱的 Taylor："
+      },
+      "closing": {
+        "english": "Best wishes,\nAlex",
+        "meaning": "祝好！\nAlex"
+      }
+    },
+    {
+      "id": "cet4-essay-08",
+      "title": "给新生的建议信",
+      "titleEnglish": "Advice for a New University Student",
+      "prompt": "以学长或学姐 Alex 的身份，写一封 120–180 词的信，为刚进入大学的朋友提供适应校园生活的建议。Write a letter of 120–180 words as Alex, offering a new university student practical advice on adjusting to campus life.",
+      "outline": [
+        "理解新生的不安，并提出循序渐进的态度。",
+        "围绕时间安排、主动求助和适度参加活动给出建议。",
+        "鼓励保持健康，并以适合自己的节奏成长。"
+      ],
+      "paragraphs": [
+        [
+          {
+            "key": "cet4-e08-s01",
+            "english": "Congratulations on starting university, where you can learn, meet people, and explore new interests.",
+            "meaning": "祝贺你开始大学生活，在这里你可以学习、结识他人并探索新的兴趣。"
+          },
+          {
+            "key": "cet4-e08-s02",
+            "english": "It is natural to feel uncertain at first, especially when everything around you seems unfamiliar.",
+            "meaning": "一开始感到不确定很正常，尤其是当你周围的一切似乎都很陌生时。"
+          },
+          {
+            "key": "cet4-e08-s03",
+            "english": "Instead of trying to solve every problem immediately, give yourself time to develop a routine that suits your own needs.",
+            "meaning": "与其试图立刻解决每一个问题，不如给自己时间来建立适合自身需要的日常安排。"
+          }
+        ],
+        [
+          {
+            "key": "cet4-e08-s04",
+            "english": "My first suggestion is to make a weekly plan that includes classes, independent study, exercise, and rest.",
+            "meaning": "我的第一条建议是制定一份周计划，其中包括上课、自主学习、锻炼和休息。"
+          },
+          {
+            "key": "cet4-e08-s05",
+            "english": "When a course becomes difficult, ask your teachers or classmates for help before small questions turn into larger gaps in understanding.",
+            "meaning": "当一门课程变难时，请向老师或同学求助，别等小疑问变成更大的理解障碍。"
+          },
+          {
+            "key": "cet4-e08-s06",
+            "english": "Joining one club can help you build friendships, but taking on too many activities may leave little time for your priorities.",
+            "meaning": "加入一个社团可以帮助你建立友谊，但参加太多活动可能让你处理重要事情的时间所剩无几。"
+          }
+        ],
+        [
+          {
+            "key": "cet4-e08-s07",
+            "english": "Remember that regular meals and adequate sleep are part of successful learning, not rewards to enjoy only after all work is finished.",
+            "meaning": "请记住，规律饮食和充足睡眠是高效学习的一部分，不是只有做完所有工作之后才能享受的奖励。"
+          },
+          {
+            "key": "cet4-e08-s08",
+            "english": "You do not have to compare yourself with others, because people begin with different experiences and move at different speeds.",
+            "meaning": "你不必将自己与别人比较，因为人们带着不同的经历出发，也会以不同的速度前进。"
+          },
+          {
+            "key": "cet4-e08-s09",
+            "english": "Stay curious, be patient with yourself, and remember that steady progress is more valuable than a perfect start that cannot last.",
+            "meaning": "保持好奇，对自己耐心一些，并记住，稳步进步比无法持续的完美开局更有价值。"
+          }
+        ]
+      ],
+      "greeting": {
+        "english": "Dear Jamie,",
+        "meaning": "亲爱的 Jamie："
+      },
+      "closing": {
+        "english": "Best wishes,\nAlex",
+        "meaning": "祝好！\nAlex"
+      }
+    },
+    {
+      "id": "cet4-essay-09",
+      "title": "志愿活动通知",
+      "titleEnglish": "A Notice About a Volunteer Activity",
+      "prompt": "以校园志愿者协会的名义，写一则 120–180 词的通知，招募学生参加社区公园清洁活动，说明时间、任务、准备事项和报名方式。Write a notice of 120–180 words for the campus volunteer association, recruiting students for a community park cleanup and giving practical arrangements. All activity details are fictional practice material. 活动安排均为练习所用的虚构信息。",
+      "outline": [
+        "开头说明活动目的、组织者和时间地点。",
+        "说明具体任务、所需物品和安全安排。",
+        "给出报名方式、人数限制和改期规则。"
+      ],
+      "paragraphs": [
+        [
+          {
+            "key": "cet4-e09-s01",
+            "english": "The campus volunteer association will organize a cleanup in Riverside Park next Sunday to protect the environment.",
+            "meaning": "校园志愿者协会将于下周日在河滨公园组织一次清洁活动，以保护环境。"
+          },
+          {
+            "key": "cet4-e09-s02",
+            "english": "All students are welcome to join us, and no previous volunteer experience is required.",
+            "meaning": "欢迎所有同学加入我们，也不要求有志愿服务经验。"
+          },
+          {
+            "key": "cet4-e09-s03",
+            "english": "Please meet at the north gate at eight thirty in the morning, where our group leaders will check attendance.",
+            "meaning": "请上午八点半在学校北门集合，小组负责人将在那里核对到场情况。"
+          }
+        ],
+        [
+          {
+            "key": "cet4-e09-s04",
+            "english": "Working in small teams, volunteers will collect litter along the paths and sort recyclable materials at several clearly marked points.",
+            "meaning": "志愿者将分成小组开展工作，沿着小路收集垃圾，并在几个标识清楚的地点分类整理可回收物。"
+          },
+          {
+            "key": "cet4-e09-s05",
+            "english": "The association will provide gloves and collection bags, while participants should bring drinking water and wear comfortable clothes and closed shoes.",
+            "meaning": "协会将提供手套和垃圾收集袋，而参加者应自带饮用水，并穿着舒适的衣服和包头鞋。"
+          },
+          {
+            "key": "cet4-e09-s06",
+            "english": "A short safety briefing will explain the tasks, and students must ask a leader for help with any sharp or unknown objects.",
+            "meaning": "简短的安全说明将解释各项任务，遇到任何尖锐或不明物体时，同学们必须向负责人求助。"
+          }
+        ],
+        [
+          {
+            "key": "cet4-e09-s07",
+            "english": "To sign up, please visit the student activity office before Thursday afternoon and leave your name and a contact number.",
+            "meaning": "如需报名，请在周四下午之前前往学生活动办公室，并留下姓名和一个联系电话。"
+          },
+          {
+            "key": "cet4-e09-s08",
+            "english": "Places are limited to twenty participants so that each team can receive enough guidance and complete its work safely.",
+            "meaning": "名额限于二十人，以便每个小组都能获得充分指导，并安全地完成工作。"
+          },
+          {
+            "key": "cet4-e09-s09",
+            "english": "If heavy rain is expected, we will announce a new date on Friday, and all registered volunteers will receive a message.",
+            "meaning": "如果预计会有大雨，我们将在周五公布新的日期，所有已报名的志愿者都会收到消息。"
+          }
+        ]
+      ],
+      "closing": {
+        "english": "Campus Volunteer Association",
+        "meaning": "校园志愿者协会"
+      }
+    },
+    {
+      "id": "cet4-essay-10",
+      "title": "阅读方式变化图表作文",
+      "titleEnglish": "Changes in Reading Preferences",
+      "prompt": "根据下列虚构示例数据，写一篇 120–180 词的短文，描述阅读方式占比的变化、分析可能原因并表达看法。Write an essay of 120–180 words describing the changes, discussing possible reasons, and giving your view.\n示例数据 / Illustrative data only; not a real survey:\n阅读方式 / Preferred format | 2016 | 2026\n纸质阅读 / Print | 60% | 40%\n数字阅读 / Digital | 40% | 60%",
+      "outline": [
+        "先描述两种阅读方式在示例数据中的升降趋势。",
+        "用可能性措辞分析便携性、选择和阅读体验，不把猜测写成调查结论。",
+        "指出示例数据的限制，并建议根据需要选择阅读方式。"
+      ],
+      "paragraphs": [
+        [
+          {
+            "key": "cet4-e10-s01",
+            "english": "The illustrative chart compares reading preferences in 2016 and 2026, using figures created for this exercise.",
+            "meaning": "这张示例图表使用为本练习编设的数字，比较2016 年和 2026 年的阅读偏好。"
+          },
+          {
+            "key": "cet4-e10-s02",
+            "english": "In this example, the share of people preferring print falls from 60% to 40%, while the digital share rises by twenty percentage points.",
+            "meaning": "在这个示例中，偏好纸质阅读的人群占比从 60% 降至 40%，而数字阅读的占比上升了二十个百分点。"
+          },
+          {
+            "key": "cet4-e10-s03",
+            "english": "The two formats therefore change places, with digital reading becoming more popular in 2026.",
+            "meaning": "因此，这两种方式的排名互换，数字阅读在 2026 年成为更受欢迎的方式。"
+          }
+        ],
+        [
+          {
+            "key": "cet4-e10-s04",
+            "english": "Phones and reading devices may let people carry many books without adding weight to their bags.",
+            "meaning": "手机和阅读设备可能让人们携带许多书籍，而不用增加包里的重量。"
+          },
+          {
+            "key": "cet4-e10-s05",
+            "english": "Digital services may also offer quick searches and flexible access, which can suit readers with busy schedules or limited storage space.",
+            "meaning": "数字服务还可能提供快速搜索和灵活的访问方式，这可能适合日程繁忙或储物空间有限的读者。"
+          },
+          {
+            "key": "cet4-e10-s06",
+            "english": "However, printed books still appeal to those who value the feel of paper or prefer fewer screen-related distractions while they read.",
+            "meaning": "不过，纸质书仍然吸引那些重视纸张触感或希望在阅读时减少屏幕干扰的人。"
+          }
+        ],
+        [
+          {
+            "key": "cet4-e10-s07",
+            "english": "These example figures cannot prove why preferences change, and real conclusions would require reliable information about the readers and the survey.",
+            "meaning": "这些示例数字无法证明偏好变化的原因，真实的结论还需要关于读者和调查的可靠信息。"
+          },
+          {
+            "key": "cet4-e10-s08",
+            "english": "In my view, neither format should replace the other completely, because each can suit different needs and reading habits.",
+            "meaning": "在我看来，两种方式都不应该完全取代另一种，因为每一种都能适应不同的需要和阅读习惯。"
+          },
+          {
+            "key": "cet4-e10-s09",
+            "english": "The best choice is the one that helps us read regularly, understand deeply, and enjoy learning beyond the limits of a single format.",
+            "meaning": "最好的选择是能够帮助我们经常阅读、深入理解并享受学习且不受单一方式限制的那一种。"
+          }
+        ]
+      ]
+    }
+  ],
+  "expressionGroups": [
+    {
+      "id": "cet4-phrases-opening",
+      "title": "开头引入",
+      "items": [
+        {
+          "key": "cet4-opening-01",
+          "english": "As university life becomes busier, learning to set priorities becomes increasingly important.",
+          "meaning": "随着大学生活变得更加忙碌，学会确定轻重缓急变得越来越重要。"
+        },
+        {
+          "key": "cet4-opening-02",
+          "english": "In recent years, online courses have offered students more choices about what and where to learn.",
+          "meaning": "近年来，在线课程为学生提供了关于学习内容和学习地点的更多选择。"
+        },
+        {
+          "key": "cet4-opening-03",
+          "english": "For many students, the transition to university brings both exciting opportunities and unfamiliar challenges.",
+          "meaning": "对许多学生而言，向大学生活的过渡带来了令人兴奋的机会和陌生的挑战。"
+        },
+        {
+          "key": "cet4-opening-04",
+          "english": "The question of how to balance study and leisure deserves careful consideration.",
+          "meaning": "如何平衡学习与休闲这一问题值得认真思考。"
+        },
+        {
+          "key": "cet4-opening-05",
+          "english": "Whether we study alone or work in groups, clear goals can give our efforts a useful direction.",
+          "meaning": "无论我们独自学习还是小组合作，明确的目标都能为我们的努力提供一个有用的方向。"
+        },
+        {
+          "key": "cet4-opening-06",
+          "english": "A healthy campus depends not only on good facilities but also on the daily choices of everyone who uses them.",
+          "meaning": "健康的校园不仅依赖于良好的设施，也依赖于每一位设施使用者的日常选择。"
+        },
+        {
+          "key": "cet4-opening-07",
+          "english": "When discussing new technology, we should consider both the convenience it offers and the habits it encourages.",
+          "meaning": "讨论新技术时，我们应当考虑它带来的便利以及它促成的习惯。"
+        },
+        {
+          "key": "cet4-opening-08",
+          "english": "Small changes in daily routines can be a starting point for a better university experience.",
+          "meaning": "日常安排中小小的改变也可能成为获得更好大学体验的起点。"
+        },
+        {
+          "key": "cet4-opening-09",
+          "english": "Few students would deny the value of cooperation, yet putting it into practice takes patience.",
+          "meaning": "很少有学生会否认合作的价值，然而将其付诸实践需要耐心。"
+        },
+        {
+          "key": "cet4-opening-10",
+          "english": "Before judging a new learning method, it is worth asking what problem it is meant to solve.",
+          "meaning": "在评判一种新的学习方法之前，值得先问一问它旨在解决什么问题。"
+        }
+      ]
+    },
+    {
+      "id": "cet4-phrases-argument",
+      "title": "观点论证",
+      "items": [
+        {
+          "key": "cet4-argument-01",
+          "english": "One reason to plan ahead is that it allows us to deal with unexpected changes more calmly.",
+          "meaning": "提前规划的一个理由是，它让我们能够更加从容地处理意料之外的变化。"
+        },
+        {
+          "key": "cet4-argument-02",
+          "english": "For example, reviewing notes after class can reveal questions that were unclear during the lesson.",
+          "meaning": "例如，课后复习笔记可以发现课堂上未弄清的问题。"
+        },
+        {
+          "key": "cet4-argument-03",
+          "english": "By sharing tasks, group members can use their different strengths and learn from one another.",
+          "meaning": "通过分担任务，小组成员能够发挥各自不同的长处，并相互学习。"
+        },
+        {
+          "key": "cet4-argument-04",
+          "english": "This approach gives students more control over their learning, which may strengthen their sense of responsibility.",
+          "meaning": "这种方法让学生在学习方面拥有更多自主权，这可能增强他们的责任感。"
+        },
+        {
+          "key": "cet4-argument-05",
+          "english": "Without a clear goal, even a rich collection of learning resources can become a source of distraction.",
+          "meaning": "没有明确的目标，即使是丰富的学习资源也会成为分散注意力的源头。"
+        },
+        {
+          "key": "cet4-argument-06",
+          "english": "A practical advantage of joining a club is the chance to meet people with similar interests.",
+          "meaning": "参加社团的一个实际优点是有机会结识兴趣相投的人。"
+        },
+        {
+          "key": "cet4-argument-07",
+          "english": "Regular practice helps us notice small weaknesses before they develop into more serious problems.",
+          "meaning": "经常练习帮助我们发现细小的不足，赶在它们发展成更严重的问题之前。"
+        },
+        {
+          "key": "cet4-argument-08",
+          "english": "Compared with studying alone, discussing a question with others can introduce a wider range of ideas.",
+          "meaning": "与独自学习相比，与他人讨论一个问题可以带来更广泛的想法。"
+        },
+        {
+          "key": "cet4-argument-09",
+          "english": "A realistic schedule leaves room for rest and is therefore easier to follow over time.",
+          "meaning": "一份切实可行的日程表为休息留出余地，因此更容易长期坚持执行。"
+        },
+        {
+          "key": "cet4-argument-10",
+          "english": "The value of feedback lies in showing us how to improve, rather than simply pointing out mistakes.",
+          "meaning": "反馈的价值在于让我们看到如何改进，而不是仅仅指出错误。"
+        }
+      ]
+    },
+    {
+      "id": "cet4-phrases-transition",
+      "title": "衔接转折",
+      "items": [
+        {
+          "key": "cet4-transition-01",
+          "english": "On the one hand, online courses offer flexibility; on the other hand, they require strong self-discipline.",
+          "meaning": "一方面，在线课程提供灵活性；另一方面，它们要求较强的自律能力。"
+        },
+        {
+          "key": "cet4-transition-02",
+          "english": "Although competition can encourage progress, cooperation often helps a team solve difficult problems more effectively.",
+          "meaning": "虽然竞争能够促进进步，合作却常常帮助团队更有效地解决难题。"
+        },
+        {
+          "key": "cet4-transition-03",
+          "english": "In addition to saving money, cooking at home gives students greater control over their daily meals.",
+          "meaning": "除了省钱，在家做饭还能让学生更自主地安排日常饮食。"
+        },
+        {
+          "key": "cet4-transition-04",
+          "english": "For example, a short walk between study sessions can help us return to work with fresh energy.",
+          "meaning": "例如，在两段学习之间短暂散步可以帮助我们恢复精力后重新投入学习。"
+        },
+        {
+          "key": "cet4-transition-05",
+          "english": "Nevertheless, a useful tool cannot replace the effort needed to understand a subject and practice essential skills.",
+          "meaning": "然而，有用的工具无法代替理解一门学科和练习基本技能所需的努力。"
+        },
+        {
+          "key": "cet4-transition-06",
+          "english": "Compared with studying alone, group discussions can expose learners to viewpoints they might otherwise overlook.",
+          "meaning": "与独自学习相比，小组讨论可以让学习者接触到原本可能忽略的观点。"
+        },
+        {
+          "key": "cet4-transition-07",
+          "english": "As a result, students who plan their week carefully may find it easier to balance study and rest.",
+          "meaning": "因此，认真规划一周安排的学生可能会更容易平衡学习和休息。"
+        },
+        {
+          "key": "cet4-transition-08",
+          "english": "Even so, we should leave some room in our plans for unexpected changes and personal needs.",
+          "meaning": "即便如此，我们也应该在计划中为意外变化和个人需要留出一些余地。"
+        },
+        {
+          "key": "cet4-transition-09",
+          "english": "Meanwhile, universities can support these efforts by offering quiet spaces and clear guidance on available resources.",
+          "meaning": "与此同时，大学可以通过提供安静的空间以及关于可用资源的明确指导，来支持这些努力。"
+        },
+        {
+          "key": "cet4-transition-10",
+          "english": "Rather than choosing between convenience and quality, we can look for practical ways to improve both.",
+          "meaning": "与其在便利性与质量之间作取舍，我们不如寻找能同时提升两者的实用方法。"
+        }
+      ]
+    },
+    {
+      "id": "cet4-phrases-conclusion",
+      "title": "总结建议",
+      "items": [
+        {
+          "key": "cet4-conclusion-01",
+          "english": "In conclusion, building a lasting reading habit requires realistic goals, suitable books, and steady effort.",
+          "meaning": "总之，建立持久的阅读习惯需要切合实际的目标、合适的书籍以及持续的努力。"
+        },
+        {
+          "key": "cet4-conclusion-02",
+          "english": "To sum up, responsible use of digital tools can improve learning when clear limits are in place.",
+          "meaning": "总的来说，在设定明确限制的情况下，负责任地使用数字工具可以改善学习。"
+        },
+        {
+          "key": "cet4-conclusion-03",
+          "english": "We should start with one manageable change and build on our success instead of demanding immediate perfection.",
+          "meaning": "我们应该从一个容易做到的改变开始，并在已有成功的基础上继续进步，而不是苛求立刻达到完美。"
+        },
+        {
+          "key": "cet4-conclusion-04",
+          "english": "It is advisable to review our progress regularly and adjust the plan when our circumstances change.",
+          "meaning": "建议定期回顾进展，并在情况发生变化时调整计划。"
+        },
+        {
+          "key": "cet4-conclusion-05",
+          "english": "By listening to different voices, we can make decisions that better reflect the needs of our community.",
+          "meaning": "通过倾听不同的声音，我们可以作出更能反映社区需求的决定。"
+        },
+        {
+          "key": "cet4-conclusion-06",
+          "english": "Both students and universities have a role to play in creating a healthier and more welcoming campus.",
+          "meaning": "学生和大学都可以发挥作用，共同建设一个更健康、更友好的校园。"
+        },
+        {
+          "key": "cet4-conclusion-07",
+          "english": "The key is not to do everything, but to choose wisely and give important tasks enough attention.",
+          "meaning": "关键不在于做所有事情，而在于明智选择并给予重要任务足够的关注。"
+        },
+        {
+          "key": "cet4-conclusion-08",
+          "english": "With clear goals and mutual support, we can turn good intentions into practical actions that last.",
+          "meaning": "有了明确的目标和相互支持，我们就能把美好的愿望转化为能够持续的实际行动。"
+        },
+        {
+          "key": "cet4-conclusion-09",
+          "english": "Above all, any solution should respect individual differences and remain flexible enough to meet changing needs.",
+          "meaning": "最重要的是，任何解决办法都应该尊重个体差异，并保持足够的灵活性，以满足不断变化的需要。"
+        },
+        {
+          "key": "cet4-conclusion-10",
+          "english": "If we keep improving a little each day, today's small steps can lead to meaningful progress over time.",
+          "meaning": "如果我们每天都进步一点，今天迈出的小步就能随着时间推移带来有意义的进展。"
+        }
+      ]
+    }
+  ]
+}

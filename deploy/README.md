@@ -350,18 +350,15 @@ On the first-release rollback, the saved Caddyfile points back to the untouched
 reload. If a legacy English hostname occurs in a shared multi-host Caddy block, the
 activation refuses to edit it and requires a deliberate manual split.
 
-## GitHub Pages retirement (manual, after production acceptance)
+## Keep GitHub Pages and the account site synchronized
 
-Do not disable the fallback before the new site and administrator login pass testing.
-No deployment script calls the GitHub API. To disable it manually:
+The user requested both sites remain available and receive public feature/content
+updates together. Follow the project AGENTS.md release agreement. Do not disable
+Pages as part of account-site acceptance.
 
-1. Open `cxz12365411/english-typing-practice` on GitHub.
-2. Go to **Settings → Pages**.
-3. Under **Build and deployment**, set **Source** to **Deploy from a branch** if needed,
-   then select **None** for the publishing branch and save/disable the site.
-4. Confirm `https://cxz12365411.github.io/english-typing-practice/` no longer serves the
-   fallback, while `https://english-47-120-37-63.sslip.io/` still passes acceptance.
-
-If branch-based Pages cannot be set to None in the current GitHub UI, remove only the
-Pages publishing source in repository Settings; do not delete `main`, the release
-branch, or the repository.
+Publish the standalone entries and their public assets on `codex/static-pages`,
+retaining the account-site navigation link. Publish account source changes on
+`main`, then stage and promote the exact tested commit using the steps above.
+CET-4 releases require `cet4-writing.json` in both the staging and final release
+root, in addition to the Vite-bundled preview asset. Verify each public site after
+its deployment; private accounts, imports, and learning records stay on Aliyun.

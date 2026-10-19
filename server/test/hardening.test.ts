@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import { randomUUID } from "node:crypto";
+import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import test from "node:test";
 import type { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
@@ -8,9 +9,11 @@ import { buildApp } from "../src/app.js";
 import { loadConfig } from "../src/config.js";
 import { migrateAndSeed, migrateDatabase, openDatabase, type SqliteDatabase } from "../src/database.js";
 import { BoundedWorkPool, hashPassword, tokenHash } from "../src/security.js";
+import { parseCet4WritingContent } from "../src/cet4-writing.js";
 
 const ORIGIN = "https://english.test";
 const SOURCE = resolve(import.meta.dirname, "../..");
+const WRITING_COUNT = parseCet4WritingContent(JSON.parse(readFileSync(resolve(SOURCE, "cet4-writing.json"), "utf8"))).items.length;
 
 interface Client {
   cookie: string;
@@ -114,11 +117,11 @@ test("migration history is checksummed, rejects future schemas, and the initial 
   const db = openDatabase({ databasePath: ":memory:" });
   try {
     const first = migrateAndSeed(db, SOURCE);
-    assert.equal(first.itemsInserted, 1120);
+    assert.equal(first.itemsInserted, 1120 + WRITING_COUNT);
     const second = migrateAndSeed(db, "Z:\\path-that-does-not-exist");
     assert.equal(second.itemsInserted, 0);
     assert.equal(second.words, 850);
-    assert.equal(second.sentences, 270);
+    assert.equal(second.sentences, 270 + WRITING_COUNT);
     db.prepare("UPDATE schema_migrations SET checksum = 'tampered' WHERE version = 2").run();
     assert.throws(() => migrateDatabase(db), /checksum mismatch/i);
   } finally {

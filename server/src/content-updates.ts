@@ -125,11 +125,14 @@ function streetPhotographyExpansion(parsed: ParsedContent): ParsedContent {
   return { categories, items };
 }
 
-interface ContentUpdate {
+export interface ContentUpdate {
   marker: string;
   select: (parsed: ParsedContent) => ParsedContent;
   allowNewCategories: boolean;
   itemCount: number;
+  categoryCount?: number;
+  sourceName?: string;
+  conflictLabel?: string;
 }
 
 const CONTENT_UPDATES: readonly ContentUpdate[] = [
@@ -137,7 +140,8 @@ const CONTENT_UPDATES: readonly ContentUpdate[] = [
   { marker: STREET_PHOTOGRAPHY_EXPANSION, select: streetPhotographyExpansion, allowNewCategories: false, itemCount: 24 }
 ];
 
-function applyContentUpdate(
+/** Caller must hold a transaction covering all changes, including the version and audit. */
+export function applyContentUpdate(
   db: SqliteDatabase,
   update: ContentUpdate,
   readSource: () => ParsedContent,
@@ -160,13 +164,13 @@ function applyContentUpdate(
         if (existing.name !== category.name || existing.kind !== category.kind ||
             existing.sort_order !== category.sortOrder || existing.status !== "published" ||
             existing.published_at === null || existing.archived_at !== null) {
-          throw new Error(`Street photography update conflict: category ${category.slug} already has different content or state`);
+          throw new Error(`${update.conflictLabel ?? "Street photography"} update conflict: category ${category.slug} already has different content or state`);
         }
         categoryIds.set(category.slug, existing.id);
         continue;
       }
       if (!update.allowNewCategories) {
-        throw new Error(`Street photography update conflict: required category ${category.slug} is missing`);
+        throw new Error(`${update.conflictLabel ?? "Street photography"} update conflict: required category ${category.slug} is missing`);
       }
       const id = randomUUID();
       db.prepare(`
@@ -190,7 +194,7 @@ function applyContentUpdate(
             existing.normalized_answer !== normalizedAnswer(item.english) || existing.sort_order !== item.sortOrder ||
             existing.revision !== 1 || existing.status !== "published" ||
             existing.published_at === null || existing.archived_at !== null) {
-          throw new Error(`Street photography update conflict: item ${item.key} already has different content or state`);
+          throw new Error(`${update.conflictLabel ?? "Street photography"} update conflict: item ${item.key} already has different content or state`);
         }
         continue;
       }
@@ -214,8 +218,8 @@ function applyContentUpdate(
       INSERT INTO audit_log(actor_user_id, action, target_type, target_id, metadata_json, created_at)
       VALUES (NULL, 'content.update', 'content_update', ?, ?, ?)
     `).run(update.marker, JSON.stringify({
-      source: "street-photography-english-phrases.md",
-      categories: 4,
+      source: update.sourceName ?? "street-photography-english-phrases.md",
+      categories: update.categoryCount ?? 4,
       items: update.itemCount,
       categoriesInserted,
       itemsInserted

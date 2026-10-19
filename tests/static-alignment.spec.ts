@@ -59,6 +59,7 @@ async function openPractice(page: Page, options: {
     });
     w.SpeechSynthesisUtterance = class { constructor(public text: string) {} };
   });
+  await page.route("**/cet4-writing.json", route => route.fulfill({ status: 404, body: "Not part of this fixture" }));
   await page.route("**/basic-english-850.md", route => route.fulfill({ contentType: "text/markdown", body: words }));
   await page.route("**/daily-english-high-frequency-sentences.md", route => route.fulfill({ contentType: "text/markdown", body: sentenceMarkdown(entries) }));
   await page.route("**/sentence-alignments.json", async route => {
@@ -102,7 +103,7 @@ async function geometryErrors(page: Page) {
   });
 }
 
-test("all 270 sentence entries exactly cover the source and validate every token and Chinese fragment", () => {
+test("original 270 plus CET4 sentence alignments cover the sources and every token and Chinese fragment", () => {
   const data = JSON.parse(readFileSync("sentence-alignments.json", "utf8")) as AlignmentData;
   const source = readFileSync("daily-english-high-frequency-sentences.md", "utf8").split(/\r?\n/)
     .filter(line => line.startsWith("|") && line.includes("<br>"))
@@ -112,9 +113,10 @@ test("all 270 sentence entries exactly cover the source and validate every token
     });
   expect(data.version).toBe(1);
   expect(source).toHaveLength(270);
-  expect(data.entries).toHaveLength(270);
+  const writing = require("../cet4-writing.js").parse(JSON.parse(readFileSync("cet4-writing.json", "utf8")));
+  expect(data.entries).toHaveLength(270 + writing.items.length);
   const expectedKeys = source.map(entry => api.key(entry.english, entry.meaning)).sort();
-  expect(data.entries.map(entry => api.key(entry.english, entry.meaning)).sort()).toEqual(expectedKeys);
+  expect(data.entries.slice(0, 270).map(entry => api.key(entry.english, entry.meaning)).sort()).toEqual(expectedKeys);
   expect(new Set(expectedKeys).size).toBe(270);
   for (const entry of data.entries) {
     expect(api.validateEntry(entry), entry.english).toBe(true);

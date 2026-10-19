@@ -330,6 +330,8 @@
       overflow-wrap: anywhere;
     }
 
+    .sound:empty { display: none; }
+
     .typebox {
       display: grid;
       gap: 12px;
@@ -517,6 +519,7 @@
     }
   </style>
   <link id="alignmentStyles" rel="stylesheet" href="alignment.css?v=20261018-1">
+  <link rel="stylesheet" href="cet4-writing.css?v=20261019-1">
 </head>
 <body>
   <div class="app">
@@ -596,6 +599,7 @@
             <div class="progress"><span id="progressBar"></span></div>
           </div>
 
+          <section id="cet4Writing" class="cet4-writing" aria-label="四级作文全文" hidden></section>
           <div class="prompt">
             <div class="alignment-scroll" id="alignmentScroll">
               <div class="alignment-stage" id="alignmentStage">
@@ -627,6 +631,7 @@
   </div>
 
   <script src="alignment.js?v=20261018-1"></script>
+  <script src="cet4-writing.js?v=20261019-1"></script>
   <script>
     const els = {
       loadStatus: document.querySelector("#loadStatus"),
@@ -702,8 +707,11 @@
       // The display preference is optional when browser storage is unavailable.
     }
     els.showAlignment.disabled = !alignmentRenderer;
+    const writingPreview = window.Cet4Writing?.create(document.querySelector("#cet4Writing"));
 
     function renderPrompt(item = currentWord()) {
+      const normalizeWritingItem = entry => entry ? { ...entry, english: entry.word } : null;
+      writingPreview?.render(normalizeWritingItem(item), state.words.map(normalizeWritingItem), els.showWord.checked);
       els.targetWord.className = `word${item?.kind === "sentence" ? " sentence" : ""}${(item?.word.length || 0) > 42 ? " long" : ""}`;
       if (alignmentRenderer) {
         alignmentRenderer.render(item, { enabled: els.showAlignment.checked, showEnglish: els.showWord.checked });
@@ -1074,7 +1082,7 @@
       els.nextBtn.disabled = false;
       updateSpeechControls();
       renderPrompt(item);
-      els.soundText.textContent = `中文谐音：${item.sound || "未填写"}`;
+      els.soundText.textContent = item.sound ? `中文谐音：${item.sound}` : "";
       els.answerInput.value = "";
       els.feedback.textContent = "";
       els.feedback.className = "feedback";
@@ -1230,9 +1238,13 @@
 
     async function boot() {
       try {
-        const [wordResponse, sentenceResponse] = await Promise.all([
+        const [wordResponse, sentenceResponse, writingData] = await Promise.all([
           fetch("basic-english-850.md", { cache: "no-store" }),
-          fetch("daily-english-high-frequency-sentences.md", { cache: "no-store" })
+          fetch("daily-english-high-frequency-sentences.md", { cache: "no-store" }),
+          fetch("cet4-writing.json", { cache: "no-cache", signal: typeof AbortSignal !== "undefined" && typeof AbortSignal.timeout === "function" ? AbortSignal.timeout(8000) : undefined })
+            .then(response => { if (!response.ok) throw new Error("CET-4 content unavailable"); return response.json(); })
+            .then(data => { const parsed = window.Cet4Writing.parse(data); writingPreview?.setData(data); return parsed; })
+            .catch(() => null)
         ]);
         if (!wordResponse.ok || !sentenceResponse.ok) throw new Error("练习内容读取失败");
         const [wordMarkdown, sentenceMarkdown] = await Promise.all([
@@ -1241,10 +1253,12 @@
         ]);
         const wordItems = parseWords(wordMarkdown);
         const sentenceItems = parseSentences(sentenceMarkdown);
-        state.words = [...wordItems, ...sentenceItems];
+        const writingCategories = new Map(writingData?.categories.map(category => [category.slug, category.name]) || []);
+        const writingItems = (writingData?.items || []).map(item => ({ ...item, word: item.english, sound: "", category: writingCategories.get(item.categorySlug) }));
+        state.words = [...wordItems, ...sentenceItems, ...writingItems];
         if (!state.words.length) throw new Error("没有解析到练习内容");
         renderCategories();
-        els.loadStatus.textContent = `已载入 ${wordItems.length} 个单词，${sentenceItems.length} 条句型`;
+        els.loadStatus.textContent = `已载入 ${wordItems.length} 个单词，${sentenceItems.length + writingItems.length} 条句型` + (writingData ? " · 含 10 篇四级范文和 40 条写作句型" : " · 四级作文暂未加载");
         els.practice.hidden = false;
         rebuildPool();
       } catch (error) {

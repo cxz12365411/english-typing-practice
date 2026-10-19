@@ -1,0 +1,17 @@
+.cet4-writing { min-width: 0; margin: 0 0 20px; }
+.cet4-writing [hidden], .cet4-writing[hidden] { display: none !important; }
+.cet4-position { margin: 0 0 10px; color: #53645c; font-size: 13px; line-height: 1.7; }
+.cet4-preview { border: 1px solid #dce5dc; border-radius: 14px; background: #f7faf6; overflow: hidden; }
+.cet4-preview > summary { cursor: pointer; padding: 12px 16px; font-weight: 650; color: #315c49; }
+.cet4-preview > summary:focus-visible { outline: 3px solid #4d826a; outline-offset: -4px; border-radius: 12px; }
+.cet4-body { padding: 0 18px 18px; overflow-wrap: anywhere; line-height: 1.85; font-size: 15px; }
+.cet4-body h3 { font-size: 20px; margin: 8px 0; line-height: 1.4; }
+.cet4-body h4 { font-size: 14px; margin: 18px 0 6px; color: #315c49; }
+.cet4-source, .cet4-unavailable { color: #68766b; font-size: 13px; }
+.cet4-prompt { white-space: pre-line; }
+.cet4-outline { margin: 6px 0; padding-left: 22px; }
+.cet4-paragraph { margin: 14px 0 0; }
+.cet4-english { margin: 8px 0; color: #242b28; }
+.cet4-chinese { margin: 6px 0 16px; color: #667169; }
+.cet4-sentence.is-current { background: #deedcf; color: #223b2c; border-radius: 3px; box-decoration-break: clone; -webkit-box-decoration-break: clone; }
+@media (max-width: 600px) { .cet4-body { padding: 0 12px 12px; font-size: 14px; } .cet4-body h3 { font-size: 18px; } }

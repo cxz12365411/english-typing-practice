@@ -7,9 +7,11 @@ import type { FastifyReply, FastifyRequest } from "fastify";
 import { buildApp } from "../src/app.js";
 import { createSession, type UserRow } from "../src/auth.js";
 import { parseSentenceMarkdown } from "../src/content-parser.js";
-import { migrateAndSeed, openDatabase, type SqliteDatabase } from "../src/database.js";
+import { openDatabase, type SqliteDatabase } from "../src/database.js";
 import { normalizeMarkdownCategoryTitle, parseMarkdownImport } from "../src/markdown-import-parser.js";
 import { normalizeAnswer } from "../src/security.js";
+
+import { migratePreCet4Fixture } from "./historical-content-fixture.js";
 
 const SOURCE = resolve(import.meta.dirname, "../..");
 const EXTRA_FILE = "docs/bar-social-extra-32.md";
@@ -56,7 +58,7 @@ function snapshot(db: SqliteDatabase): string {
 
 function original238Database(): SqliteDatabase {
   const db = openDatabase({ databasePath: ":memory:" });
-  migrateAndSeed(db, SOURCE);
+  migratePreCet4Fixture(db, SOURCE);
   db.prepare("DELETE FROM item_revisions WHERE item_id IN (SELECT id FROM items WHERE item_key BETWEEN 'sentence-0239' AND 'sentence-0270')").run();
   db.prepare("DELETE FROM items WHERE item_key BETWEEN 'sentence-0239' AND 'sentence-0270'").run();
   db.prepare("DELETE FROM categories WHERE slug IN ('sentences-19', 'sentences-20', 'sentences-21', 'sentences-22')").run();
@@ -110,15 +112,15 @@ test("canonical 32 bar phrases exactly match the approved plan and the four-grou
 test("fresh 270-sentence installations publish 26 categories once without any new migration or content patch", () => {
   const db = openDatabase({ databasePath: ":memory:" });
   try {
-    assert.deepEqual(migrateAndSeed(db, SOURCE), { categoriesInserted: 26, itemsInserted: 1120, words: 850, sentences: 270 });
+    assert.deepEqual(migratePreCet4Fixture(db, SOURCE), { categoriesInserted: 26, itemsInserted: 1120, words: 850, sentences: 270 });
     assert.equal(count(db, "categories WHERE status = 'published'"), 26);
     assert.equal(count(db, "items WHERE status = 'published'"), 1120);
     assert.equal(count(db, "item_revisions"), 1120);
     assert.equal(count(db, "schema_migrations"), 4);
     const before = snapshot(db);
-    assert.deepEqual(migrateAndSeed(db, "Z:\\missing-source-directory"), { categoriesInserted: 0, itemsInserted: 0, words: 850, sentences: 270 });
+    assert.deepEqual(migratePreCet4Fixture(db, "Z:\\missing-source-directory"), { categoriesInserted: 0, itemsInserted: 0, words: 850, sentences: 270 });
     assert.equal(snapshot(db), before);
-    assert.equal(count(db, "app_meta WHERE key LIKE 'content_update:%'"), 2);
+    assert.equal(count(db, "app_meta WHERE key LIKE 'content_update:street-photography-%'"), 2);
   } finally { db.close(); }
 });
 
@@ -127,12 +129,12 @@ test("existing 238-sentence databases never automatically import bar phrases on 
   try {
     const before = snapshot(db);
     for (const source of [SOURCE, "Z:\\missing-source-directory"]) {
-      assert.deepEqual(migrateAndSeed(db, source), { categoriesInserted: 0, itemsInserted: 0, words: 850, sentences: 238 });
+      assert.deepEqual(migratePreCet4Fixture(db, source), { categoriesInserted: 0, itemsInserted: 0, words: 850, sentences: 238 });
       assert.equal(snapshot(db), before);
     }
     assert.equal(count(db, "categories"), 22);
     assert.equal(count(db, "items"), 1088);
-    assert.equal(count(db, "app_meta WHERE key LIKE 'content_update:%'"), 2);
+    assert.equal(count(db, "app_meta WHERE key LIKE 'content_update:street-photography-%'"), 2);
   } finally { db.close(); }
 });
 
@@ -143,7 +145,7 @@ test("legacy 238-sentence databases without an initial seed marker remain unchan
     const categories = db.prepare("SELECT * FROM categories ORDER BY id").all();
     const revisions = db.prepare("SELECT * FROM item_revisions ORDER BY id").all();
     db.prepare("DELETE FROM app_meta WHERE key IN ('initial_seed_completed', 'initial_seed_checksum')").run();
-    assert.deepEqual(migrateAndSeed(db, SOURCE), { categoriesInserted: 0, itemsInserted: 0, words: 850, sentences: 238 });
+    assert.deepEqual(migratePreCet4Fixture(db, SOURCE), { categoriesInserted: 0, itemsInserted: 0, words: 850, sentences: 238 });
     assert.deepEqual(db.prepare("SELECT * FROM items ORDER BY id").all(), items);
     assert.deepEqual(db.prepare("SELECT * FROM categories ORDER BY id").all(), categories);
     assert.deepEqual(db.prepare("SELECT * FROM item_revisions ORDER BY id").all(), revisions);
@@ -215,7 +217,7 @@ test("MD-imported bar categories and phrases preserve original IDs and history a
     assert.deepEqual(batch.json().items.map((item: { english: string }) => item.english), EXPECTED_ENGLISH);
     const importedItems = db.prepare("SELECT * FROM items WHERE item_key LIKE 'md-%' ORDER BY id").all();
     const beforeRestart = snapshot(db);
-    assert.deepEqual(migrateAndSeed(db, SOURCE), { categoriesInserted: 0, itemsInserted: 0, words: 850, sentences: 270 });
+    assert.deepEqual(migratePreCet4Fixture(db, SOURCE), { categoriesInserted: 0, itemsInserted: 0, words: 850, sentences: 270 });
     assert.equal(snapshot(db), beforeRestart);
     const retry = await app.inject({ method: "POST", url: "/api/admin/markdown-imports/commit", headers, payload: commitPayload });
     assert.equal(retry.statusCode, 200, retry.body);

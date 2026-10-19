@@ -93,6 +93,7 @@ for required_path in \
   web/dist/sw.js \
   basic-english-850.md \
   daily-english-high-frequency-sentences.md \
+  cet4-writing.json \
   release.json; do
   [[ -e "${incoming}/${required_path}" ]] || die "incoming release is missing ${required_path}"
 done
@@ -171,6 +172,7 @@ trap 'exit 143' TERM
 /usr/bin/cp -a -- "${incoming}/web/dist" "$staging_dir/web/dist"
 /usr/bin/install -m 0640 -o root -g englishapp "${incoming}/basic-english-850.md" "$staging_dir/basic-english-850.md"
 /usr/bin/install -m 0640 -o root -g englishapp "${incoming}/daily-english-high-frequency-sentences.md" "$staging_dir/daily-english-high-frequency-sentences.md"
+/usr/bin/install -m 0640 -o root -g englishapp "${incoming}/cet4-writing.json" "$staging_dir/cet4-writing.json"
 /usr/bin/install -m 0600 -o root -g root "${incoming}/release.json" "$staging_dir/release.json"
 
 while IFS= read -r -d '' link_path; do
@@ -191,12 +193,13 @@ done < <(/usr/bin/find "$staging_dir" -type l -print0)
 /usr/bin/chown -R root:caddy "$staging_dir/web"
 /usr/bin/find "$staging_dir/web" -type d -exec /usr/bin/chmod 0750 {} +
 /usr/bin/find "$staging_dir/web" -type f -exec /usr/bin/chmod 0640 {} +
-/usr/bin/chown root:englishapp "$staging_dir/basic-english-850.md" "$staging_dir/daily-english-high-frequency-sentences.md"
-/usr/bin/chmod 0640 "$staging_dir/basic-english-850.md" "$staging_dir/daily-english-high-frequency-sentences.md"
+/usr/bin/chown root:englishapp "$staging_dir/basic-english-850.md" "$staging_dir/daily-english-high-frequency-sentences.md" "$staging_dir/cet4-writing.json"
+/usr/bin/chmod 0640 "$staging_dir/basic-english-850.md" "$staging_dir/daily-english-high-frequency-sentences.md" "$staging_dir/cet4-writing.json"
 /usr/bin/mv -T -- "$staging_dir" "$release_dir"
 
 # Verify effective identities, not just numeric modes, before the release can become current.
 "$RUNUSER" --user englishapp -- /usr/bin/test -r "${release_dir}/server/dist/index.js" || die "API account cannot read server release"
+"$RUNUSER" --user englishapp -- /usr/bin/test -r "${release_dir}/cet4-writing.json" || die "API account cannot read writing content"
 if "$RUNUSER" --user englishapp -- /usr/bin/test -r "${release_dir}/web/dist/index.html"; then
   die "API account unexpectedly reads Caddy-only Web assets"
 fi

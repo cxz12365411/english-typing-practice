@@ -3,6 +3,8 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { expect, test, type Page } from "@playwright/test";
 
+const totalSentences = 270 + require("../cet4-writing.js").parse(JSON.parse(readFileSync("cet4-writing.json", "utf8"))).items.length;
+
 const INITIAL_ADMIN_PASSWORD = "E2eInitialAdmin!2026";
 const ADMIN_PASSWORD = "E2eChangedAdmin!2026";
 const LEARNER_PASSWORD = "E2eChangedLearner!2026";
@@ -87,8 +89,8 @@ test.describe.serial("multi-user application", () => {
     await login(page, "learner1", learnerTemporaryPassword);
     await changeForcedPassword(page, learnerTemporaryPassword, LEARNER_PASSWORD);
     await expect(page).toHaveURL(/\/practice$/);
-    await expect(page.getByText(/已载入 850 个单词，270 条句型/)).toBeVisible();
-    await expect(page.locator("#categorySelect option")).toHaveCount(27);
+    await expect(page.getByText(`已载入 850 个单词，${totalSentences} 条句型`)).toBeVisible();
+    await expect(page.locator("#categorySelect option")).toHaveCount(41);
 
     await expect(page.locator("#legacyBanner")).toBeVisible();
     await page.getByRole("button", { name: "确认导入" }).click();
@@ -322,7 +324,7 @@ test.describe.serial("multi-user application", () => {
     await form.locator('[name="code"]').fill(code);
     await form.getByRole("button", { name: "登录", exact: true }).click();
     await expect(page).toHaveURL(/\/practice$/);
-    await expect(page.getByText(/已载入 850 个单词，270 条句型/)).toBeVisible();
+    await expect(page.getByText(`已载入 850 个单词，${totalSentences} 条句型`)).toBeVisible();
   });
 
   test("email verification code resets a password and revokes the old password", async ({ page }) => {
