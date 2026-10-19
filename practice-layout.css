@@ -1,0 +1,183 @@
+/* Shared by the standalone pages and the account practice route. */
+.app.practice-layout, .app-shell.practice-layout {
+  position: relative;
+  width: var(--practice-layout-width, calc(100% - 32px));
+  max-width: calc(100% - 20px);
+  margin-inline: auto;
+}
+
+.practice-layout .workbench, .practice-layout .practice-grid {
+  grid-template-columns: minmax(0, 1fr) 12px var(--practice-side-width, 300px);
+}
+
+.practice-layout :is(.main, .practice-main, .side, .practice-side, .control, .field, .toggle, .toggle-group, .actions, .practice-actions, .speech-options, .stats, select) {
+  min-width: 0;
+}
+
+.practice-layout :is(.side, .practice-side) {
+  border-left: 0;
+  overflow-wrap: anywhere;
+}
+
+.practice-layout :is(.toggle-group, .actions, .practice-actions) {
+  flex-wrap: wrap;
+}
+
+.practice-layout .progress-meta {
+  flex-wrap: wrap;
+}
+
+.layout-tools {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 8px 14px;
+  margin: 0 0 12px;
+  color: var(--muted, #62665f);
+  font-size: 12px;
+}
+
+.layout-tools button {
+  padding: 6px 10px;
+  border: 1px solid var(--line, #d9d7ce);
+  border-radius: 6px;
+  color: var(--ink, #202124);
+  background: var(--panel, white);
+  cursor: pointer;
+  font: inherit;
+}
+
+.layout-edge, .layout-divider {
+  padding: 0;
+  border: 0;
+  cursor: col-resize;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.layout-edge {
+  position: absolute;
+  z-index: 2;
+  top: 24px;
+  bottom: 36px;
+  width: 14px;
+  border-radius: 6px;
+  background: transparent;
+}
+
+.layout-edge-left { left: -14px; }
+.layout-edge-right { right: -14px; }
+
+.layout-edge::after {
+  content: "";
+  display: block;
+  position: sticky;
+  top: calc(50vh - 32px);
+  margin-left: 5px;
+  width: 4px;
+  height: 64px;
+  border-radius: 4px;
+  background: var(--line-strong, #bbb8ad);
+}
+
+.layout-divider {
+  position: relative;
+  align-self: stretch;
+  background: #f3f2ec;
+  border-inline: 1px solid var(--line, #d9d7ce);
+}
+
+.layout-divider::after {
+  content: "";
+  display: block;
+  position: sticky;
+  top: calc(50vh - 24px);
+  margin-left: 3px;
+  width: 4px;
+  height: 48px;
+  border-radius: 4px;
+  background: var(--line-strong, #bbb8ad);
+}
+
+.layout-edge:hover, .layout-divider:hover {
+  background: var(--green-soft, #e4f4eb);
+}
+
+.layout-edge:focus-visible, .layout-divider:focus-visible, .layout-tools button:focus-visible {
+  outline: 2px solid var(--blue, #2667a8);
+  outline-offset: -2px;
+}
+
+.practice-layout-dragging, .practice-layout-dragging * {
+  cursor: col-resize !important;
+  user-select: none !important;
+  -webkit-user-select: none !important;
+}
+
+.practice-layout.layout-compact :is(.controls, .practice-controls) {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.practice-layout.layout-stacked :is(.workbench, .practice-grid) {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.practice-layout.layout-stacked :is(.side, .practice-side) {
+  border-top: 1px solid var(--line, #d9d7ce);
+}
+
+.practice-layout.layout-stacked :is(.topbar, .page-title, .app-header) {
+  flex-direction: column;
+  align-items: stretch;
+}
+
+.practice-layout.layout-stacked .header-actions {
+  justify-content: space-between;
+}
+
+.practice-layout.layout-stacked .user-chip {
+  border-left: 0;
+  margin-left: 0;
+  padding-left: 0;
+}
+
+.practice-layout.layout-stacked .speech-options {
+  grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+}
+
+.practice-layout.layout-small :is(.controls, .practice-controls, .speech-options) {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.practice-layout.layout-small .stats {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.practice-layout.layout-small :is(.main, .practice-main) {
+  padding: 20px;
+}
+
+.practice-layout.layout-small :is(.actions, .practice-actions) .btn {
+  flex: 1;
+}
+
+.practice-layout:not(.layout-desktop) .layout-edge,
+.practice-layout.layout-stacked .layout-divider,
+.practice-layout [data-layout-handle][hidden] {
+  display: none;
+}
+
+@media (max-width: 920px) {
+  /* Apply immediately during window resizing, before the observer's next frame. */
+  .practice-layout [data-layout-handle] { display: none; }
+  .practice-layout :is(.workbench, .practice-grid) {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .practice-layout :is(.side, .practice-side) {
+    border-top: 1px solid var(--line, #d9d7ce);
+  }
+  .layout-tools { justify-content: flex-start; }
+  .layout-tools span { display: none; }
+}

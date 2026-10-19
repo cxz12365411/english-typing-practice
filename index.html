@@ -519,6 +519,7 @@
     }
   </style>
   <link id="alignmentStyles" rel="stylesheet" href="alignment.css?v=20261018-1">
+  <link rel="stylesheet" href="practice-layout.css?v=20261019-1">
   <link rel="stylesheet" href="cet4-writing.css?v=20261019-1">
 </head>
 <body>
@@ -536,6 +537,7 @@
       </section>
     </header>
 
+    <div id="layoutControls"></div>
     <main class="practice" id="practice" hidden>
       <section class="controls" aria-label="练习设置">
         <div class="control">
@@ -631,8 +633,16 @@
   </div>
 
   <script src="alignment.js?v=20261018-1"></script>
+  <script src="practice-layout.js?v=20261019-1"></script>
   <script src="cet4-writing.js?v=20261019-1"></script>
   <script>
+    window.PracticeLayout?.create({
+      shell: document.querySelector(".app"),
+      grid: document.querySelector(".workbench"),
+      main: document.querySelector(".main"),
+      side: document.querySelector(".side"),
+      toolbarHost: document.querySelector("#layoutControls")
+    });
     const els = {
       loadStatus: document.querySelector("#loadStatus"),
       practice: document.querySelector("#practice"),

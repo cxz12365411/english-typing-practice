@@ -178,6 +178,20 @@ See [the bar-social sync notes](docs/content-sync-2026-10-13.md). Existing accou
 receive the additions through the ordinary administrator Markdown import, not a
 new automatic content patch or database migration.
 
+## Adjustable practice layout
+
+Both practice sites fill the available window by default. Drag either outside edge
+to resize the centered page, or drag the divider next to the mistake notebook to
+give the exercise more room. Focus a handle and use the left/right arrow keys for
+16px adjustments. “恢复默认布局” restores the full width and a 300px notebook.
+The current browser remembers these settings separately on each site's origin.
+
+The shared `practice-layout.js`/`practice-layout.css` use the actual container width
+for responsive controls and columns. Narrow windows automatically stack the
+notebook without overwriting the saved desktop width. Resizing only changes layout;
+it does not rebuild the question or submit/reset the answer. Account routes clean
+up the controller when leaving practice. No API or database changes are required.
+
 ## CET-4 writing practice
 
 `cet4-writing.json` is the shared source for 10 original reference essays and

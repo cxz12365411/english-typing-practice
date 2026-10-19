@@ -1,5 +1,6 @@
 import { createPracticeAlignment } from "./alignment";
 import { createWritingPreview } from "./cet4-writing";
+import { createPracticeLayout } from "./practice-layout";
 import { createSpeechController, speechSettingsMarkup } from "./speech";
 import { ApiError, api } from "./api";
 import { practiceBatchId } from "./routes";
@@ -97,6 +98,7 @@ let state: PracticeState | null = null;
 let renderGeneration = 0;
 let alignmentController: ReturnType<typeof createPracticeAlignment> | null = null;
 let writingController: ReturnType<typeof createWritingPreview> | null = null;
+let layoutController: ReturnType<typeof createPracticeLayout> | null = null;
 let speechController: ReturnType<typeof createSpeechController> | null = null;
 
 function isActive(activeState: PracticeState): boolean {
@@ -239,6 +241,7 @@ function practiceMarkup(
       </div>
     </section>
 
+    <div id="layoutControls"></div>
     <main class="panel practice-card">
       <section class="practice-controls" aria-label="练习设置">
         <label class="field">
@@ -1203,6 +1206,7 @@ export async function renderPractice(context: PageContext): Promise<void> {
       state.unavailableCount
     ), "/practice");
     mustElement<HTMLElement>("#legacyCount").textContent = String(legacyKeys.length);
+    layoutController = createPracticeLayout();
     const activeState = state;
     alignmentController = createPracticeAlignment({ isActive: () => isActive(activeState), onDataReady: renderPrompt });
     writingController = createWritingPreview({ isActive: () => isActive(activeState), onDataReady: renderPrompt });
@@ -1229,6 +1233,8 @@ export async function renderPractice(context: PageContext): Promise<void> {
 
 export function disposePractice(): void {
   renderGeneration += 1;
+  layoutController?.destroy();
+  layoutController = null;
   if (!state) return;
   state.disposed = true;
   window.removeEventListener("online", onOnline);
