@@ -517,10 +517,15 @@
     .alignment-arrows[hidden] {
       display: none;
     }
+    .home-demo { margin: 0 0 20px; border: 1px solid var(--line); border-radius: 16px; background: #fff; }
+    .home-demo > summary { cursor: pointer; padding: 14px 18px; color: #315c4f; font-size: 14px; font-weight: 600; }
+    .home-demo > summary:focus-visible { outline: 2px solid var(--blue); outline-offset: 3px; }
+    .home-demo-body { width: min(720px, 100%); padding: 0 16px 16px; margin: auto; }
   </style>
   <link id="alignmentStyles" rel="stylesheet" href="alignment.css?v=20261018-1">
   <link rel="stylesheet" href="practice-layout.css?v=20261019-1">
   <link rel="stylesheet" href="cet4-writing.css?v=20261019-1">
+  <link rel="stylesheet" href="login-promo.css?v=20261027-1">
 </head>
 <body>
   <div class="app">
@@ -538,6 +543,10 @@
       </section>
     </header>
 
+    <details class="home-demo" id="homePromoDetails">
+      <summary>8秒，认识你的英语练习</summary>
+      <div class="home-demo-body"><div id="homePromo"><p>中文箭头联想 · 中文谐音助记 · 逐句打字练习</p></div></div>
+    </details>
     <div id="layoutControls"></div>
     <main class="practice" id="practice" hidden>
       <section class="controls" aria-label="练习设置">
@@ -633,6 +642,19 @@
     </main>
   </div>
 
+  <script src="login-promo.js?v=20261027-1"></script>
+  <script>
+    (() => {
+      const details = document.querySelector("#homePromoDetails");
+      let promo = null;
+      details.addEventListener("toggle", () => {
+        if (details.open) {
+          if (!promo) promo = window.PracticePromo?.create(document.querySelector("#homePromo"));
+          else if (document.querySelector("#homePromo").dataset.promoStatus === "paused") promo.play();
+        } else promo?.pause();
+      });
+    })();
+  </script>
   <script src="alignment.js?v=20261027-1"></script>
   <script src="practice-layout.js?v=20261019-1"></script>
   <script src="cet4-writing.js?v=20261019-1"></script>
