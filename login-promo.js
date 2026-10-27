@@ -7,9 +7,8 @@
 
   function markup(id) {
     return `
-      <section class="practice-promo" aria-label="8 秒功能演示">
-        <p class="promo-sr-only">打字时，英文词组通过箭头连接对应中文。Would like 合译为愿意，you 对应你。中文谐音可辅助记忆，例如 memory，记忆，谐音梅默伊。谐音帮助记忆，发音请听朗读。此演示无声音，可暂停或重新播放。</p>
-        <div class="promo-topline" aria-hidden="true"><span><i></i> ENGLISH, CONNECTED.</span><span>8 秒 · 产品演示</span></div>
+      <section class="practice-promo" role="button" tabindex="0" aria-label="暂停演示" aria-describedby="${id}-description">
+        <p id="${id}-description" class="promo-sr-only">打字时，英文词组通过箭头连接对应中文。Would like 合译为愿意，you 对应你。中文谐音可辅助记忆，例如 memory，记忆，谐音梅默伊。谐音帮助记忆，发音请听朗读。此演示无声音，点击画面或按空格、回车可暂停、继续，结束后可重播。</p>
         <div class="promo-view" aria-hidden="true">
           <div class="promo-light promo-light-one"></div><div class="promo-light promo-light-two"></div>
           <div class="promo-scene promo-hook" data-promo-scene="hook">
@@ -57,10 +56,6 @@
             <p class="promo-finish-note">把每一次输入，变成一次记忆。</p>
           </div>
         </div>
-        <div class="promo-bottomline">
-          <div class="promo-playback"><button type="button" class="promo-toggle" data-promo-toggle aria-label="暂停演示"><span data-promo-icon aria-hidden="true">Ⅱ</span><span data-promo-control-text>暂停</span></button><button type="button" class="promo-replay" data-promo-replay aria-label="重新播放演示" title="重新播放演示">↻</button></div>
-          <div class="promo-timeline" aria-hidden="true"><span class="promo-track"><i data-promo-progress></i></span><span class="promo-time" data-promo-time>0:00 / 0:08</span></div>
-        </div>
       </section>`;
   }
 
@@ -70,12 +65,6 @@
     host.classList.add("practice-promo-host");
     host.dataset.promoDuration = String(duration);
     const view = host.querySelector(".practice-promo");
-    const toggle = host.querySelector("[data-promo-toggle]");
-    const replay = host.querySelector("[data-promo-replay]");
-    const controlText = host.querySelector("[data-promo-control-text]");
-    const icon = host.querySelector("[data-promo-icon]");
-    const progress = host.querySelector("[data-promo-progress]");
-    const time = host.querySelector("[data-promo-time]");
     const input = host.querySelector("[data-promo-input]");
     const note = host.querySelector("[data-promo-note]");
     const groupNodes = [...host.querySelectorAll("[data-promo-group]")];
@@ -105,13 +94,9 @@
       if (lastStatus !== status) {
         host.dataset.promoStatus = view.dataset.status = status;
         const label = status === "playing" ? "暂停" : status === "finished" ? "重播" : elapsed > 0 ? "继续" : "播放";
-        toggle.setAttribute("aria-label", label + "演示");
-        controlText.textContent = label;
-        icon.textContent = status === "playing" ? "Ⅱ" : "▶";
+        view.setAttribute("aria-label", label + "演示");
         lastStatus = status;
       }
-      progress.style.transform = `scaleX(${elapsed / duration})`;
-      time.textContent = `0:0${Math.min(8, Math.floor(elapsed / 1000))} / 0:08`;
       view.style.setProperty("--promo-float", `${Math.sin(elapsed / 1600) * 16}px`);
       if (stage === "arrows") {
         const local = elapsed - 1200;
@@ -175,14 +160,18 @@
     }
 
     function onToggle() { if (running || requested && elapsed < duration) pause(); else play(); }
-    function onReplay() { elapsed = 0; lastGroup = ""; requested = true; reconcile(); }
+    function onKeyDown(event) {
+      if (event.key !== " " && event.key !== "Enter") return;
+      event.preventDefault();
+      if (!event.repeat) onToggle();
+    }
     function onMotionChange() {
       reduced = !!media?.matches;
       if (reduced) { elapsed = duration; requested = false; }
       reconcile();
     }
-    toggle.addEventListener("click", onToggle);
-    replay.addEventListener("click", onReplay);
+    view.addEventListener("click", onToggle);
+    view.addEventListener("keydown", onKeyDown);
     document.addEventListener("visibilitychange", reconcile);
     media?.addEventListener?.("change", onMotionChange);
     const observer = typeof IntersectionObserver !== "undefined" ? new IntersectionObserver(entries => {
@@ -201,8 +190,8 @@
         requested = false;
         stopFrame();
         observer?.disconnect();
-        toggle.removeEventListener("click", onToggle);
-        replay.removeEventListener("click", onReplay);
+        view.removeEventListener("click", onToggle);
+        view.removeEventListener("keydown", onKeyDown);
         document.removeEventListener("visibilitychange", reconcile);
         media?.removeEventListener?.("change", onMotionChange);
         host.dataset.promoStatus = "destroyed";
