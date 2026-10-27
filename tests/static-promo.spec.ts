@@ -30,6 +30,8 @@ for (const entry of ["/index.html", "/typing-practice.html"]) {
     await page.locator("#answerInput").fill("co");
     const original = await page.locator("#targetWord").textContent();
     await details.locator("summary").click();
+    await expect(promo.locator(".promo-topline, .promo-bottomline, button")).toHaveCount(0);
+    await expect(promo.getByRole("button", { name: "暂停演示", exact: true })).toHaveAttribute("tabindex", "0");
     await expect(promo).toHaveAttribute("data-promo-duration", "8000");
     await expect(promo).toHaveAttribute("data-promo-status", "playing");
     await page.clock.runFor(1800);
@@ -50,16 +52,17 @@ test("the demo finishes once at eight seconds and can be replayed using the keyb
   await openPractice(page);
   await page.locator("#homePromoDetails summary").click();
   const promo = page.locator("#homePromo");
+  const card = promo.locator(".practice-promo");
   await expect(promo).toHaveAttribute("data-promo-status", "playing");
-  await promo.locator("[data-promo-replay]").click();
   await page.bringToFront();
   await page.clock.runFor(8100);
   await expect(promo).toHaveAttribute("data-promo-elapsed", "8000");
   await expect(promo).toHaveAttribute("data-promo-stage", "finish");
   await expect(promo).toHaveAttribute("data-promo-status", "finished");
+  await expect(card).toHaveAttribute("aria-label", "重播演示");
   await page.clock.runFor(5000);
   await expect(promo).toHaveAttribute("data-promo-elapsed", "8000");
-  await promo.locator("[data-promo-toggle]").focus();
+  await card.focus();
   await page.keyboard.press("Enter");
   await expect(promo).toHaveAttribute("data-promo-status", "playing");
   await page.clock.runFor(1500);
@@ -81,7 +84,7 @@ test("375px static demo fits inside the page and respects reduced motion", async
   const box = await promo.boundingBox();
   expect(box!.x).toBeGreaterThanOrEqual(0);
   expect(box!.x + box!.width).toBeLessThanOrEqual(375);
-  await promo.locator("[data-promo-toggle]").click();
+  await promo.getByRole("button", { name: "重播演示", exact: true }).click();
   await page.clock.runFor(5000);
   await expect(promo).toHaveAttribute("data-promo-stage", "mnemonic");
   await expect(promo).toContainText("梅默伊");

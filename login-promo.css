@@ -19,11 +19,13 @@
   box-shadow: 0 24px 80px -40px rgba(35, 69, 96, .25), inset 0 0 0 1px rgba(39, 64, 84, .035);
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
   -webkit-font-smoothing: antialiased;
+  cursor: pointer;
+  touch-action: manipulation;
 }
 
 .practice-promo *, .practice-promo *::before, .practice-promo *::after { box-sizing: border-box; }
 .practice-promo p, .practice-promo h2 { margin: 0; }
-.practice-promo button { font: inherit; }
+.practice-promo:focus-visible { outline: 2px solid #2678d8; outline-offset: 4px; }
 .practice-promo .promo-sr-only {
   position: absolute;
   width: 1px;
@@ -36,25 +38,7 @@
   border: 0;
 }
 
-.practice-promo .promo-topline, .practice-promo .promo-bottomline {
-  position: relative;
-  z-index: 2;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  padding: 22px 28px 0;
-}
-.practice-promo .promo-topline {
-  color: #69747f;
-  font-size: 10px;
-  font-weight: 650;
-  letter-spacing: 1.25px;
-}
-.practice-promo .promo-topline > span { display: inline-flex; align-items: center; gap: 7px; white-space: nowrap; }
-.practice-promo .promo-topline > span:last-child { letter-spacing: .3px; font-weight: 500; }
-.practice-promo .promo-topline i { width: 6px; height: 6px; border-radius: 100%; background: #348d80; box-shadow: 0 0 0 4px #348d800c; }
-.practice-promo .promo-view { position: relative; aspect-ratio: 1.65; min-height: 310px; }
+.practice-promo .promo-view { position: relative; width: 100%; aspect-ratio: 1.65; min-height: 390px; }
 .practice-promo .promo-light { position: absolute; pointer-events: none; border-radius: 50%; filter: blur(35px); opacity: .55; transform: translateY(var(--promo-float)); }
 .practice-promo .promo-light-one { width: 45%; height: 75%; left: 0; top: 0; background: radial-gradient(ellipse, #d7eaff 0%, #deedff00 72%); }
 .practice-promo .promo-light-two { width: 45%; height: 70%; right: -8%; bottom: -10%; background: radial-gradient(ellipse, #dbf2e9 0%, #def6eb00 72%); }
@@ -100,23 +84,9 @@
 .practice-promo .promo-feature-list { display: flex; flex-wrap: wrap; justify-content: center; gap: 7px; margin-top: 25px; }
 .practice-promo .promo-feature-list span { padding: 7px 12px; border: 1px solid #e0e8ed; border-radius: 99px; background: #ffffff90; color: #5b7380; font-size: 10px; white-space: nowrap; }
 .practice-promo .promo-finish-note { margin-top: 17px; color: #7b858d; font-size: 11px; }
-.practice-promo .promo-bottomline { gap: 20px; padding: 0 25px 20px; }
-.practice-promo .promo-playback { display: flex; align-items: center; gap: 7px; }
-.practice-promo .promo-toggle, .practice-promo .promo-replay { display: inline-flex; align-items: center; justify-content: center; min-height: 36px; border: 1px solid #dde5eb; border-radius: 99px; background: #ffffffa6; color: #536b7b; cursor: pointer; font-size: 11px; transition: background .2s, border-color .2s; }
-.practice-promo .promo-toggle { gap: 7px; padding: 0 13px; min-width: 72px; }
-.practice-promo [data-promo-icon] { width: 11px; font-size: 10px; }
-.practice-promo .promo-replay { width: 36px; padding: 0; font-size: 20px; }
-.practice-promo .promo-toggle:hover, .practice-promo .promo-replay:hover { border-color: #b4ccdc; background: white; }
-.practice-promo button:focus-visible { outline: 2px solid #2678d8; outline-offset: 3px; box-shadow: none; }
-.practice-promo .promo-timeline { display: flex; align-items: center; justify-content: flex-end; gap: 13px; flex: 1; min-width: 0; }
-.practice-promo .promo-track { display: block; width: 100%; max-width: 150px; height: 3px; border-radius: 3px; background: #dee6eb; overflow: hidden; }
-.practice-promo .promo-track i { display: block; height: 100%; transform: scaleX(0); transform-origin: left; background: linear-gradient(90deg, #3b86c9, #269b81); }
-.practice-promo .promo-time { flex-shrink: 0; font-variant-numeric: tabular-nums; color: #7b8994; font-size: 10px; }
-
 @container (max-width: 420px) {
   .practice-promo { border-radius: 21px; }
-  .practice-promo .promo-topline { padding: 18px 18px 0; font-size: 8px; letter-spacing: .8px; }
-  .practice-promo .promo-view { min-height: 275px; }
+  .practice-promo .promo-view { min-height: 300px; }
   .practice-promo .promo-scene { padding: 22px 18px; }
   .practice-promo .promo-scene-heading { margin-bottom: 15px; gap: 8px; }
   .practice-promo .promo-scene-index { width: 24px; height: 24px; }
@@ -126,8 +96,6 @@
   .practice-promo .promo-group-note { margin-top: 11px; font-size: 8px; }
   .practice-promo .promo-memory-clue { padding: 10px 16px; gap: 14px; margin-top: 18px; }
   .practice-promo .promo-memory-clue strong { font-size: 23px; }
-  .practice-promo .promo-bottomline { padding: 0 18px 17px; gap: 16px; }
-  .practice-promo .promo-timeline { gap: 8px; }
   .practice-promo .promo-headline { letter-spacing: -1.3px; }
   .practice-promo .promo-feature-list { gap: 5px; margin-top: 21px; }
   .practice-promo .promo-feature-list span { padding: 6px 9px; font-size: 9px; }

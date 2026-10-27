@@ -56,7 +56,10 @@ test("login demo runs eight seconds, presents both learning aids and stops witho
   const promo = page.locator("#loginPromo");
   await expect(promo).toHaveAttribute("data-promo-status", "playing");
   await expect(promo).toHaveAttribute("data-promo-duration", "8000");
-  await promo.locator("[data-promo-replay]").click();
+  await expect(promo.locator(".promo-topline, .promo-bottomline, button")).toHaveCount(0);
+  await expect(promo).not.toContainText("ENGLISH, CONNECTED.");
+  await expect(promo).not.toContainText("8 秒 · 产品演示");
+  await expect(promo.getByRole("button", { name: "暂停演示", exact: true })).toHaveAttribute("tabindex", "0");
   await page.clock.runFor(2000);
   await expect(promo).toHaveAttribute("data-promo-stage", "arrows");
   await expect(promo).toContainText("Would");
@@ -82,6 +85,7 @@ test("pause, keyboard resume and replay leave typed credentials untouched", asyn
   const requests = await mockLogin(page);
   await page.goto("/login");
   const promo = page.locator("#loginPromo");
+  const card = promo.locator(".practice-promo");
   const username = page.locator('#passwordLoginForm [name="username"]');
   const password = page.locator('#passwordLoginForm [name="password"]');
   await expect(promo).toHaveAttribute("data-promo-status", "playing");
@@ -89,16 +93,22 @@ test("pause, keyboard resume and replay leave typed credentials untouched", asyn
   await password.fill("LocalOnlyDraft!2026");
   await page.clock.runFor(1800);
   await expect(password).toBeFocused();
-  await promo.locator("[data-promo-toggle]").click();
+  await card.click();
   await expect(promo).toHaveAttribute("data-promo-status", "paused");
+  await expect(card).toHaveAttribute("aria-label", "继续演示");
   const elapsed = await promo.getAttribute("data-promo-elapsed");
   await page.clock.runFor(3000);
   await expect(promo).toHaveAttribute("data-promo-elapsed", elapsed!);
-  await promo.locator("[data-promo-toggle]").press("Enter");
+  const scrollY = await page.evaluate(() => window.scrollY);
+  await card.press("Space");
   await expect(promo).toHaveAttribute("data-promo-status", "playing");
+  expect(await page.evaluate(() => window.scrollY)).toBe(scrollY);
   await page.clock.runFor(500);
   expect(Number(await promo.getAttribute("data-promo-elapsed"))).toBeGreaterThan(Number(elapsed));
-  await promo.locator("[data-promo-replay]").click();
+  await page.clock.runFor(6000);
+  await expect(promo).toHaveAttribute("data-promo-status", "finished");
+  await expect(card).toHaveAttribute("aria-label", "重播演示");
+  await card.press("Enter");
   await expect(promo).toHaveAttribute("data-promo-stage", "hook");
   await expect(username).toHaveValue("draft.learner");
   await expect(password).toHaveValue("LocalOnlyDraft!2026");
@@ -146,10 +156,19 @@ test("375px login remains usable with a static reduced-motion poster and optiona
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
   await expect(page.locator('#passwordLoginForm [name="username"]')).toBeVisible();
   await expect(page.locator('#passwordLoginForm [name="password"]')).toBeVisible();
-  await promo.locator("[data-promo-toggle]").click();
+  await promo.getByRole("button", { name: "重播演示", exact: true }).click();
   await page.clock.runFor(5200);
   await expect(promo).toHaveAttribute("data-promo-stage", "mnemonic");
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+  const clipped = await promo.evaluate(host => {
+    const bounds = host.getBoundingClientRect();
+    return [...host.querySelectorAll<HTMLElement>(".practice-promo, .promo-view, .promo-mnemonic, .promo-memory-word, .promo-memory-clue")]
+      .map(element => {
+        const rect = element.getBoundingClientRect();
+        return { element: element.className, left: rect.left, right: rect.right, width: rect.width, scrollLeft: element.scrollLeft };
+      }).filter(rect => rect.left < bounds.left - 1 || rect.right > bounds.right + 1);
+  });
+  expect(clipped, "the mnemonic must remain inside the visible card, not be clipped by overflow:hidden").toEqual([]);
   mkdirSync("out", { recursive: true });
   await page.screenshot({ path: "out/login-promo-account-mobile.png", fullPage: true, animations: "disabled" });
 });
