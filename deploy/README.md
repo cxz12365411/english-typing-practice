@@ -350,15 +350,17 @@ On the first-release rollback, the saved Caddyfile points back to the untouched
 reload. If a legacy English hostname occurs in a shared multi-host Caddy block, the
 activation refuses to edit it and requires a deliberate manual split.
 
-## Keep GitHub Pages and the account site synchronized
+## Publish to Aliyun; keep GitHub Pages disabled
 
-The user requested both sites remain available and receive public feature/content
-updates together. Follow the project AGENTS.md release agreement. Do not disable
-Pages as part of account-site acceptance.
+On 2026-10-27, the user requested closure of every GitHub-hosted typing website
+entrance. This supersedes the earlier dual-site release agreement. Follow the
+current project AGENTS.md: keep the source repository and history, but do not
+re-enable GitHub Pages or deploy the historical `codex/static-pages` branch.
 
-Publish the standalone entries and their public assets on `codex/static-pages`,
-retaining the account-site navigation link. Publish account source changes on
-`main`, then stage and promote the exact tested commit using the steps above.
+Publish source changes on `main`, then stage and promote the exact tested account
+commit using the steps above. Standalone entries remain local regression fixtures.
 CET-4 releases require `cet4-writing.json` in both the staging and final release
-root, in addition to the Vite-bundled preview asset. Verify each public site after
-its deployment; private accounts, imports, and learning records stay on Aliyun.
+root, in addition to the Vite-bundled preview asset. Verify the Aliyun site after
+deployment; private accounts, imports, and learning records stay on Aliyun.
+Historical content-sync notes describe former Pages releases, not permission to
+restore them. Reopening Pages requires a new explicit request from the user.

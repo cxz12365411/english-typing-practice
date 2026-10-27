@@ -3,6 +3,14 @@
 A multi-user English typing practice application with synchronized progress, an
 administrator console, content publishing, and an installable PWA shell.
 
+## Live website
+
+Use the [Aliyun account site](https://english-47-120-37-63.sslip.io/login).
+At the owner's request, all GitHub Pages website entrances were disabled on
+2026-10-27. GitHub retains the source and history; standalone HTML files remain
+available for local development and regression checks. Do not deploy
+`codex/static-pages` or re-enable Pages without a new explicit request.
+
 ## Applications
 
 - `/login` — username/password or email-code sign-in, email registration, and
@@ -77,9 +85,8 @@ If a saved voice disappears, a recommended voice is used until it returns.
 Run `npm run test:static` for the standalone regression suite. It uses headless
 Chrome with a simulated speech service to exercise loading, preferences and
 cancellation; actual sound quality still needs listening in the target browser.
-Keep both standalone HTML files identical. GitHub Pages publishes from the
-`codex/static-pages` branch; preserve its account-site navigation banner when
-applying standalone updates from `main`.
+Keep both standalone HTML files identical for local regression checks. GitHub
+Pages is disabled; `codex/static-pages` is retained only as historical source.
 
 ### Eight-second homepage demo
 
@@ -135,8 +142,8 @@ and alignment loading before a new page takes ownership of the controls.
 When editing the corpus, update the matching alignment entry and review its
 meaning. Run `npm run test:static` to check exact coverage, indices, Chinese
 concatenation, DOM geometry, mobile overflow, accessibility interactions, failure
-fallbacks, scoring, mistakes, and speech regressions. Publish all three alignment
-assets alongside both HTML entries on `codex/static-pages`.
+fallbacks, scoring, mistakes, and speech regressions. Keep all three alignment
+assets alongside both HTML entries for local checks; deploy the account build to Aliyun.
 
 ## Markdown imports
 
@@ -151,9 +158,8 @@ sentence-table and street-photography paragraph documents are also supported.
 English/meaning are required; pronunciation is optional. No AI or external API is
 used. Limits are 1 MiB UTF-8 text and 5000 records per import.
 
-See [the import guide](docs/markdown-import.md). GitHub Pages remains a separate
-standalone site; account-site imports are only published there through an explicit,
-reviewed content sync, not automatically.
+See [the import guide](docs/markdown-import.md). Account-site imports and learning
+records stay on the account server. GitHub Pages is closed.
 
 ## Production
 
@@ -183,8 +189,8 @@ See [the initial sync notes](docs/content-sync-2026-09-15.md),
 [the October 32-phrase sync](docs/content-sync-2026-10-10.md).
 
 The October additions were already published to the account site through the
-administrator's Markdown import. This repository update also publishes them to
-the no-login GitHub Pages site and includes them in new-installation seed data.
+administrator's Markdown import. They were also published to the former no-login
+GitHub Pages site and are included in new-installation seed data.
 It does not add a third automatic content patch or re-import existing databases.
 The reusable three-column [32-phrase Markdown](docs/street-photography-extra-32.md)
 contains only public practice content, not accounts or learning records.
@@ -238,5 +244,5 @@ root. New sentence alignments extend the existing `sentence-alignments.json`.
 
 Release acceptance includes the static browser suite, production-build account
 browser suite, server content-upgrade tests, and deployment script tests. Publish
-the public learning content to GitHub Pages and the account site together, keeping
-the Pages account-site link and all private learning data on the account server.
+source updates to `main` and the account build to Aliyun. Keep GitHub Pages disabled
+and all private learning data on the account server.
