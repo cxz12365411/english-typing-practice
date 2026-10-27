@@ -633,7 +633,7 @@
     </main>
   </div>
 
-  <script src="alignment.js?v=20261018-1"></script>
+  <script src="alignment.js?v=20261027-1"></script>
   <script src="practice-layout.js?v=20261019-1"></script>
   <script src="cet4-writing.js?v=20261019-1"></script>
   <script>
@@ -712,6 +712,7 @@
         note: document.querySelector("#alignmentNote")
       })
       : null;
+    alignmentRenderer?.bindInput(els.answerInput);
     try {
       els.showAlignment.checked = localStorage.getItem("basicTypingAlignmentEnabled") !== "false";
     } catch {
@@ -1022,6 +1023,7 @@
     }
 
     function renderLetters() {
+      alignmentRenderer?.syncInput();
       const item = currentWord();
       if (!item) {
         els.letters.innerHTML = "";
@@ -1092,9 +1094,9 @@
       els.answerInput.disabled = false;
       els.nextBtn.disabled = false;
       updateSpeechControls();
+      els.answerInput.value = "";
       renderPrompt(item);
       els.soundText.textContent = item.sound ? `中文谐音：${item.sound}` : "";
-      els.answerInput.value = "";
       els.feedback.textContent = "";
       els.feedback.className = "feedback";
       state.answeredCurrent = false;

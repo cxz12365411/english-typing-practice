@@ -15,6 +15,25 @@
     return JSON.stringify([english, meaning]);
   }
 
+  // Visual progress only: answer validation remains owned by each practice page.
+  function comparable(text) {
+    return text.normalize("NFKC").replace(/[‘’]/g, "'").replace(/[“”]/g, '"')
+      .trimStart().replace(/\s+/g, " ").toLocaleLowerCase("en-US");
+  }
+
+  function typingTokenIndex(english, answer, caret = answer.length) {
+    const tokens = tokenize(english);
+    if (!tokens.length || !answer.trim()) return null;
+    const target = comparable(english);
+    const prefix = comparable(answer.slice(0, Math.max(0, Math.min(answer.length, caret))));
+    let position = 0;
+    // Stop at the first typo before the caret, rather than advancing past an error.
+    while (position < prefix.length && position < target.length && prefix[position] === target[position]) position += 1;
+    // At the end of a word, keep that word lit until its separator is entered.
+    const index = tokens.findIndex(token => comparable(english.slice(0, token.end)).length >= position);
+    return index < 0 ? tokens.length - 1 : index;
+  }
+
   function validateEntry(entry) {
     if (!entry || typeof entry.english !== "string" || typeof entry.meaning !== "string"
       || !Array.isArray(entry.zhParts) || !entry.zhParts.length
@@ -63,6 +82,9 @@
       this.pinned = null;
       this.hovered = null;
       this.focused = null;
+      this.typing = null;
+      this.typingIndex = null;
+      this.inputListeners = [];
       this.destroyed = false;
       this.listeners = [];
       this.listen(this.english, "pointerover", (event) => {
@@ -111,15 +133,57 @@
       this.listeners.push(() => target.removeEventListener(type, listener));
     }
 
+    bindInput(input) {
+      if (this.destroyed || this.input === input) return;
+      this.inputListeners.forEach(remove => remove());
+      this.inputListeners = [];
+      this.input = input;
+      const update = () => {
+        if (document.activeElement === input) this.syncInput({ interacting: !!input.value.trim(), reveal: true });
+      };
+      const onInput = () => this.syncInput({ interacting: true, reveal: true });
+      for (const type of ["input", "focus", "click", "keyup", "select"]) {
+        const listener = type === "input" ? onInput : update;
+        input.addEventListener(type, listener);
+        this.inputListeners.push(() => input.removeEventListener(type, listener));
+      }
+      this.syncInput();
+    }
+
+    syncInput({ interacting = false, reveal = false } = {}) {
+      if (this.destroyed) return;
+      if (interacting) this.pinned = this.hovered = this.focused = null;
+      this.typingIndex = this.entry && this.input
+        ? typingTokenIndex(this.entry.english, this.input.value, this.input.selectionStart ?? this.input.value.length)
+        : null;
+      this.typing = this.typingIndex === null ? null : Number(this.tokenNodes[this.typingIndex].dataset.group);
+      this.highlight();
+      if (reveal) this.revealTypingToken();
+    }
+
+    revealTypingToken() {
+      if (this.typingIndex === null || !this.entry || document.activeElement !== this.input) return;
+      const token = this.tokenNodes[this.typingIndex].getBoundingClientRect();
+      const viewport = this.scroll.getBoundingClientRect();
+      // Move only this diagram's horizontal scrollbar; keep the answer field in view.
+      const padding = 12;
+      if (token.left < viewport.left + padding) this.scroll.scrollLeft += token.left - viewport.left - padding;
+      else if (token.right > viewport.right - padding) this.scroll.scrollLeft += token.right - viewport.right + padding;
+    }
+
     destroy() {
       if (this.destroyed) return;
       this.destroyed = true;
       this.listeners.forEach((remove) => remove());
       this.listeners = [];
+      this.inputListeners.forEach(remove => remove());
+      this.inputListeners = [];
+      this.input = null;
       this.observer?.disconnect();
       if (this.frame !== null) cancelAnimationFrame(this.frame);
       this.frame = null;
       this.entry = null;
+      this.typing = this.typingIndex = null;
       this.entries.clear();
       this.tokenNodes = this.zhNodes = this.paths = [];
     }
@@ -150,6 +214,7 @@
       this.currentKey = nextKey;
       this.entry = null;
       this.pinned = this.hovered = this.focused = null;
+      this.typing = this.typingIndex = null;
       if (this.frame !== null) cancelAnimationFrame(this.frame);
       this.frame = null;
       this.stage.classList.remove("has-alignment", "has-highlight");
@@ -212,7 +277,7 @@
       this.scroll.setAttribute("aria-label", "中英文对应图，可左右滚动查看完整句子");
       this.svg.removeAttribute("hidden");
       this.note.hidden = false;
-      this.highlight();
+      this.syncInput({ reveal: true });
       this.scheduleDraw();
     }
 
@@ -276,7 +341,7 @@
 
     highlight() {
       if (this.destroyed || !this.entry) return;
-      const active = this.hovered ?? this.focused ?? this.pinned;
+      const active = this.hovered ?? this.focused ?? this.typing ?? this.pinned;
       this.stage.classList.toggle("has-highlight", active !== null);
       for (const node of [...this.tokenNodes, ...this.paths]) {
         node.classList.toggle("is-highlighted", Number(node.dataset.group) === active);
@@ -287,17 +352,19 @@
         if (selected) node.style.setProperty("--link-color", colors[active % colors.length]);
       });
       if (active === null) {
-        this.note.textContent = "移到或点击英文词，查看它对应的中文含义。";
+        const hint = "打字时自动高亮对应词组，也可移到或点击英文词查看中文含义。";
+        if (this.note.textContent !== hint) this.note.textContent = hint;
         return;
       }
       const group = this.entry.groups[active];
       const english = runs(group.en).map((part) => this.entry.english.slice(this.tokens[part[0]].start, this.tokens[part[part.length - 1]].end)).join(" … ");
       const chinese = runs(group.zh).map((part) => part.map((index) => this.entry.zhParts[index]).join("")).join(" … ");
-      this.note.textContent = `${english} → ${chinese}${group.note ? `。${group.note}` : ""}`;
+      const note = `${english} → ${chinese}${group.note ? `。${group.note}` : ""}`;
+      if (this.note.textContent !== note) this.note.textContent = note;
     }
   }
 
-  const api = { tokenize, key, validateEntry, create: (elements) => new Renderer(elements) };
+  const api = { tokenize, key, validateEntry, typingTokenIndex, create: (elements) => new Renderer(elements) };
   const commonJS = typeof module !== "undefined" && module.exports;
   if (commonJS) module.exports = api;
   // Bundlers can provide module.exports in a browser too; the SPA still needs this global.
