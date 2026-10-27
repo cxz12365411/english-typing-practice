@@ -121,7 +121,6 @@ function loginMarkup(capabilities: AuthCapabilities): string {
     <main class="login-home">
       <section class="login-story" aria-label="英语打字练习功能演示">
         <div class="login-story-heading">
-          <span class="login-eyebrow">ENGLISH TYPING</span>
           <h2>每一次敲击，<br>都多一份理解。</h2>
           <p>用中文连起词义，用谐音找到记忆线索。</p>
         </div>

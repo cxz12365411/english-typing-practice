@@ -91,9 +91,8 @@ a {
 
 .login-story { min-width: 0; }
 .login-story-heading { margin: 0 0 28px; }
-.login-eyebrow { font-size: 11px; font-weight: 700; letter-spacing: .18em; color: #58716a; }
 .login-story-heading h2 {
-  margin: 14px 0;
+  margin: 0 0 14px;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   font-size: clamp(32px, 3.6vw, 49px);
   line-height: 1.16;
