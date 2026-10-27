@@ -48,7 +48,7 @@ async function freezeClock(page: Page) {
   await page.clock.pauseAt(new Date("2026-10-27T00:00:01Z"));
 }
 
-test("login demo runs eight seconds, presents both learning aids and stops without restarting", async ({ page }) => {
+test("login demo presents both learning aids and keeps playing through three eight-second cycles", async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 1000 });
   await freezeClock(page);
   await mockLogin(page);
@@ -66,20 +66,26 @@ test("login demo runs eight seconds, presents both learning aids and stops witho
   await expect(promo).toContainText("愿意");
   await expect(promo.locator("[data-promo-group].is-active").first()).toBeAttached();
   mkdirSync("out", { recursive: true });
-  await page.screenshot({ path: "out/login-promo-account-desktop-arrows.png", fullPage: true, animations: "disabled" });
+  await page.screenshot({ path: "out/login-promo-loop-account-desktop-arrows.png", fullPage: true, animations: "disabled" });
   await page.clock.runFor(3200);
   await expect(promo).toHaveAttribute("data-promo-stage", "mnemonic");
   await expect(promo).toContainText("memory");
   await expect(promo).toContainText("梅默伊");
-  await page.screenshot({ path: "out/login-promo-account-desktop-mnemonic.png", fullPage: true, animations: "disabled" });
+  await page.screenshot({ path: "out/login-promo-loop-account-desktop-mnemonic.png", fullPage: true, animations: "disabled" });
   await page.clock.runFor(3000);
-  await expect(promo).toHaveAttribute("data-promo-elapsed", "8000");
-  await expect(promo).toHaveAttribute("data-promo-status", "finished");
-  await page.clock.runFor(4000);
-  await expect(promo).toHaveAttribute("data-promo-elapsed", "8000");
+  await expect(promo).toHaveAttribute("data-promo-stage", "hook");
+  await expect(promo).toHaveAttribute("data-promo-status", "playing");
+  expect(Number(await promo.getAttribute("data-promo-elapsed"))).toBeLessThan(500);
+  await page.clock.runFor(1800);
+  await expect(promo).toHaveAttribute("data-promo-stage", "arrows");
+  await page.clock.runFor(3200);
+  await expect(promo).toHaveAttribute("data-promo-stage", "mnemonic");
+  await page.clock.runFor(3000);
+  await expect(promo).toHaveAttribute("data-promo-stage", "hook");
+  await expect(promo).toHaveAttribute("data-promo-status", "playing");
 });
 
-test("pause, keyboard resume and replay leave typed credentials untouched", async ({ page }) => {
+test("pause across multiple cycles and keyboard resume leave typed credentials untouched", async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 1000 });
   await freezeClock(page);
   const requests = await mockLogin(page);
@@ -97,7 +103,7 @@ test("pause, keyboard resume and replay leave typed credentials untouched", asyn
   await expect(promo).toHaveAttribute("data-promo-status", "paused");
   await expect(card).toHaveAttribute("aria-label", "继续演示");
   const elapsed = await promo.getAttribute("data-promo-elapsed");
-  await page.clock.runFor(3000);
+  await page.clock.runFor(17000);
   await expect(promo).toHaveAttribute("data-promo-elapsed", elapsed!);
   const scrollY = await page.evaluate(() => window.scrollY);
   await card.press("Space");
@@ -106,9 +112,8 @@ test("pause, keyboard resume and replay leave typed credentials untouched", asyn
   await page.clock.runFor(500);
   expect(Number(await promo.getAttribute("data-promo-elapsed"))).toBeGreaterThan(Number(elapsed));
   await page.clock.runFor(6000);
-  await expect(promo).toHaveAttribute("data-promo-status", "finished");
-  await expect(card).toHaveAttribute("aria-label", "重播演示");
-  await card.press("Enter");
+  await expect(promo).toHaveAttribute("data-promo-status", "playing");
+  await expect(card).toHaveAttribute("aria-label", "暂停演示");
   await expect(promo).toHaveAttribute("data-promo-stage", "hook");
   await expect(username).toHaveValue("draft.learner");
   await expect(password).toHaveValue("LocalOnlyDraft!2026");
@@ -170,7 +175,10 @@ test("375px login remains usable with a static reduced-motion poster and optiona
   });
   expect(clipped, "the mnemonic must remain inside the visible card, not be clipped by overflow:hidden").toEqual([]);
   mkdirSync("out", { recursive: true });
-  await page.screenshot({ path: "out/login-promo-account-mobile.png", fullPage: true, animations: "disabled" });
+  await page.screenshot({ path: "out/login-promo-loop-account-mobile.png", fullPage: true, animations: "disabled" });
+  await page.clock.runFor(3100);
+  await expect(promo).toHaveAttribute("data-promo-stage", "hook");
+  await expect(promo).toHaveAttribute("data-promo-status", "playing");
 });
 
 test("email-enabled auth tabs remain keyboard accessible beside the demo", async ({ page }) => {

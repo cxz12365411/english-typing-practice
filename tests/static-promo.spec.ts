@@ -47,7 +47,7 @@ for (const entry of ["/index.html", "/typing-practice.html"]) {
   });
 }
 
-test("the demo finishes once at eight seconds and can be replayed using the keyboard", async ({ page }) => {
+test("the demo repeats every eight seconds and keyboard pause holds across multiple cycles", async ({ page }) => {
   await freezeClock(page);
   await openPractice(page);
   await page.locator("#homePromoDetails summary").click();
@@ -56,14 +56,23 @@ test("the demo finishes once at eight seconds and can be replayed using the keyb
   await expect(promo).toHaveAttribute("data-promo-status", "playing");
   await page.bringToFront();
   await page.clock.runFor(8100);
-  await expect(promo).toHaveAttribute("data-promo-elapsed", "8000");
-  await expect(promo).toHaveAttribute("data-promo-stage", "finish");
-  await expect(promo).toHaveAttribute("data-promo-status", "finished");
-  await expect(card).toHaveAttribute("aria-label", "重播演示");
-  await page.clock.runFor(5000);
-  await expect(promo).toHaveAttribute("data-promo-elapsed", "8000");
+  await expect(promo).toHaveAttribute("data-promo-stage", "hook");
+  await expect(promo).toHaveAttribute("data-promo-status", "playing");
+  expect(Number(await promo.getAttribute("data-promo-elapsed"))).toBeLessThan(500);
+  await page.clock.runFor(1500);
+  await expect(promo).toHaveAttribute("data-promo-stage", "arrows");
+  await page.clock.runFor(3500);
+  await expect(promo).toHaveAttribute("data-promo-stage", "mnemonic");
+  await page.clock.runFor(3200);
+  await expect(promo).toHaveAttribute("data-promo-stage", "hook");
+  await expect(promo).toHaveAttribute("data-promo-status", "playing");
   await card.focus();
   await page.keyboard.press("Enter");
+  await expect(promo).toHaveAttribute("data-promo-status", "paused");
+  const pausedAt = await promo.getAttribute("data-promo-elapsed");
+  await page.clock.runFor(17000);
+  await expect(promo).toHaveAttribute("data-promo-elapsed", pausedAt!);
+  await card.press("Space");
   await expect(promo).toHaveAttribute("data-promo-status", "playing");
   await page.clock.runFor(1500);
   await expect(promo).toHaveAttribute("data-promo-stage", "arrows");
@@ -90,5 +99,8 @@ test("375px static demo fits inside the page and respects reduced motion", async
   await expect(promo).toContainText("梅默伊");
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
   mkdirSync("out", { recursive: true });
-  await page.screenshot({ path: "out/login-promo-static-mobile.png", fullPage: true, animations: "disabled" });
+  await page.screenshot({ path: "out/login-promo-loop-static-mobile.png", fullPage: true, animations: "disabled" });
+  await page.clock.runFor(3400);
+  await expect(promo).toHaveAttribute("data-promo-stage", "hook");
+  await expect(promo).toHaveAttribute("data-promo-status", "playing");
 });

@@ -89,8 +89,8 @@ The shared `login-promo.js` and `login-promo.css` use text and SVG, with no vide
 download, audio autoplay, external service, or extra dependency. The sequence shows
 typing-linked semantic arrows, the existing `memory / 记忆 / 梅默伊` mnemonic, and
 a closing title. The card has no header labels, playback buttons, timeline or timer.
-It plays once, then stops; clicking the animation or pressing Space/Enter while it
-has keyboard focus pauses, resumes or replays it.
+It continuously repeats the eight-second sequence; clicking the animation or
+pressing Space/Enter while it has keyboard focus pauses or resumes it.
 Hidden/offscreen playback pauses, reduced-motion preferences show a still poster,
 and leaving the login screen disposes the player. Demo controls do not read or
 modify login fields, practice answers, or learning records.
