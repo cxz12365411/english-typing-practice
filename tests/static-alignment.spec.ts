@@ -36,6 +36,8 @@ const separateTargets: AlignmentEntry = {
 };
 const words = "## 1. 测试 3 个\n- **apple**：苹果\n- **book**：书；书籍\n- **cat**：猫\n";
 const defaultEntries = [hey, separateTargets];
+const would = (JSON.parse(readFileSync("sentence-alignments.json", "utf8")) as AlignmentData).entries
+  .find(entry => entry.english === "Would you like to exchange numbers?")!;
 
 function sentenceMarkdown(entries: AlignmentEntry[]) {
   return "## 1. 测试箭头\n| English | 中文 |\n|---|---|\n" + entries.map(entry => `| ${entry.english} | ${entry.meaning} |`).join("\n");
@@ -248,6 +250,7 @@ test("late alignment data decorates the current prompt without changing input, g
   const before = await page.locator("#letters").textContent();
   release();
   await expect(page.locator(".alignment-path")).toHaveCount(5);
+  await expect(page.locator(".alignment-token.is-highlighted")).toHaveText(["is", "taken"]);
   await expect(page.locator("#answerInput")).toHaveValue("Hey, is");
   await expect(page.locator("#answerInput")).toBeFocused();
   await expect(page.locator("#letters")).toHaveText(before!);
@@ -387,5 +390,115 @@ test("the longest real sentence keeps all text and words linked inside the mobil
   await expect(page.locator(".alignment-token")).toHaveCount(count);
   await expect.poll(() => page.locator(".alignment-path").evaluateAll(paths => new Set(paths.map(path => (path as SVGPathElement).dataset.enIndex)).size)).toBe(count);
   expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(375);
+  await expect.poll(() => geometryErrors(page)).toEqual([]);
+});
+
+for (const entry of ["/index.html", "/typing-practice.html"]) {
+  test(`typing progress highlights the current semantic group, spelling error and caret in ${entry}`, async ({ page }) => {
+    await openPractice(page, { entry, entries: [would] });
+    await selectSentences(page);
+    const answer = page.locator("#answerInput");
+    await expect(page.locator(".alignment-token")).toHaveCount(6);
+    await answer.fill("would");
+    await expect(page.locator(".alignment-token.is-highlighted")).toHaveText(["Would", "like"]);
+    await expect(page.locator(".alignment-zh.is-highlighted")).toHaveText(["愿意", "吗"]);
+    await expect(page.locator(".alignment-path.is-highlighted")).toHaveCount(4);
+    await expect(page.locator("#alignmentNote")).toContainText("礼貌询问意愿");
+    if (entry === "/index.html") await page.screenshot({ path: "out/typing-arrow-static-would.png", fullPage: true });
+
+    await answer.press("Space");
+    await expect(page.locator(".alignment-token.is-highlighted")).toHaveText(["you"]);
+    if (entry === "/index.html") await page.screenshot({ path: "out/typing-arrow-static-progress-you.png", fullPage: true });
+    await answer.press("Backspace");
+    await expect(page.locator(".alignment-token.is-highlighted")).toHaveText(["Would", "like"]);
+    await answer.fill("  ＷＯＵＬＤ   yo");
+    await expect(page.locator(".alignment-token.is-highlighted")).toHaveText(["you"]);
+    await answer.fill("wouxd you li");
+    await expect(page.locator(".alignment-token.is-highlighted")).toHaveText(["Would", "like"]);
+
+    await answer.fill("Would you like to ex");
+    for (let step = 0; step < 12; step += 1) await answer.press("ArrowLeft");
+    await expect(page.locator(".alignment-token.is-highlighted")).toHaveText(["you"]);
+    await answer.evaluate(input => {
+      (input as HTMLInputElement).setSelectionRange(2, 2);
+      input.dispatchEvent(new Event("select"));
+    });
+    await expect(page.locator(".alignment-token.is-highlighted")).toHaveText(["Would", "like"]);
+    await expect(answer).toHaveValue("Would you like to ex");
+    await expect(answer).toBeFocused();
+    await expect(page.locator("#targetWord")).toHaveText(would.english);
+    await expect(page.locator("#doneStat")).toHaveText("0");
+    await expect(page.locator("#mistakeStat")).toHaveText("0");
+    await expect.poll(() => geometryErrors(page)).toEqual([]);
+  });
+}
+
+test("typing progress resumes after a temporary manual inspection and clears with an empty answer", async ({ page }) => {
+  await openPractice(page, { entries: [would] });
+  await selectSentences(page);
+  const answer = page.locator("#answerInput");
+  await answer.fill("would");
+  await page.locator('.alignment-token[data-en-index="4"]').hover();
+  await expect(page.locator(".alignment-token.is-highlighted")).toHaveText(["to", "exchange"]);
+  await answer.hover();
+  await expect(page.locator(".alignment-token.is-highlighted")).toHaveText(["Would", "like"]);
+  await page.locator('.alignment-token[data-en-index="5"]').click();
+  await expect(page.locator(".alignment-token.is-highlighted")).toHaveText(["numbers"]);
+  await answer.fill("would y");
+  await expect(page.locator(".alignment-token.is-highlighted")).toHaveText(["you"]);
+  await answer.fill("");
+  await expect(page.locator(".alignment-token.is-highlighted, .alignment-path.is-highlighted")).toHaveCount(0);
+  await expect(page.locator("#alignmentStage")).not.toHaveClass(/has-highlight/);
+  await expect(page.locator("#doneStat")).toHaveText("0");
+});
+
+test("typing progress recovers after delayed data and visibility toggles without resetting the answer", async ({ page }) => {
+  let release!: () => void;
+  const delay = new Promise<void>(resolve => { release = resolve; });
+  try {
+    await openPractice(page, { entries: [would], delay });
+    await selectSentences(page);
+    const answer = page.locator("#answerInput");
+    await answer.fill("Would you like to ex");
+    await expect(page.locator(".alignment-path")).toHaveCount(0);
+    release();
+    await expect(page.locator(".alignment-token.is-highlighted")).toHaveText(["to", "exchange"]);
+    await page.locator("#showAlignment").uncheck();
+    await answer.fill("Would you");
+    await expect(page.locator(".alignment-path")).toHaveCount(0);
+    await page.locator("#showAlignment").check();
+    await expect(page.locator(".alignment-token.is-highlighted")).toHaveText(["you"]);
+    await page.locator("#showWord").uncheck();
+    await answer.fill("Would you like");
+    await expect(page.locator(".alignment-token, .alignment-path")).toHaveCount(0);
+    await expect(page.locator("#alignmentNote")).toBeHidden();
+    await expect(page.locator("#targetWord")).toHaveText("•".repeat(would.english.length));
+    await page.locator("#showWord").check();
+    await expect(page.locator(".alignment-token.is-highlighted")).toHaveText(["Would", "like"]);
+    await expect(answer).toHaveValue("Would you like");
+    await expect(page.locator("#doneStat")).toHaveText("0");
+  } finally {
+    release();
+  }
+});
+
+test("typing progress reveals a late word inside the 375px diagram without moving the page", async ({ page }) => {
+  await page.setViewportSize({ width: 375, height: 812 });
+  await openPractice(page, { entries: [would] });
+  await selectSentences(page);
+  const answer = page.locator("#answerInput");
+  await answer.fill("Would");
+  const pageTop = await page.evaluate(() => window.scrollY);
+  await answer.fill("Would you like to exchange num");
+  await expect(page.locator(".alignment-token.is-highlighted")).toHaveText(["numbers"]);
+  await expect.poll(() => page.locator("#alignmentScroll").evaluate(scroll => {
+    const viewport = scroll.getBoundingClientRect();
+    const token = scroll.querySelector('.alignment-token[data-en-index="5"]')!.getBoundingClientRect();
+    return scroll.scrollLeft > 0 && token.left >= viewport.left - 1 && token.right <= viewport.right + 1;
+  })).toBe(true);
+  expect(await page.evaluate(() => window.scrollY)).toBe(pageTop);
+  expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(375);
+  await expect(answer).toHaveValue("Would you like to exchange num");
+  await expect(answer).toBeFocused();
   await expect.poll(() => geometryErrors(page)).toEqual([]);
 });

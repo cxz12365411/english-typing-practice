@@ -355,6 +355,7 @@ function renderPrompt(): void {
 
 function renderLetters(): void {
   if (!state) return;
+  alignmentController?.syncInput();
   const item = currentItem();
   const container = mustElement<HTMLElement>("#letters");
   container.replaceChildren();

@@ -11,6 +11,8 @@ interface AlignmentItem {
 }
 
 interface AlignmentRenderer {
+  bindInput(input: HTMLInputElement): void;
+  syncInput(): void;
   setData(data: unknown): void;
   render(item: AlignmentItem | null, options: { enabled: boolean; showEnglish: boolean }): void;
   destroy(): void;
@@ -33,6 +35,7 @@ declare global {
 
 export interface PracticeAlignmentController {
   render(item: ContentItem | null, options: { showEnglish: boolean }): void;
+  syncInput(): void;
   destroy(): void;
 }
 
@@ -55,6 +58,7 @@ export function createPracticeAlignment(options: {
     note: mustElement<HTMLElement>("#alignmentNote")
   });
   const abort = new AbortController();
+  renderer?.bindInput(mustElement<HTMLInputElement>("#answerInput"));
   let disposed = false;
   const active = () => !disposed && options.isActive();
 
@@ -94,6 +98,9 @@ export function createPracticeAlignment(options: {
   }
 
   return {
+    syncInput() {
+      if (active()) renderer?.syncInput();
+    },
     render(item, { showEnglish }) {
       if (!active()) return;
       if (renderer) {

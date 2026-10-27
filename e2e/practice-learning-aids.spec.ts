@@ -15,6 +15,7 @@ const alignmentData = JSON.parse(readFileSync("sentence-alignments.json", "utf8"
 const hey = alignmentData.entries.find(entry => entry.english === "Hey, is this seat taken?")!;
 const longest = alignmentData.entries.reduce((previous, entry) => entry.english.length > previous.english.length ? entry : previous);
 const otherSentence = alignmentData.entries.find(entry => entry.english === "Hi, how are you?")!;
+const would = alignmentData.entries.find(entry => entry.english === "Would you like to exchange numbers?")!;
 const dataUrl = /\/sentence-alignments(?:-[^/?]+)?\.json(?:\?.*)?$/;
 const user = {
   id: "learning-aids-user", username: "learning.admin", displayName: "学习辅助回归管理员", role: "admin",
@@ -243,12 +244,76 @@ test("delayed alignment data preserves the answer currently being typed", async 
     await expect(page.locator(".alignment-path")).toHaveCount(0);
     delayed.resolve();
     await expect(page.locator(".alignment-path")).toHaveCount(5);
+    await expect(page.locator(".alignment-token.is-highlighted")).toHaveText(["this"]);
     await expect(page.locator("#answerInput")).toHaveValue("Hey, is this");
     await expect(page.locator("#positionText")).toHaveText("1 / 3");
     await expect(page.locator("#doneStat")).toHaveText("0");
   } finally {
     delayed.resolve();
   }
+});
+
+test("account typing progress follows a word, shared phrase, typo and editing caret without submitting", async ({ page }) => {
+  const mocked = await mockApp(page, [item(would, 0), item(hey, 1)]);
+  await readyPractice(page);
+  const answer = page.locator("#answerInput");
+  await expect(page.locator(".alignment-token")).toHaveCount(6);
+  await answer.fill("would");
+  await expect(page.locator(".alignment-token.is-highlighted")).toHaveText(["Would", "like"]);
+  await expect(page.locator(".alignment-zh.is-highlighted")).toHaveText(["愿意", "吗"]);
+  await expect(page.locator(".alignment-path.is-highlighted")).toHaveCount(4);
+  await page.screenshot({ path: "out/typing-arrow-account-would.png", fullPage: true });
+  await answer.press("Space");
+  await expect(page.locator(".alignment-token.is-highlighted")).toHaveText(["you"]);
+  await page.screenshot({ path: "out/typing-arrow-account-progress-you.png", fullPage: true });
+  await answer.press("Backspace");
+  await expect(page.locator(".alignment-token.is-highlighted")).toHaveText(["Would", "like"]);
+  await answer.fill("  ＷＯＵＬＤ   yo");
+  await expect(page.locator(".alignment-token.is-highlighted")).toHaveText(["you"]);
+  await answer.fill("Would yxu like to ex");
+  await expect(page.locator(".alignment-token.is-highlighted")).toHaveText(["you"]);
+  await answer.evaluate(input => {
+    (input as HTMLInputElement).setSelectionRange(2, 2);
+    input.dispatchEvent(new Event("select"));
+  });
+  await expect(page.locator(".alignment-token.is-highlighted")).toHaveText(["Would", "like"]);
+  await expect(answer).toHaveValue("Would yxu like to ex");
+  await expect(answer).toBeFocused();
+  await expect(page.locator("#targetWord")).toHaveText(would.english);
+  await expect(page.locator("#positionText")).toHaveText("1 / 2");
+  await expect(page.locator("#doneStat")).toHaveText("0");
+  expect(mocked.sessions()).toBe(1);
+  expect(mocked.requests.filter(request => request.path.endsWith("/attempts"))).toEqual([]);
+  await expect.poll(() => geometryErrors(page)).toEqual([]);
+});
+
+test("account typing progress resumes after inspection and hide or arrow toggles", async ({ page }) => {
+  const mocked = await mockApp(page, [item(would, 0), item(hey, 1)]);
+  await readyPractice(page);
+  const answer = page.locator("#answerInput");
+  await answer.fill("would");
+  await page.locator('.alignment-token[data-en-index="4"]').hover();
+  await expect(page.locator(".alignment-token.is-highlighted")).toHaveText(["to", "exchange"]);
+  await answer.hover();
+  await expect(page.locator(".alignment-token.is-highlighted")).toHaveText(["Would", "like"]);
+  await page.locator("#showAlignment").uncheck();
+  await answer.fill("Would you");
+  await expect(page.locator(".alignment-token, .alignment-path")).toHaveCount(0);
+  await page.locator("#showAlignment").check();
+  await expect(page.locator(".alignment-token.is-highlighted")).toHaveText(["you"]);
+  await page.locator("#showEnglish").uncheck();
+  await answer.fill("Would you like to ex");
+  await expect(page.locator("#targetWord")).toHaveText("•".repeat(would.english.length));
+  await expect(page.locator(".alignment-token, .alignment-path")).toHaveCount(0);
+  await expect(page.locator("#alignmentNote")).toBeHidden();
+  await page.locator("#showEnglish").check();
+  await expect(page.locator(".alignment-token.is-highlighted")).toHaveText(["to", "exchange"]);
+  await expect(answer).toHaveValue("Would you like to ex");
+  await answer.fill("");
+  await expect(page.locator(".alignment-token.is-highlighted, .alignment-path.is-highlighted")).toHaveCount(0);
+  await expect(page.locator("#positionText")).toHaveText("1 / 2");
+  expect(mocked.sessions()).toBe(1);
+  expect(mocked.requests.filter(request => request.path.endsWith("/attempts"))).toEqual([]);
 });
 
 test("an unavailable alignment asset leaves typing and the original prompt usable", async ({ page }) => {

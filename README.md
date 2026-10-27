@@ -90,6 +90,11 @@ renderer and styles and publishes the data with a content-hashed asset URL.
 current browser. Hover, click, or Tab to an English word to highlight its semantic
 group and explanation; Escape clears the selection. On narrow screens, scroll
 inside the two-line diagram. Hiding English also removes its arrows and hints.
+While typing, the current word's semantic group, Chinese meaning, and arrows
+highlight together. Spaces advance the highlight; backspace and caret movement
+update it, and a typo keeps the highlight at the first incorrect word. Long
+diagrams scroll horizontally to keep the current word visible without moving the
+page or interrupting the answer.
 
 All 850 words link to their existing complete definitions. All 400 sentences (270
 original sentences and 130 CET-4 practice sentences) have
