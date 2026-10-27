@@ -1,4 +1,4 @@
-/* Shared, dependency-free eight-second product demo. No audio or user data. */
+/* Shared, dependency-free looping eight-second product demo. No audio or user data. */
 (function (root) {
   "use strict";
 
@@ -8,7 +8,7 @@
   function markup(id) {
     return `
       <section class="practice-promo" role="button" tabindex="0" aria-label="暂停演示" aria-describedby="${id}-description">
-        <p id="${id}-description" class="promo-sr-only">打字时，英文词组通过箭头连接对应中文。Would like 合译为愿意，you 对应你。中文谐音可辅助记忆，例如 memory，记忆，谐音梅默伊。谐音帮助记忆，发音请听朗读。此演示无声音，点击画面或按空格、回车可暂停、继续，结束后可重播。</p>
+        <p id="${id}-description" class="promo-sr-only">打字时，英文词组通过箭头连接对应中文。Would like 合译为愿意，you 对应你。中文谐音可辅助记忆，例如 memory，记忆，谐音梅默伊。谐音帮助记忆，发音请听朗读。此演示无声音，每8秒循环播放，点击画面或按空格、回车可暂停或继续。</p>
         <div class="promo-view" aria-hidden="true">
           <div class="promo-light promo-light-one"></div><div class="promo-light promo-light-two"></div>
           <div class="promo-scene promo-hook" data-promo-scene="hook">
@@ -122,12 +122,8 @@
     function tick(now) {
       frame = null;
       if (destroyed || !running) return;
-      elapsed = Math.min(duration, elapsed + Math.max(0, now - lastTime));
+      elapsed = (elapsed + Math.max(0, now - lastTime)) % duration;
       lastTime = now;
-      if (elapsed >= duration) {
-        requested = false;
-        running = false;
-      }
       render();
       if (running) frame = requestAnimationFrame(tick);
     }
