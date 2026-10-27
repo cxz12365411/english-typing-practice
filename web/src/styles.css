@@ -79,14 +79,14 @@ a {
 }
 
 .login-home {
-  width: min(1320px, 100%);
+  width: min(1480px, 100%);
   min-height: 100svh;
   margin: auto;
-  padding: 56px 32px;
+  padding: 48px 32px;
   display: grid;
-  grid-template-columns: minmax(0, 1.35fr) minmax(360px, 1fr);
+  grid-template-columns: minmax(0, 1fr) clamp(300px, 27vw, 340px);
   align-items: center;
-  gap: clamp(28px, 4vw, 64px);
+  gap: clamp(24px, 3vw, 48px);
 }
 
 .login-story { min-width: 0; }
@@ -100,8 +100,26 @@ a {
   font-weight: 700;
 }
 .login-story-heading p { margin: 0; color: var(--muted); font-size: 15px; line-height: 1.7; }
-.login-home .auth-card { width: 100%; max-width: 480px; justify-self: center; border-radius: 24px; box-shadow: 0 14px 48px #263a2e0a; }
-.login-home .auth-card.email-auth-card { max-width: 540px; }
+.login-home .auth-card { width: 100%; max-width: 340px; padding: 24px; justify-self: center; border-radius: 22px; box-shadow: 0 14px 48px #263a2e0a; }
+.login-home .auth-brand { gap: 10px; margin-bottom: 20px; }
+.login-home .brand-mark { flex: 0 0 40px; width: 40px; height: 40px; border-radius: 10px; font-size: 22px; }
+.login-home .auth-brand h1 { font-size: 20px; }
+.login-home .auth-brand p { font-size: 12px; line-height: 1.5; }
+.login-home .form-stack { gap: 12px; }
+.login-home .auth-card .helper { margin: 2px 0 0; font-size: 12px; }
+.login-home .auth-card .message { padding: 10px 12px; font-size: 12px; }
+.login-home .auth-capability-note { margin-top: 14px; }
+.login-home .auth-card .input, .login-home .auth-card .btn { min-height: 44px; }
+.login-home .auth-tabs { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 4px; margin: 0 0 16px; padding-bottom: 8px; overflow: visible; }
+.login-home .auth-tab { min-width: 0; padding: 7px 4px; font-size: 12px; }
+.login-home .verification-row { grid-template-columns: minmax(0, 1fr); }
+.login-home .verification-row .btn { width: 100%; }
+@media (min-width: 941px) {
+  .login-home .practice-promo .promo-view { min-height: 430px; }
+  .login-home .practice-promo .promo-headline,
+  .login-home .practice-promo .promo-finish-title { font-size: clamp(40px, 7.6cqw, 72px); }
+  .login-home .practice-promo .promo-memory-word { font-size: clamp(64px, 12cqw, 106px); }
+}
 @media (max-width: 940px) {
   .login-home { grid-template-columns: minmax(0, 1fr); gap: 30px; padding: 32px 24px; max-width: 740px; }
   .login-story-heading { margin-bottom: 20px; }
@@ -110,7 +128,8 @@ a {
   .login-home { padding: 24px 16px; gap: 24px; }
   .login-story-heading h2 { font-size: 30px; }
   .login-story-heading p { font-size: 13px; }
-  .login-home .auth-card { padding: 24px; }
+  .login-home .auth-card { padding: 22px; }
+  .login-home .practice-promo .promo-view { min-height: 320px; }
 }
 
 .loading-card,

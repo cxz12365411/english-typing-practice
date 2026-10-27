@@ -1,5 +1,5 @@
 import { expect, test, type Page, type Route } from "@playwright/test";
-import { mkdirSync } from "node:fs";
+import { mkdirSync, writeFileSync } from "node:fs";
 
 const user = {
   id: "promo-user", username: "promo.learner", displayName: "演示验收", role: "user",
@@ -48,6 +48,26 @@ async function freezeClock(page: Page) {
   await page.clock.pauseAt(new Date("2026-10-27T00:00:01Z"));
 }
 
+async function captureLayout(page: Page, width: number) {
+  const geometry = await page.evaluate(() => {
+    const rect = (selector: string) => {
+      const bounds = document.querySelector(selector)!.getBoundingClientRect();
+      return { x: bounds.x, y: bounds.y, width: bounds.width, height: bounds.height, right: bounds.right };
+    };
+    return {
+      viewport: innerWidth, scrollWidth: document.documentElement.scrollWidth,
+      home: rect(".login-home"), story: rect(".login-story"), promo: rect("#loginPromo"),
+      login: rect(".auth-card"), submit: rect('#passwordLoginForm button[type="submit"]')
+    };
+  });
+  expect(geometry.scrollWidth).toBeLessThanOrEqual(geometry.viewport);
+  expect(geometry.submit.height).toBeGreaterThanOrEqual(44);
+  if (width >= 940) expect(geometry.promo.width).toBeGreaterThan(geometry.login.width);
+  mkdirSync("out", { recursive: true });
+  writeFileSync(`out/login-promo-large-${width}-geometry.json`, JSON.stringify(geometry, null, 2));
+  await page.screenshot({ path: `out/login-promo-large-${width}.png`, fullPage: true, animations: "disabled" });
+}
+
 test("login demo presents both learning aids and keeps playing through three eight-second cycles", async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 1000 });
   await freezeClock(page);
@@ -65,8 +85,7 @@ test("login demo presents both learning aids and keeps playing through three eig
   await expect(promo).toContainText("Would");
   await expect(promo).toContainText("愿意");
   await expect(promo.locator("[data-promo-group].is-active").first()).toBeAttached();
-  mkdirSync("out", { recursive: true });
-  await page.screenshot({ path: "out/login-promo-loop-account-desktop-arrows.png", fullPage: true, animations: "disabled" });
+  await captureLayout(page, 1440);
   await page.clock.runFor(3200);
   await expect(promo).toHaveAttribute("data-promo-stage", "mnemonic");
   await expect(promo).toContainText("memory");
@@ -174,18 +193,28 @@ test("375px login remains usable with a static reduced-motion poster and optiona
       }).filter(rect => rect.left < bounds.left - 1 || rect.right > bounds.right + 1);
   });
   expect(clipped, "the mnemonic must remain inside the visible card, not be clipped by overflow:hidden").toEqual([]);
-  mkdirSync("out", { recursive: true });
-  await page.screenshot({ path: "out/login-promo-loop-account-mobile.png", fullPage: true, animations: "disabled" });
+  await captureLayout(page, 375);
   await page.clock.runFor(3100);
   await expect(promo).toHaveAttribute("data-promo-stage", "hook");
   await expect(promo).toHaveAttribute("data-promo-status", "playing");
 });
 
 test("email-enabled auth tabs remain keyboard accessible beside the demo", async ({ page }) => {
+  await page.setViewportSize({ width: 1031, height: 1000 });
+  await freezeClock(page);
   await mockLogin(page, true);
   await page.goto("/login");
   await page.getByRole("tab", { name: "账号密码", exact: true }).click();
   await expect(page.locator('#passwordLoginForm [name="username"]')).toBeFocused();
+  expect(await page.locator(".auth-tabs").evaluate(tabs => {
+    const bounds = tabs.getBoundingClientRect();
+    return tabs.scrollWidth <= tabs.clientWidth && [...tabs.querySelectorAll('[role="tab"]')].every(tab => {
+      const rect = tab.getBoundingClientRect();
+      return rect.left >= bounds.left && rect.right <= bounds.right;
+    });
+  }), "all four auth tabs must fit the compact login card without horizontal clipping").toBe(true);
+  await page.clock.runFor(2000);
+  await captureLayout(page, 1031);
   await page.locator('#passwordLoginForm [name="username"]').fill("tab.draft");
   await page.locator('#passwordLoginForm [name="password"]').fill("UnsubmittedDraft!2026");
   await page.getByRole("tab", { name: "账号密码", exact: true }).focus();
