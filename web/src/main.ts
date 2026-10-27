@@ -2,7 +2,7 @@ import "./styles.css";
 import { renderAdmin, disposeAdmin } from "./admin";
 import { ApiError, api } from "./api";
 import { clearVerificationCountdowns } from "./email";
-import { renderLoginScreen } from "./login";
+import { disposeLoginScreen, renderLoginScreen } from "./login";
 import { normaliseAppRoute } from "./routes";
 import { confirmDiscardPendingAttempt, disposePractice, renderPractice } from "./practice";
 import type { AuthCapabilities, PageContext, SessionResponse, User } from "./types";
@@ -22,6 +22,7 @@ let renderedRouteUrl = `${location.pathname}${location.search}`;
 let pendingReturnRoute: string | null = null;
 
 function disposePage(): void {
+  disposeLoginScreen();
   clearVerificationCountdowns();
   disposePractice();
   disposeAdmin();

@@ -1,0 +1,140 @@
+.practice-promo-host {
+  min-width: 0;
+  width: 100%;
+  container-type: inline-size;
+}
+
+.practice-promo {
+  --promo-blue: #2678d8;
+  --promo-green: #16866c;
+  --promo-float: 0px;
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  width: 100%;
+  border: 1px solid rgba(255, 255, 255, .9);
+  border-radius: 28px;
+  color: #1d1d1f;
+  background: linear-gradient(145deg, #fff 3%, #f8fafc 53%, #f0f5f7 100%);
+  box-shadow: 0 24px 80px -40px rgba(35, 69, 96, .25), inset 0 0 0 1px rgba(39, 64, 84, .035);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+.practice-promo *, .practice-promo *::before, .practice-promo *::after { box-sizing: border-box; }
+.practice-promo p, .practice-promo h2 { margin: 0; }
+.practice-promo button { font: inherit; }
+.practice-promo .promo-sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+.practice-promo .promo-topline, .practice-promo .promo-bottomline {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 22px 28px 0;
+}
+.practice-promo .promo-topline {
+  color: #69747f;
+  font-size: 10px;
+  font-weight: 650;
+  letter-spacing: 1.25px;
+}
+.practice-promo .promo-topline > span { display: inline-flex; align-items: center; gap: 7px; white-space: nowrap; }
+.practice-promo .promo-topline > span:last-child { letter-spacing: .3px; font-weight: 500; }
+.practice-promo .promo-topline i { width: 6px; height: 6px; border-radius: 100%; background: #348d80; box-shadow: 0 0 0 4px #348d800c; }
+.practice-promo .promo-view { position: relative; aspect-ratio: 1.65; min-height: 310px; }
+.practice-promo .promo-light { position: absolute; pointer-events: none; border-radius: 50%; filter: blur(35px); opacity: .55; transform: translateY(var(--promo-float)); }
+.practice-promo .promo-light-one { width: 45%; height: 75%; left: 0; top: 0; background: radial-gradient(ellipse, #d7eaff 0%, #deedff00 72%); }
+.practice-promo .promo-light-two { width: 45%; height: 70%; right: -8%; bottom: -10%; background: radial-gradient(ellipse, #dbf2e9 0%, #def6eb00 72%); }
+.practice-promo .promo-scene { position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: center; padding: 28px; opacity: 0; transform: translateY(13px) scale(.985); filter: blur(5px); pointer-events: none; transition: opacity .4s ease, transform .55s cubic-bezier(.22, 1, .36, 1), filter .45s ease; }
+.practice-promo[data-stage="hook"] .promo-hook, .practice-promo[data-stage="arrows"] .promo-arrows, .practice-promo[data-stage="mnemonic"] .promo-mnemonic, .practice-promo[data-stage="finish"] .promo-finish { opacity: 1; transform: none; filter: none; }
+.practice-promo .promo-eyebrow { color: #6b7480; font-size: 12px; font-weight: 600; letter-spacing: 1px; }
+.practice-promo .promo-headline { margin-top: 17px; font-size: clamp(32px, 7.6cqw, 56px); font-weight: 750; letter-spacing: -2.2px; line-height: 1.2; }
+.practice-promo .promo-gradient { color: #147a99; background: linear-gradient(100deg, #2379d3 7%, #168769 95%); background-clip: text; -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+.practice-promo .promo-hook-link { display: flex; align-items: center; gap: 16px; margin-top: 30px; color: #5b6670; font-size: 14px; font-weight: 500; }
+.practice-promo .promo-hook-link svg { width: 94px; height: 26px; fill: none; stroke: #4f93b3; stroke-width: 1.5; }
+.practice-promo .promo-scene-heading { display: flex; align-items: center; gap: 11px; margin-bottom: 20px; }
+.practice-promo .promo-scene-index { display: inline-flex; flex: 0 0 auto; align-items: center; justify-content: center; width: 28px; height: 28px; margin-right: 7px; border: 1px solid #cddce5; border-radius: 50%; color: #5f8296; font-size: 10px; font-weight: 500; letter-spacing: 0; }
+.practice-promo .promo-scene-heading .promo-scene-index { margin-right: 0; }
+.practice-promo .promo-scene-heading .promo-eyebrow { font-size: 10px; margin-bottom: 5px; }
+.practice-promo .promo-scene-heading h2 { font-size: clamp(17px, 3.3cqw, 25px); letter-spacing: -.8px; font-weight: 650; }
+.practice-promo .promo-demo-surface { padding: 16px 10px 10px; border-radius: 18px; background: rgba(255, 255, 255, .85); border: 1px solid #e8eef2; box-shadow: 0 12px 26px -20px #37658d55; }
+.practice-promo .promo-diagram { display: block; width: 100%; height: auto; overflow: visible; font-family: Arial, "PingFang SC", "Microsoft YaHei", sans-serif; }
+.practice-promo .promo-english text { fill: #9a9fa6; transition: fill .2s ease; }
+.practice-promo .promo-chinese text { fill: #858e96; transition: fill .2s ease; }
+.practice-promo .promo-links path { stroke: #dbe5ec; stroke-linecap: round; stroke-dasharray: 1; stroke-dashoffset: var(--promo-line-progress, 0); transition: stroke .2s ease; }
+.practice-promo .promo-links path.is-active { stroke: #277ed0; stroke-width: 2.6; }
+.practice-promo .promo-english text.is-active, .practice-promo .promo-chinese text.is-active { fill: #216fae; }
+.practice-promo[data-group="you"] .promo-links path.is-active { stroke: #16866c; }
+.practice-promo[data-group="you"] .promo-english text.is-active, .practice-promo[data-group="you"] .promo-chinese text.is-active { fill: #16866c; }
+.practice-promo .promo-demo-input { display: flex; align-items: center; height: 46px; margin-top: 8px; padding: 0 12px; border: 1px solid #c7dbeb; border-radius: 10px; box-shadow: 0 0 0 3px #eaf3fc88; }
+.practice-promo .promo-input-label { margin-right: 15px; color: #84909d; font-size: 9px; white-space: nowrap; }
+.practice-promo .promo-input-value { white-space: pre; font-size: clamp(17px, 3.7cqw, 25px); font-weight: 500; letter-spacing: -.5px; }
+.practice-promo .promo-caret { flex: 0 0 1.5px; height: 24px; margin-left: 2px; border-radius: 2px; background: #3a85d0; }
+.practice-promo .promo-keycap { margin-left: auto; color: #8da1af; border: 1px solid #e2e9ed; padding: 2px 6px; border-radius: 5px; font-size: 12px; }
+.practice-promo .promo-group-note { margin-top: 13px; color: #688296; font-size: 10px; line-height: 1.5; text-align: center; }
+.practice-promo .promo-mnemonic { text-align: center; align-items: center; }
+.practice-promo .promo-mnemonic .promo-eyebrow { display: flex; align-items: center; }
+.practice-promo .promo-memory-word { margin-top: 12px; font-size: clamp(53px, 12cqw, 86px); line-height: 1.1; font-weight: 720; letter-spacing: -4px; }
+.practice-promo .promo-memory-dot { color: #239684; }
+.practice-promo .promo-memory-meaning { margin-top: 3px; color: #6c757c; font-size: 17px; font-weight: 500; letter-spacing: 7px; padding-left: 7px; }
+.practice-promo .promo-memory-clue { margin-top: 23px; display: flex; align-items: center; gap: 20px; padding: 13px 22px; background: #fffaf0; border: 1px solid #ead9b0; border-radius: 14px; box-shadow: 0 9px 30px -20px #a36a1266; }
+.practice-promo .promo-memory-clue span { color: #9e803f; font-size: 10px; }
+.practice-promo .promo-memory-clue strong { color: #8c6426; font-size: 25px; letter-spacing: 3px; font-weight: 550; }
+.practice-promo .promo-memory-clue svg { width: 26px; height: 22px; stroke: #bd954f; fill: none; stroke-width: 2; stroke-linecap: round; }
+.practice-promo .promo-memory-note { margin-top: 15px; color: #7b8289; font-size: 10px; }
+.practice-promo .promo-finish { align-items: center; text-align: center; }
+.practice-promo .promo-finish-title { margin-top: 17px; font-size: clamp(33px, 7.7cqw, 56px); line-height: 1.2; font-weight: 750; letter-spacing: -2px; }
+.practice-promo .promo-feature-list { display: flex; flex-wrap: wrap; justify-content: center; gap: 7px; margin-top: 25px; }
+.practice-promo .promo-feature-list span { padding: 7px 12px; border: 1px solid #e0e8ed; border-radius: 99px; background: #ffffff90; color: #5b7380; font-size: 10px; white-space: nowrap; }
+.practice-promo .promo-finish-note { margin-top: 17px; color: #7b858d; font-size: 11px; }
+.practice-promo .promo-bottomline { gap: 20px; padding: 0 25px 20px; }
+.practice-promo .promo-playback { display: flex; align-items: center; gap: 7px; }
+.practice-promo .promo-toggle, .practice-promo .promo-replay { display: inline-flex; align-items: center; justify-content: center; min-height: 36px; border: 1px solid #dde5eb; border-radius: 99px; background: #ffffffa6; color: #536b7b; cursor: pointer; font-size: 11px; transition: background .2s, border-color .2s; }
+.practice-promo .promo-toggle { gap: 7px; padding: 0 13px; min-width: 72px; }
+.practice-promo [data-promo-icon] { width: 11px; font-size: 10px; }
+.practice-promo .promo-replay { width: 36px; padding: 0; font-size: 20px; }
+.practice-promo .promo-toggle:hover, .practice-promo .promo-replay:hover { border-color: #b4ccdc; background: white; }
+.practice-promo button:focus-visible { outline: 2px solid #2678d8; outline-offset: 3px; box-shadow: none; }
+.practice-promo .promo-timeline { display: flex; align-items: center; justify-content: flex-end; gap: 13px; flex: 1; min-width: 0; }
+.practice-promo .promo-track { display: block; width: 100%; max-width: 150px; height: 3px; border-radius: 3px; background: #dee6eb; overflow: hidden; }
+.practice-promo .promo-track i { display: block; height: 100%; transform: scaleX(0); transform-origin: left; background: linear-gradient(90deg, #3b86c9, #269b81); }
+.practice-promo .promo-time { flex-shrink: 0; font-variant-numeric: tabular-nums; color: #7b8994; font-size: 10px; }
+
+@container (max-width: 420px) {
+  .practice-promo { border-radius: 21px; }
+  .practice-promo .promo-topline { padding: 18px 18px 0; font-size: 8px; letter-spacing: .8px; }
+  .practice-promo .promo-view { min-height: 275px; }
+  .practice-promo .promo-scene { padding: 22px 18px; }
+  .practice-promo .promo-scene-heading { margin-bottom: 15px; gap: 8px; }
+  .practice-promo .promo-scene-index { width: 24px; height: 24px; }
+  .practice-promo .promo-demo-surface { padding: 12px 5px 8px; border-radius: 12px; }
+  .practice-promo .promo-demo-input { height: 40px; padding: 0 8px; }
+  .practice-promo .promo-input-label { margin-right: 10px; font-size: 8px; }
+  .practice-promo .promo-group-note { margin-top: 11px; font-size: 8px; }
+  .practice-promo .promo-memory-clue { padding: 10px 16px; gap: 14px; margin-top: 18px; }
+  .practice-promo .promo-memory-clue strong { font-size: 23px; }
+  .practice-promo .promo-bottomline { padding: 0 18px 17px; gap: 16px; }
+  .practice-promo .promo-timeline { gap: 8px; }
+  .practice-promo .promo-headline { letter-spacing: -1.3px; }
+  .practice-promo .promo-feature-list { gap: 5px; margin-top: 21px; }
+  .practice-promo .promo-feature-list span { padding: 6px 9px; font-size: 9px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .practice-promo .promo-scene { transition: none; transform: none; filter: none; }
+  .practice-promo .promo-light { transform: none; }
+  .practice-promo .promo-links path, .practice-promo .promo-english text, .practice-promo .promo-chinese text { transition: none; }
+}

@@ -9,6 +9,19 @@ import {
 import type { AuthCapabilities, EmailCodePurpose, SessionResponse } from "./types";
 import { mustElement, setBusy } from "./ui";
 import { getErrorMessage, validatePassword } from "./utils";
+import "../../login-promo.js";
+import "../../login-promo.css";
+
+interface PromoController { play(): void; pause(): void; destroy(): void }
+declare global {
+  interface Window { PracticePromo?: { create(host: HTMLElement): PromoController } }
+}
+let loginPromo: PromoController | null = null;
+
+export function disposeLoginScreen(): void {
+  loginPromo?.destroy();
+  loginPromo = null;
+}
 
 type AuthMode = "email-login" | "register" | "reset-password" | "password-login";
 
@@ -105,7 +118,15 @@ function enabledAuthMarkup(capabilities: AuthCapabilities): string {
 
 function loginMarkup(capabilities: AuthCapabilities): string {
   return `
-    <main class="screen-center">
+    <main class="login-home">
+      <section class="login-story" aria-label="英语打字练习功能演示">
+        <div class="login-story-heading">
+          <span class="login-eyebrow">ENGLISH TYPING</span>
+          <h2>每一次敲击，<br>都多一份理解。</h2>
+          <p>用中文连起词义，用谐音找到记忆线索。</p>
+        </div>
+        <div id="loginPromo"><p>中文箭头联想 · 中文谐音助记 · 逐句打字练习</p></div>
+      </section>
       <section class="auth-card${capabilities.emailAuthEnabled ? " email-auth-card" : ""}">
         <div class="auth-brand">
           <span class="brand-mark" aria-hidden="true">ET</span>
@@ -132,7 +153,7 @@ function switchAuthMode(mode: AuthMode): void {
     panel.hidden = panel.dataset.authPanel !== mode;
   });
   // The panel is already visible; a deferred focus could interrupt password entry.
-  document.querySelector<HTMLElement>(`[data-auth-panel="${mode}"] input`)?.focus();
+  document.querySelector<HTMLElement>(`[data-auth-panel="${mode}"] input`)?.focus({ preventScroll: true });
 }
 
 function bindTabs(): void {
@@ -379,10 +400,12 @@ export function renderLoginScreen(
   capabilities: AuthCapabilities,
   callbacks: LoginCallbacks
 ): void {
+  disposeLoginScreen();
   app.innerHTML = loginMarkup(capabilities);
+  loginPromo = window.PracticePromo?.create(mustElement("#loginPromo")) ?? null;
   bindPasswordLogin(callbacks);
   if (!capabilities.emailAuthEnabled) {
-    mustElement<HTMLInputElement>('[name="username"]', mustElement("#passwordLoginForm")).focus();
+    mustElement<HTMLInputElement>('[name="username"]', mustElement("#passwordLoginForm")).focus({ preventScroll: true });
     return;
   }
   bindTabs();

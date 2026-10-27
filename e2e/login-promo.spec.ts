@@ -1,0 +1,171 @@
+import { expect, test, type Page, type Route } from "@playwright/test";
+import { mkdirSync } from "node:fs";
+
+const user = {
+  id: "promo-user", username: "promo.learner", displayName: "演示验收", role: "user",
+  status: "active", mustChangePassword: false, createdAt: "2026-10-27T00:00:00.000Z"
+};
+const category = { id: "words", name: "基础单词", kind: "word", sortOrder: 0, status: "published" };
+const item = {
+  id: "promo-word", key: "promo-word-key", english: "memory", meaning: "记忆", pronunciation: "梅默伊",
+  categoryId: "words", kind: "word", revision: 1, sortOrder: 0, status: "published"
+};
+
+async function json(route: Route, body: unknown) {
+  await route.fulfill({ contentType: "application/json", body: JSON.stringify(body) });
+}
+
+async function mockLogin(page: Page, emailEnabled = false) {
+  const capabilities = { emailAuthEnabled: emailEnabled, selfRegistrationEnabled: emailEnabled };
+  let currentUser: typeof user | null = null;
+  const requests: Array<{ path: string; body: unknown }> = [];
+  await page.route("**/api/**", async route => {
+    const request = route.request();
+    const path = new URL(request.url()).pathname;
+    const body = request.postDataJSON();
+    if (request.method() === "POST") requests.push({ path, body });
+    if (path === "/api/auth/session") return json(route, { user: currentUser, csrfToken: "promo-csrf", capabilities });
+    if (path === "/api/auth/login") {
+      currentUser = user;
+      return json(route, { user, csrfToken: "promo-login-csrf", capabilities });
+    }
+    if (path === "/api/auth/logout") {
+      currentUser = null;
+      return route.fulfill({ status: 204 });
+    }
+    if (path === "/api/content") return json(route, { categories: [category], items: [item], version: 1 });
+    if (path === "/api/me/mistakes") return json(route, { items: [] });
+    if (path === "/api/me/summary") return json(route, { totals: { sessions: 0, attempts: 0, correct: 0, accuracy: 0 } });
+    if (path === "/api/practice/sessions") return json(route, { session: { id: "promo-session", startedAt: new Date().toISOString() } });
+    if (path.endsWith("/finish")) return json(route, { ok: true });
+    throw new Error(`Unexpected promo request: ${request.method()} ${path}`);
+  });
+  return requests;
+}
+
+async function freezeClock(page: Page) {
+  await page.clock.install({ time: new Date("2026-10-27T00:00:00Z") });
+  await page.clock.pauseAt(new Date("2026-10-27T00:00:01Z"));
+}
+
+test("login demo runs eight seconds, presents both learning aids and stops without restarting", async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 1000 });
+  await freezeClock(page);
+  await mockLogin(page);
+  await page.goto("/login");
+  const promo = page.locator("#loginPromo");
+  await expect(promo).toHaveAttribute("data-promo-status", "playing");
+  await expect(promo).toHaveAttribute("data-promo-duration", "8000");
+  await promo.locator("[data-promo-replay]").click();
+  await page.clock.runFor(2000);
+  await expect(promo).toHaveAttribute("data-promo-stage", "arrows");
+  await expect(promo).toContainText("Would");
+  await expect(promo).toContainText("愿意");
+  await expect(promo.locator("[data-promo-group].is-active").first()).toBeAttached();
+  mkdirSync("out", { recursive: true });
+  await page.screenshot({ path: "out/login-promo-account-desktop-arrows.png", fullPage: true, animations: "disabled" });
+  await page.clock.runFor(3200);
+  await expect(promo).toHaveAttribute("data-promo-stage", "mnemonic");
+  await expect(promo).toContainText("memory");
+  await expect(promo).toContainText("梅默伊");
+  await page.screenshot({ path: "out/login-promo-account-desktop-mnemonic.png", fullPage: true, animations: "disabled" });
+  await page.clock.runFor(3000);
+  await expect(promo).toHaveAttribute("data-promo-elapsed", "8000");
+  await expect(promo).toHaveAttribute("data-promo-status", "finished");
+  await page.clock.runFor(4000);
+  await expect(promo).toHaveAttribute("data-promo-elapsed", "8000");
+});
+
+test("pause, keyboard resume and replay leave typed credentials untouched", async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 1000 });
+  await freezeClock(page);
+  const requests = await mockLogin(page);
+  await page.goto("/login");
+  const promo = page.locator("#loginPromo");
+  const username = page.locator('#passwordLoginForm [name="username"]');
+  const password = page.locator('#passwordLoginForm [name="password"]');
+  await expect(promo).toHaveAttribute("data-promo-status", "playing");
+  await username.fill("draft.learner");
+  await password.fill("LocalOnlyDraft!2026");
+  await page.clock.runFor(1800);
+  await expect(password).toBeFocused();
+  await promo.locator("[data-promo-toggle]").click();
+  await expect(promo).toHaveAttribute("data-promo-status", "paused");
+  const elapsed = await promo.getAttribute("data-promo-elapsed");
+  await page.clock.runFor(3000);
+  await expect(promo).toHaveAttribute("data-promo-elapsed", elapsed!);
+  await promo.locator("[data-promo-toggle]").press("Enter");
+  await expect(promo).toHaveAttribute("data-promo-status", "playing");
+  await page.clock.runFor(500);
+  expect(Number(await promo.getAttribute("data-promo-elapsed"))).toBeGreaterThan(Number(elapsed));
+  await promo.locator("[data-promo-replay]").click();
+  await expect(promo).toHaveAttribute("data-promo-stage", "hook");
+  await expect(username).toHaveValue("draft.learner");
+  await expect(password).toHaveValue("LocalOnlyDraft!2026");
+  expect(requests).toEqual([]);
+});
+
+test("successful login disposes the old demo and logout creates a fresh instance", async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 1000 });
+  await freezeClock(page);
+  const requests = await mockLogin(page);
+  await page.goto("/login");
+  const promo = page.locator("#loginPromo");
+  await expect(promo).toHaveAttribute("data-promo-status", "playing");
+  await page.clock.runFor(1500);
+  const oldHost = await promo.elementHandle();
+  await page.locator('#passwordLoginForm [name="username"]').fill("promo.learner");
+  await page.locator('#passwordLoginForm [name="password"]').fill("LocalOnlyLogin!2026");
+  await page.locator("#passwordLoginForm").getByRole("button", { name: "登录", exact: true }).click();
+  await expect(page).toHaveURL(/\/practice$/);
+  await expect(page.locator("#answerInput")).toBeEnabled();
+  await expect(promo).toHaveCount(0);
+  const stoppedAt = await oldHost!.evaluate(el => (el as HTMLElement).dataset.promoElapsed);
+  await page.clock.runFor(10000);
+  expect(await oldHost!.evaluate(el => (el as HTMLElement).dataset.promoElapsed)).toBe(stoppedAt);
+  expect(requests.filter(request => request.path === "/api/auth/login")).toEqual([
+    { path: "/api/auth/login", body: { username: "promo.learner", password: "LocalOnlyLogin!2026" } }
+  ]);
+  await page.locator("#logoutButton").click();
+  await expect(page).toHaveURL(/\/login$/);
+  await expect(promo).toHaveCount(1);
+  await expect(promo).toHaveAttribute("data-promo-stage", "hook");
+});
+
+test("375px login remains usable with a static reduced-motion poster and optional playback", async ({ page }) => {
+  await page.setViewportSize({ width: 375, height: 900 });
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await freezeClock(page);
+  await mockLogin(page);
+  await page.goto("/login");
+  const promo = page.locator("#loginPromo");
+  await expect(promo).toHaveAttribute("data-promo-stage", "finish");
+  await expect(promo).toHaveAttribute("data-promo-status", "finished");
+  await page.clock.runFor(9000);
+  await expect(promo).toHaveAttribute("data-promo-elapsed", "8000");
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+  await expect(page.locator('#passwordLoginForm [name="username"]')).toBeVisible();
+  await expect(page.locator('#passwordLoginForm [name="password"]')).toBeVisible();
+  await promo.locator("[data-promo-toggle]").click();
+  await page.clock.runFor(5200);
+  await expect(promo).toHaveAttribute("data-promo-stage", "mnemonic");
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+  mkdirSync("out", { recursive: true });
+  await page.screenshot({ path: "out/login-promo-account-mobile.png", fullPage: true, animations: "disabled" });
+});
+
+test("email-enabled auth tabs remain keyboard accessible beside the demo", async ({ page }) => {
+  await mockLogin(page, true);
+  await page.goto("/login");
+  await page.getByRole("tab", { name: "账号密码", exact: true }).click();
+  await expect(page.locator('#passwordLoginForm [name="username"]')).toBeFocused();
+  await page.locator('#passwordLoginForm [name="username"]').fill("tab.draft");
+  await page.locator('#passwordLoginForm [name="password"]').fill("UnsubmittedDraft!2026");
+  await page.getByRole("tab", { name: "账号密码", exact: true }).focus();
+  await page.keyboard.press("ArrowLeft");
+  await expect(page.getByRole("tab", { name: "找回密码", exact: true })).toHaveAttribute("aria-selected", "true");
+  await page.getByRole("tab", { name: "账号密码", exact: true }).click();
+  await expect(page.locator('#passwordLoginForm [name="username"]')).toHaveValue("tab.draft");
+  await expect(page.locator('#passwordLoginForm [name="password"]')).toHaveValue("UnsubmittedDraft!2026");
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+});
