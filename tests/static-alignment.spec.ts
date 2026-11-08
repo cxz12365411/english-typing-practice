@@ -105,7 +105,7 @@ async function geometryErrors(page: Page) {
   });
 }
 
-test("original 270 plus CET4 sentence alignments cover the sources and every token and Chinese fragment", () => {
+test("original 270 plus CET4 and CET6 sentence alignments cover the sources and every token and Chinese fragment", () => {
   const data = JSON.parse(readFileSync("sentence-alignments.json", "utf8")) as AlignmentData;
   const source = readFileSync("daily-english-high-frequency-sentences.md", "utf8").split(/\r?\n/)
     .filter(line => line.startsWith("|") && line.includes("<br>"))
@@ -116,7 +116,7 @@ test("original 270 plus CET4 sentence alignments cover the sources and every tok
   expect(data.version).toBe(1);
   expect(source).toHaveLength(270);
   const writing = require("../cet4-writing.js").parse(JSON.parse(readFileSync("cet4-writing.json", "utf8")));
-  expect(data.entries).toHaveLength(270 + writing.items.length);
+  expect(data.entries).toHaveLength(270 + writing.items.length + require("../cet4-writing.js").parse(JSON.parse(readFileSync("cet6-writing.json", "utf8"))).items.length);
   const expectedKeys = source.map(entry => api.key(entry.english, entry.meaning)).sort();
   expect(data.entries.slice(0, 270).map(entry => api.key(entry.english, entry.meaning)).sort()).toEqual(expectedKeys);
   expect(new Set(expectedKeys).size).toBe(270);

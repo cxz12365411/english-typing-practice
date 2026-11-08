@@ -173,7 +173,7 @@ test("account practice loads the real 270 alignments and highlights the screensh
     expect(new URL(response.url()).pathname).toMatch(/^\/assets\/sentence-alignments-[^/]+\.json$/);
   }
   const writing = require("../cet4-writing.js").parse(JSON.parse(readFileSync("cet4-writing.json", "utf8")));
-  expect(alignmentData.entries).toHaveLength(270 + writing.items.length);
+  expect(alignmentData.entries).toHaveLength(270 + writing.items.length + require("../cet4-writing.js").parse(JSON.parse(readFileSync("cet6-writing.json", "utf8"))).items.length);
   await expect(page.locator("#targetWord")).toHaveText(hey.english);
   await expect(page.locator("#meaningText")).toHaveText(hey.meaning);
   await expect(page.locator(".alignment-token")).toHaveCount(5);

@@ -117,8 +117,8 @@ update it, and a typo keeps the highlight at the first incorrect word. Long
 diagrams scroll horizontally to keep the current word visible without moving the
 page or interrupting the answer.
 
-All 850 words link to their existing complete definitions. All 400 sentences (270
-original sentences and 130 CET-4 practice sentences) have
+All 850 words link to their existing complete definitions. All 478 sentences (270
+original sentences, 130 CET-4 and 78 CET-6 practice sentences) have
 reviewed semantic groups: contractions, hyphenated words, numbers, and `____` are
 tokens; punctuation and spaces remain unchanged. Articles, auxiliaries, idioms,
 and omitted words belong to their full expression, with explanatory notes where
@@ -246,3 +246,19 @@ Release acceptance includes the static browser suite, production-build account
 browser suite, server content-upgrade tests, and deployment script tests. Publish
 source updates to `main` and the account build to Aliyun. Keep GitHub Pages disabled
 and all private learning data on the account server.
+
+## CET-6 writing practice
+
+`cet6-writing.json` adds six original 150–200-word essays (AI and independent
+thinking, evaluating information, career decisions, sustainability, volunteering,
+and lifelong learning) and 24 complete writing expressions in four groups. Ten
+new categories use stable `cet6-*` keys. All 78 exercises include bilingual
+semantic alignments, speech and typing progress; essays include a prompt, outline
+and collapsible full text through the shared writing renderer. These are original
+reference materials, not past examination questions or official model answers.
+
+The one-shot `content_update:cet6-writing-v1` transaction adds items and revisions
+without altering existing content, user records or administrator edits. Both
+writing JSON resources must be included in staged and promoted releases. A failed
+preview resource only disables its own preview; independent CET-4 and CET-6 asset
+responses merge without overwriting each other or resetting the answer.

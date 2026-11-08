@@ -6,6 +6,7 @@ import Database from "better-sqlite3";
 import type { AppConfig } from "./config.js";
 import { parseSentenceMarkdown, parseWordMarkdown, type ParsedContent } from "./content-parser.js";
 import { applyContentUpdates } from "./content-updates.js";
+import { applyCet6WritingUpdate } from "./cet6-writing.js";
 import { applyCet4WritingUpdate } from "./cet4-writing.js";
 
 export type SqliteDatabase = Database.Database;
@@ -525,10 +526,15 @@ export function migrateAndSeed(db: SqliteDatabase, explicitSourceDir?: string): 
       () => JSON.parse(readFileSync(resolve(locateContentSource(explicitSourceDir), "cet4-writing.json"), "utf8")),
       () => bumpContentVersion(db)
     );
+    const advancedWriting = applyCet6WritingUpdate(
+      db,
+      () => JSON.parse(readFileSync(resolve(locateContentSource(explicitSourceDir), "cet6-writing.json"), "utf8")),
+      () => bumpContentVersion(db)
+    );
     const counts = contentCounts(db);
     return {
-      categoriesInserted: seeded.categoriesInserted + updated.categoriesInserted + writing.categoriesInserted,
-      itemsInserted: seeded.itemsInserted + updated.itemsInserted + writing.itemsInserted,
+      categoriesInserted: seeded.categoriesInserted + updated.categoriesInserted + writing.categoriesInserted + advancedWriting.categoriesInserted,
+      itemsInserted: seeded.itemsInserted + updated.itemsInserted + writing.itemsInserted + advancedWriting.itemsInserted,
       words: counts.words,
       sentences: counts.sentences
     };

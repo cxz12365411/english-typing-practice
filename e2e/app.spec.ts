@@ -3,7 +3,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { expect, test, type Page } from "@playwright/test";
 
-const totalSentences = 270 + require("../cet4-writing.js").parse(JSON.parse(readFileSync("cet4-writing.json", "utf8"))).items.length;
+const totalSentences = 270 + ["cet4-writing.json", "cet6-writing.json"].reduce((sum, file) => sum + require("../cet4-writing.js").parse(JSON.parse(readFileSync(file, "utf8"))).items.length, 0);
 
 const INITIAL_ADMIN_PASSWORD = "E2eInitialAdmin!2026";
 const ADMIN_PASSWORD = "E2eChangedAdmin!2026";
@@ -90,7 +90,7 @@ test.describe.serial("multi-user application", () => {
     await changeForcedPassword(page, learnerTemporaryPassword, LEARNER_PASSWORD);
     await expect(page).toHaveURL(/\/practice$/);
     await expect(page.getByText(`已载入 850 个单词，${totalSentences} 条句型`)).toBeVisible();
-    await expect(page.locator("#categorySelect option")).toHaveCount(41);
+    await expect(page.locator("#categorySelect option")).toHaveCount(51);
 
     await expect(page.locator("#legacyBanner")).toBeVisible();
     await page.getByRole("button", { name: "确认导入" }).click();

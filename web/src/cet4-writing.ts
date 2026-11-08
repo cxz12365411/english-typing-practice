@@ -1,6 +1,7 @@
 import "../../cet4-writing.js";
 import "../../cet4-writing.css";
 import writingDataUrl from "../../cet4-writing.json?url";
+import advancedWritingDataUrl from "../../cet6-writing.json?url";
 import type { ContentCategory, ContentItem } from "./types";
 import { mustElement } from "./ui";
 
@@ -25,7 +26,7 @@ export function createWritingPreview(options: { isActive(): boolean; onDataReady
   const abort = new AbortController();
   let disposed = false;
   if (renderer) {
-    void fetch(writingDataUrl, { signal: abort.signal }).then(response => {
+    for (const resourceUrl of [writingDataUrl, advancedWritingDataUrl]) void fetch(resourceUrl, { signal: abort.signal }).then(response => {
       if (!response.ok) throw new Error("CET-4 preview unavailable");
       return response.json() as Promise<unknown>;
     }).then(data => {

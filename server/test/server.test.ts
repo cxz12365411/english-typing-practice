@@ -7,11 +7,12 @@ import type { FastifyInstance } from "fastify";
 import { buildApp } from "../src/app.js";
 import { openDatabase, type SqliteDatabase } from "../src/database.js";
 import { hashPassword } from "../src/security.js";
+import { parseCet6WritingContent } from "../src/cet6-writing.js";
 import { parseCet4WritingContent } from "../src/cet4-writing.js";
 
 const ORIGIN = "https://english.test";
 const SOURCE = resolve(import.meta.dirname, "../..");
-const WRITING_COUNT = parseCet4WritingContent(JSON.parse(readFileSync(resolve(SOURCE, "cet4-writing.json"), "utf8"))).items.length;
+const WRITING_COUNT = parseCet4WritingContent(JSON.parse(readFileSync(resolve(SOURCE, "cet4-writing.json"), "utf8"))).items.length + parseCet6WritingContent(JSON.parse(readFileSync(resolve(SOURCE, "cet6-writing.json"), "utf8"))).items.length;
 
 interface Client {
   cookie: string;

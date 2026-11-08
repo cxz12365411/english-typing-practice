@@ -79,6 +79,7 @@ done
 /usr/bin/install -m 0600 -o root -g root "$build_dir/basic-english-850.md" "$staging/basic-english-850.md"
 /usr/bin/install -m 0600 -o root -g root "$build_dir/daily-english-high-frequency-sentences.md" "$staging/daily-english-high-frequency-sentences.md"
 /usr/bin/install -m 0600 -o root -g root "$build_dir/cet4-writing.json" "$staging/cet4-writing.json"
+/usr/bin/install -m 0600 -o root -g root "$build_dir/cet6-writing.json" "$staging/cet6-writing.json"
 
 for workspace_link in english-typing-practice-server english-typing-practice-web; do
   candidate="${staging}/server/node_modules/${workspace_link}"

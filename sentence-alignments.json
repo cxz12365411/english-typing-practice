@@ -24259,6 +24259,3924 @@
           ]
         }
       ]
+    },
+    {
+      "english": "As artificial intelligence enters university classrooms, students are gaining access to instant explanations and personalized feedback.",
+      "meaning": "随着人工智能进入大学课堂，学生正在获得即时讲解和个性化反馈。",
+      "zhParts": [
+        "随着人工智能进入大学课堂，",
+        "学生正在获得",
+        "即时讲解和个性化反馈。"
+      ],
+      "groups": [
+        {
+          "en": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5
+          ],
+          "zh": [
+            0
+          ],
+          "note": "按语义词组理解，冠词、助动词等随所属表达合译。"
+        },
+        {
+          "en": [
+            6,
+            7,
+            8,
+            9,
+            10
+          ],
+          "zh": [
+            1
+          ],
+          "note": "按语义词组理解，冠词、助动词等随所属表达合译。"
+        },
+        {
+          "en": [
+            11,
+            12,
+            13,
+            14,
+            15
+          ],
+          "zh": [
+            2
+          ],
+          "note": "按语义词组理解，冠词、助动词等随所属表达合译。"
+        }
+      ]
+    },
+    {
+      "english": "However, the educational value of these tools depends less on their speed than on how thoughtfully students use them.",
+      "meaning": "然而，这些工具的教育价值与其说取决于速度，不如说取决于学生使用时是否认真思考。",
+      "zhParts": [
+        "然而，这些工具的教育价值",
+        "与其说取决于速度，",
+        "不如说取决于学生使用时是否认真思考。"
+      ],
+      "groups": [
+        {
+          "en": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6
+          ],
+          "zh": [
+            0
+          ],
+          "note": "按语义词组理解，冠词、助动词等随所属表达合译。"
+        },
+        {
+          "en": [
+            7,
+            8,
+            9,
+            10,
+            11
+          ],
+          "zh": [
+            1
+          ],
+          "note": "按语义词组理解，冠词、助动词等随所属表达合译。"
+        },
+        {
+          "en": [
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18
+          ],
+          "zh": [
+            2
+          ],
+          "note": "按语义词组理解，冠词、助动词等随所属表达合译。"
+        }
+      ]
+    },
+    {
+      "english": "Used appropriately, an AI assistant can suggest alternative arguments and help learners identify weaknesses in an essay.",
+      "meaning": "使用得当时，人工智能助手可以提出不同的论点，并帮助学习者发现文章中的不足。",
+      "zhParts": [
+        "使用得当时，人工智能助手",
+        "可以提出不同的论点，",
+        "并帮助学习者发现文章中的不足。"
+      ],
+      "groups": [
+        {
+          "en": [
+            0,
+            1,
+            2,
+            3,
+            4
+          ],
+          "zh": [
+            0
+          ],
+          "note": "按语义词组理解，冠词、助动词等随所属表达合译。"
+        },
+        {
+          "en": [
+            5,
+            6,
+            7,
+            8
+          ],
+          "zh": [
+            1
+          ],
+          "note": "按语义词组理解，冠词、助动词等随所属表达合译。"
+        },
+        {
+          "en": [
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16
+          ],
+          "zh": [
+            2
+          ],
+          "note": "按语义词组理解，冠词、助动词等随所属表达合译。"
+        }
+      ]
+    },
+    {
+      "english": "This support is particularly useful when students compare the suggestions with their own reasoning instead of accepting every answer.",
+      "meaning": "这种支持尤其有用，当学生把建议与自己的推理进行比较，而不是接受每一个答案时。",
+      "zhParts": [
+        "这种支持尤其有用，",
+        "当学生把建议与自己的推理进行比较，",
+        "而不是接受每一个答案时。"
+      ],
+      "groups": [
+        {
+          "en": [
+            0,
+            1,
+            2,
+            3,
+            4
+          ],
+          "zh": [
+            0
+          ],
+          "note": "按语义词组理解，冠词、助动词等随所属表达合译。"
+        },
+        {
+          "en": [
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13
+          ],
+          "zh": [
+            1
+          ],
+          "note": "按语义词组理解，冠词、助动词等随所属表达合译。"
+        },
+        {
+          "en": [
+            14,
+            15,
+            16,
+            17,
+            18
+          ],
+          "zh": [
+            2
+          ],
+          "note": "按语义词组理解，冠词、助动词等随所属表达合译。"
+        }
+      ]
+    },
+    {
+      "english": "Yet fluent language does not guarantee factual accuracy, and a convincing response may contain information that cannot be verified.",
+      "meaning": "然而，流畅的语言并不能保证事实准确，看似可信的回答也可能包含无法核实的信息。",
+      "zhParts": [
+        "然而，流畅的语言",
+        "并不能保证事实准确，",
+        "看似可信的回答也可能包含无法核实的信息。"
+      ],
+      "groups": [
+        {
+          "en": [
+            0,
+            1,
+            2
+          ],
+          "zh": [
+            0
+          ],
+          "note": "按语义词组理解，冠词、助动词等随所属表达合译。"
+        },
+        {
+          "en": [
+            3,
+            4,
+            5,
+            6,
+            7
+          ],
+          "zh": [
+            1
+          ],
+          "note": "按语义词组理解，冠词、助动词等随所属表达合译。"
+        },
+        {
+          "en": [
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18
+          ],
+          "zh": [
+            2
+          ],
+          "note": "按语义词组理解，冠词、助动词等随所属表达合译。"
+        }
+      ]
+    },
+    {
+      "english": "For example, students should check original sources before including an unfamiliar statistic in an academic assignment.",
+      "meaning": "例如，学生应该核查原始来源，再把不熟悉的统计数据写入学术作业。",
+      "zhParts": [
+        "例如，学生应该核查原始来源，",
+        "再把不熟悉的统计数据",
+        "写入学术作业。"
+      ],
+      "groups": [
+        {
+          "en": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6
+          ],
+          "zh": [
+            0
+          ],
+          "note": "按语义词组理解，冠词、助动词等随所属表达合译。"
+        },
+        {
+          "en": [
+            7,
+            8,
+            9,
+            10,
+            11
+          ],
+          "zh": [
+            1
+          ],
+          "note": "按语义词组理解，冠词、助动词等随所属表达合译。"
+        },
+        {
+          "en": [
+            12,
+            13,
+            14,
+            15
+          ],
+          "zh": [
+            2
+          ],
+          "note": "按语义词组理解，冠词、助动词等随所属表达合译。"
+        }
+      ]
+    },
+    {
+      "english": "Universities should therefore teach students to question automated advice and explain the decisions they make after receiving it.",
+      "meaning": "因此，大学应该教会学生质疑自动生成的建议，并解释他们在获得建议后作出的决定。",
+      "zhParts": [
+        "因此，大学应该教会学生",
+        "质疑自动生成的建议，",
+        "并解释他们在获得建议后作出的决定。"
+      ],
+      "groups": [
+        {
+          "en": [
+            0,
+            1,
+            2,
+            3,
+            4
+          ],
+          "zh": [
+            0
+          ],
+          "note": "按语义词组理解，冠词、助动词等随所属表达合译。"
+        },
+        {
+          "en": [
+            5,
+            6,
+            7,
+            8
+          ],
+          "zh": [
+            1
+          ],
+          "note": "按语义词组理解，冠词、助动词等随所属表达合译。"
+        },
+        {
+          "en": [
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17
+          ],
+          "zh": [
+            2
+          ],
+          "note": "按语义词组理解，冠词、助动词等随所属表达合译。"
+        }
+      ]
+    },
+    {
+      "english": "A practical approach is to draft independently, consult the tool selectively, and then revise with clear reasons.",
+      "meaning": "一个可行的做法是独立起草，有选择地使用工具，然后依据明确的理由修改。",
+      "zhParts": [
+        "一个可行的做法是独立起草，",
+        "有选择地使用工具，",
+        "然后依据明确的理由修改。"
+      ],
+      "groups": [
+        {
+          "en": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6
+          ],
+          "zh": [
+            0
+          ],
+          "note": "按语义词组理解，冠词、助动词等随所属表达合译。"
+        },
+        {
+          "en": [
+            7,
+            8,
+            9,
+            10
+          ],
+          "zh": [
+            1
+          ],
+          "note": "按语义词组理解，冠词、助动词等随所属表达合译。"
+        },
+        {
+          "en": [
+            11,
+            12,
+            13,
+            14,
+            15,
+            16
+          ],
+          "zh": [
+            2
+          ],
+          "note": "按语义词组理解，冠词、助动词等随所属表达合译。"
+        }
+      ]
+    },
+    {
+      "english": "In this way, technology becomes a partner in learning rather than a substitute for the intellectual effort that meaningful education requires.",
+      "meaning": "这样一来，技术就成为学习伙伴，而非替代智力投入的工具，而有意义的教育恰恰需要这种投入。",
+      "zhParts": [
+        "这样一来，技术就成为学习伙伴，",
+        "而非替代智力投入的工具，",
+        "而有意义的教育恰恰需要这种投入。"
+      ],
+      "groups": [
+        {
+          "en": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8
+          ],
+          "zh": [
+            0
+          ],
+          "note": "按语义词组理解，冠词、助动词等随所属表达合译。"
+        },
+        {
+          "en": [
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16
+          ],
+          "zh": [
+            1
+          ],
+          "note": "按语义词组理解，冠词、助动词等随所属表达合译。"
+        },
+        {
+          "en": [
+            17,
+            18,
+            19,
+            20
+          ],
+          "zh": [
+            2
+          ],
+          "note": "按语义词组理解，冠词、助动词等随所属表达合译。"
+        }
+      ]
+    },
+    {
+      "english": "University students encounter an enormous amount of information through social media, online lectures, and everyday conversations.",
+      "meaning": "大学生接触到海量信息，来源包括社交媒体、在线讲座和日常交流。",
+      "zhParts": [
+        "大学生接触到海量信息，",
+        "来源包括社交媒体、在线讲座和日常交流。"
+      ],
+      "groups": [
+        {
+          "en": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7
+          ],
+          "zh": [
+            0
+          ],
+          "note": "按语义词组理解，冠词、助动词等随所属表达合译。"
+        },
+        {
+          "en": [
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15
+          ],
+          "zh": [
+            1
+          ],
+          "note": "按语义词组理解，冠词、助动词等随所属表达合译。"
+        }
+      ]
+    },
+    {
+      "english": "Although this abundance makes learning convenient, it also requires us to distinguish reliable evidence from attractive but misleading claims.",
+      "meaning": "虽然信息丰富让学习更方便，但它也要求我们区分可靠证据和吸引眼球却具有误导性的说法。",
+      "zhParts": [
+        "虽然信息丰富让学习更方便，",
+        "但它也要求我们区分可靠证据",
+        "和吸引眼球却具有误导性的说法。"
+      ],
+      "groups": [
+        {
+          "en": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5
+          ],
+          "zh": [
+            0
+          ],
+          "note": "按语义词组理解，冠词、助动词等随所属表达合译。"
+        },
+        {
+          "en": [
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13
+          ],
+          "zh": [
+            1
+          ],
+          "note": "按语义词组理解，冠词、助动词等随所属表达合译。"
+        },
+        {
+          "en": [
+            14,
+            15,
+            16,
+            17,
+            18
+          ],
+          "zh": [
+            2
+          ],
+          "note": "按语义词组理解，冠词、助动词等随所属表达合译。"
+        }
+      ]
+    },
+    {
+      "english": "One common problem is that dramatic headlines encourage readers to react emotionally before examining the details of a story.",
+      "meaning": "一个常见的问题是，夸张的标题促使读者作出情绪化反应，却还没有查看报道的细节。",
+      "zhParts": [
+        "一个常见的问题是，夸张的标题",
+        "促使读者作出情绪化反应，",
+        "却还没有查看报道的细节。"
+      ],
+      "groups": [
+        {
+          "en": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6
+          ],
+          "zh": [
+            0
+          ],
+          "note": "按语义词组理解，冠词、助动词等随所属表达合译。"
+        },
+        {
+          "en": [
+            7,
+            8,
+            9,
+            10,
+            11
+          ],
+          "zh": [
+            1
+          ],
+          "note": "按语义词组理解，冠词、助动词等随所属表达合译。"
+        },
+        {
+          "en": [
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18
+          ],
+          "zh": [
+            2
+          ],
+          "note": "按语义词组理解，冠词、助动词等随所属表达合译。"
+        }
+      ]
+    },
+    {
+      "english": "A second difficulty arises when numbers are presented without context, making a small change appear far more important than it really is.",
+      "meaning": "第二个困难出现在数字脱离语境呈现时，这会让微小的变化显得比实际重要得多。",
+      "zhParts": [
+        "第二个困难出现在",
+        "数字脱离语境呈现时，",
+        "这会让微小的变化显得比实际重要得多。"
+      ],
+      "groups": [
+        {
+          "en": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "zh": [
+            0
+          ],
+          "note": "按语义词组理解，冠词、助动词等随所属表达合译。"
+        },
+        {
+          "en": [
+            4,
+            5,
+            6,
+            7,
+            8,
+            9
+          ],
+          "zh": [
+            1
+          ],
+          "note": "按语义词组理解，冠词、助动词等随所属表达合译。"
+        },
+        {
+          "en": [
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21
+          ],
+          "zh": [
+            2
+          ],
+          "note": "按语义词组理解，冠词、助动词等随所属表达合译。"
+        }
+      ]
+    },
+    {
+      "english": "To avoid such mistakes, readers should ask who produced the information, what evidence supports it, and whether other credible sources agree.",
+      "meaning": "为了避免此类错误，读者应该追问信息由谁制作、有什么证据支持，以及其他可信来源是否持相同看法。",
+      "zhParts": [
+        "为了避免此类错误，",
+        "读者应该追问信息由谁制作、",
+        "有什么证据支持，以及其他可信来源是否持相同看法。"
+      ],
+      "groups": [
+        {
+          "en": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "zh": [
+            0
+          ],
+          "note": "按语义词组理解，冠词、助动词等随所属表达合译。"
+        },
+        {
+          "en": [
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10
+          ],
+          "zh": [
+            1
+          ],
+          "note": "按语义词组理解，冠词、助动词等随所属表达合译。"
+        },
+        {
+          "en": [
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20
+          ],
+          "zh": [
+            2
+          ],
+          "note": "按语义词组理解，冠词、助动词等随所属表达合译。"
+        }
+      ]
+    },
+    {
+      "english": "Checking the publication date is equally necessary, because an accurate report from several years ago may no longer describe current conditions.",
+      "meaning": "核查发布日期同样必要，因为数年前准确的报道可能已无法描述当前情况。",
+      "zhParts": [
+        "核查发布日期",
+        "同样必要，",
+        "因为数年前准确的报道可能已无法描述当前情况。"
+      ],
+      "groups": [
+        {
+          "en": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "zh": [
+            0
+          ],
+          "note": "按语义词组理解，冠词、助动词等随所属表达合译。"
+        },
+        {
+          "en": [
+            4,
+            5,
+            6
+          ],
+          "zh": [
+            1
+          ],
+          "note": "按语义词组理解，冠词、助动词等随所属表达合译。"
+        },
+        {
+          "en": [
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20
+          ],
+          "zh": [
+            2
+          ],
+          "note": "按语义词组理解，冠词、助动词等随所属表达合译。"
+        }
+      ]
+    },
+    {
+      "english": "Critical thinking does not mean rejecting every unfamiliar idea or assuming that all sources are dishonest.",
+      "meaning": "批判性思维并不意味着拒绝每一种陌生观点，或认定所有来源都不诚实。",
+      "zhParts": [
+        "批判性思维并不意味着",
+        "拒绝每一种陌生观点，",
+        "或认定所有来源都不诚实。"
+      ],
+      "groups": [
+        {
+          "en": [
+            0,
+            1,
+            2,
+            3,
+            4
+          ],
+          "zh": [
+            0
+          ],
+          "note": "按语义词组理解，冠词、助动词等随所属表达合译。"
+        },
+        {
+          "en": [
+            5,
+            6,
+            7,
+            8
+          ],
+          "zh": [
+            1
+          ],
+          "note": "按语义词组理解，冠词、助动词等随所属表达合译。"
+        },
+        {
+          "en": [
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15
+          ],
+          "zh": [
+            2
+          ],
+          "note": "按语义词组理解，冠词、助动词等随所属表达合译。"
+        }
+      ]
+    },
+    {
+      "english": "Rather, it means remaining open to new evidence while being willing to postpone judgment when the available information is incomplete.",
+      "meaning": "相反，它意味着对新证据保持开放，同时愿意暂缓判断，当现有信息不完整时。",
+      "zhParts": [
+        "相反，它意味着对新证据保持开放，",
+        "同时愿意暂缓判断，",
+        "当现有信息不完整时。"
+      ],
+      "groups": [
+        {
+          "en": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7
+          ],
+          "zh": [
+            0
+          ],
+          "note": "按语义词组理解，冠词、助动词等随所属表达合译。"
+        },
+        {
+          "en": [
+            8,
+            9,
+            10,
+            11,
+            12,
+            13
+          ],
+          "zh": [
+            1
+          ],
+          "note": "按语义词组理解，冠词、助动词等随所属表达合译。"
+        },
+        {
+          "en": [
+            14,
+            15,
+            16,
+            17,
+            18,
+            19
+          ],
+          "zh": [
+            2
+          ],
+          "note": "按语义词组理解，冠词、助动词等随所属表达合译。"
+        }
+      ]
+    },
+    {
+      "english": "By developing this habit, students can become more responsible participants in both academic discussions and public debate.",
+      "meaning": "通过培养这一习惯，学生能够成为更负责任的参与者，无论在学术讨论还是公共辩论中。",
+      "zhParts": [
+        "通过培养这一习惯，",
+        "学生能够成为更负责任的参与者，",
+        "无论在学术讨论还是公共辩论中。"
+      ],
+      "groups": [
+        {
+          "en": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "zh": [
+            0
+          ],
+          "note": "按语义词组理解，冠词、助动词等随所属表达合译。"
+        },
+        {
+          "en": [
+            4,
+            5,
+            6,
+            7,
+            8,
+            9
+          ],
+          "zh": [
+            1
+          ],
+          "note": "按语义词组理解，冠词、助动词等随所属表达合译。"
+        },
+        {
+          "en": [
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16
+          ],
+          "zh": [
+            2
+          ],
+          "note": "按语义词组理解，冠词、助动词等随所属表达合译。"
+        }
+      ]
+    },
+    {
+      "english": "For many university graduates, choosing a first job means balancing immediate financial needs with expectations about future development.",
+      "meaning": "对许多大学毕业生而言，选择第一份工作意味着平衡眼前的经济需求与对未来发展的期待。",
+      "zhParts": [
+        "对许多大学毕业生而言，",
+        "选择第一份工作意味着平衡眼前的经济需求",
+        "与对未来发展的期待。"
+      ],
+      "groups": [
+        {
+          "en": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "zh": [
+            0
+          ],
+          "note": "按语义词组理解，冠词、助动词等随所属表达合译。"
+        },
+        {
+          "en": [
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12
+          ],
+          "zh": [
+            1
+          ],
+          "note": "按语义词组理解，冠词、助动词等随所属表达合译。"
+        },
+        {
+          "en": [
+            13,
+            14,
+            15,
+            16,
+            17
+          ],
+          "zh": [
+            2
+          ],
+          "note": "按语义词组理解，冠词、助动词等随所属表达合译。"
+        }
+      ]
+    },
+    {
+      "english": "A high salary is understandably attractive, but it should not be the only factor that determines a career decision.",
+      "meaning": "高薪具有吸引力是可以理解的，但它不应成为唯一因素，用来决定职业选择。",
+      "zhParts": [
+        "高薪具有吸引力是可以理解的，",
+        "但它不应成为唯一因素，",
+        "用来决定职业选择。"
+      ],
+      "groups": [
+        {
+          "en": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5
+          ],
+          "zh": [
+            0
+          ],
+          "note": "按语义词组理解，冠词、助动词等随所属表达合译。"
+        },
+        {
+          "en": [
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13
+          ],
+          "zh": [
+            1
+          ],
+          "note": "按语义词组理解，冠词、助动词等随所属表达合译。"
+        },
+        {
+          "en": [
+            14,
+            15,
+            16,
+            17,
+            18
+          ],
+          "zh": [
+            2
+          ],
+          "note": "按语义词组理解，冠词、助动词等随所属表达合译。"
+        }
+      ]
+    },
+    {
+      "english": "A position that offers meaningful training may help a beginner acquire transferable skills and gradually discover where their strengths lie.",
+      "meaning": "一个提供有意义培训的岗位可能帮助新人获得可迁移的技能，并逐渐发现自己的优势所在。",
+      "zhParts": [
+        "一个提供有意义培训的岗位",
+        "可能帮助新人获得可迁移的技能，",
+        "并逐渐发现自己的优势所在。"
+      ],
+      "groups": [
+        {
+          "en": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5
+          ],
+          "zh": [
+            0
+          ],
+          "note": "按语义词组理解，冠词、助动词等随所属表达合译。"
+        },
+        {
+          "en": [
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12
+          ],
+          "zh": [
+            1
+          ],
+          "note": "按语义词组理解，冠词、助动词等随所属表达合译。"
+        },
+        {
+          "en": [
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19
+          ],
+          "zh": [
+            2
+          ],
+          "note": "按语义词组理解，冠词、助动词等随所属表达合译。"
+        }
+      ]
+    },
+    {
+      "english": "For instance, working with an experienced team can improve communication and problem-solving abilities, which remain valuable even when industries change.",
+      "meaning": "例如，与经验丰富的团队共事能够提升沟通和解决问题的能力，即使行业发生变化，这些能力仍然有价值。",
+      "zhParts": [
+        "例如，与经验丰富的团队共事",
+        "能够提升沟通和解决问题的能力，",
+        "即使行业发生变化，这些能力仍然有价值。"
+      ],
+      "groups": [
+        {
+          "en": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6
+          ],
+          "zh": [
+            0
+          ],
+          "note": "按语义词组理解，冠词、助动词等随所属表达合译。"
+        },
+        {
+          "en": [
+            7,
+            8,
+            9,
+            10,
+            11,
+            12
+          ],
+          "zh": [
+            1
+          ],
+          "note": "按语义词组理解，冠词、助动词等随所属表达合译。"
+        },
+        {
+          "en": [
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19
+          ],
+          "zh": [
+            2
+          ],
+          "note": "按语义词组理解，冠词、助动词等随所属表达合译。"
+        }
+      ]
+    },
+    {
+      "english": "Nevertheless, advice to follow one's passion should not ignore practical responsibilities, especially for graduates who need to support their families.",
+      "meaning": "然而，追随个人热情的建议不应忽略实际责任，尤其是对需要支持家庭的毕业生而言。",
+      "zhParts": [
+        "然而，追随个人热情的建议",
+        "不应忽略实际责任，",
+        "尤其是对需要支持家庭的毕业生而言。"
+      ],
+      "groups": [
+        {
+          "en": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5
+          ],
+          "zh": [
+            0
+          ],
+          "note": "按语义词组理解，冠词、助动词等随所属表达合译。"
+        },
+        {
+          "en": [
+            6,
+            7,
+            8,
+            9,
+            10
+          ],
+          "zh": [
+            1
+          ],
+          "note": "按语义词组理解，冠词、助动词等随所属表达合译。"
+        },
+        {
+          "en": [
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19
+          ],
+          "zh": [
+            2
+          ],
+          "note": "按语义词组理解，冠词、助动词等随所属表达合译。"
+        }
+      ]
+    },
+    {
+      "english": "The challenge is to find a reasonable balance between personal interests, acceptable working conditions, and realistic financial requirements.",
+      "meaning": "难点在于找到合理的平衡，在个人兴趣、可以接受的工作条件与现实的经济需求之间。",
+      "zhParts": [
+        "难点在于找到合理的平衡，",
+        "在个人兴趣、可以接受的工作条件",
+        "与现实的经济需求之间。"
+      ],
+      "groups": [
+        {
+          "en": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7
+          ],
+          "zh": [
+            0
+          ],
+          "note": "按语义词组理解，冠词、助动词等随所属表达合译。"
+        },
+        {
+          "en": [
+            8,
+            9,
+            10,
+            11,
+            12,
+            13
+          ],
+          "zh": [
+            1
+          ],
+          "note": "按语义词组理解，冠词、助动词等随所属表达合译。"
+        },
+        {
+          "en": [
+            14,
+            15,
+            16,
+            17
+          ],
+          "zh": [
+            2
+          ],
+          "note": "按语义词组理解，冠词、助动词等随所属表达合译。"
+        }
+      ]
+    },
+    {
+      "english": "Before accepting an offer, graduates can speak with current employees and investigate what their daily responsibilities would actually involve.",
+      "meaning": "在接受录用之前，毕业生可以与在职员工交流，并了解日常职责实际包含哪些内容。",
+      "zhParts": [
+        "在接受录用之前，",
+        "毕业生可以与在职员工交流，",
+        "并了解日常职责实际包含哪些内容。"
+      ],
+      "groups": [
+        {
+          "en": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "zh": [
+            0
+          ],
+          "note": "按语义词组理解，冠词、助动词等随所属表达合译。"
+        },
+        {
+          "en": [
+            4,
+            5,
+            6,
+            7,
+            8,
+            9
+          ],
+          "zh": [
+            1
+          ],
+          "note": "按语义词组理解，冠词、助动词等随所属表达合译。"
+        },
+        {
+          "en": [
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18
+          ],
+          "zh": [
+            2
+          ],
+          "note": "按语义词组理解，冠词、助动词等随所属表达合译。"
+        }
+      ]
+    },
+    {
+      "english": "Internships and small projects also provide evidence that is more useful than an impressive job title alone.",
+      "meaning": "实习和小型项目也能提供依据，比仅仅一个听起来不错的职位名称更有用。",
+      "zhParts": [
+        "实习和小型项目",
+        "也能提供依据，",
+        "比仅仅一个听起来不错的职位名称更有用。"
+      ],
+      "groups": [
+        {
+          "en": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "zh": [
+            0
+          ],
+          "note": "按语义词组理解，冠词、助动词等随所属表达合译。"
+        },
+        {
+          "en": [
+            4,
+            5,
+            6
+          ],
+          "zh": [
+            1
+          ],
+          "note": "按语义词组理解，冠词、助动词等随所属表达合译。"
+        },
+        {
+          "en": [
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16
+          ],
+          "zh": [
+            2
+          ],
+          "note": "按语义词组理解，冠词、助动词等随所属表达合译。"
+        }
+      ]
+    },
+    {
+      "english": "Ultimately, a thoughtful career choice should leave room for learning and adjustment, rather than promise a perfect path from the very beginning.",
+      "meaning": "最终，经过深思熟虑的职业选择应该为学习和调整留出空间，而不是承诺从一开始就拥有完美的道路。",
+      "zhParts": [
+        "最终，经过深思熟虑的职业选择",
+        "应该为学习和调整留出空间，",
+        "而不是承诺从一开始就拥有完美的道路。"
+      ],
+      "groups": [
+        {
+          "en": [
+            0,
+            1,
+            2,
+            3,
+            4
+          ],
+          "zh": [
+            0
+          ],
+          "note": "按语义词组理解，冠词、助动词等随所属表达合译。"
+        },
+        {
+          "en": [
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11
+          ],
+          "zh": [
+            1
+          ],
+          "note": "按语义词组理解，冠词、助动词等随所属表达合译。"
+        },
+        {
+          "en": [
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21
+          ],
+          "zh": [
+            2
+          ],
+          "note": "按语义词组理解，冠词、助动词等随所属表达合译。"
+        }
+      ]
+    },
+    {
+      "english": "Environmental protection is often discussed as a matter of individual responsibility, and students are encouraged to make greener choices in daily life.",
+      "meaning": "环境保护经常被讨论，被视为个人责任的问题，学生也被鼓励在日常生活中作出更环保的选择。",
+      "zhParts": [
+        "环境保护经常被讨论，",
+        "被视为个人责任的问题，",
+        "学生也被鼓励在日常生活中作出更环保的选择。"
+      ],
+      "groups": [
+        {
+          "en": [
+            0,
+            1,
+            2,
+            3,
+            4
+          ],
+          "zh": [
+            0
+          ],
+          "note": "按语义词组理解，冠词、助动词等随所属表达合译。"
+        },
+        {
+          "en": [
+            5,
+            6,
+            7,
+            8,
+            9,
+            10
+          ],
+          "zh": [
+            1
+          ],
+          "note": "按语义词组理解，冠词、助动词等随所属表达合译。"
+        },
+        {
+          "en": [
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21
+          ],
+          "zh": [
+            2
+          ],
+          "note": "按语义词组理解，冠词、助动词等随所属表达合译。"
+        }
+      ]
+    },
+    {
+      "english": "Such choices matter, yet lasting change becomes more likely when institutions make responsible behavior convenient and affordable.",
+      "meaning": "这些选择很重要，然而，持久的改变更有可能发生，当机构让负责任的行为变得方便且负担得起时。",
+      "zhParts": [
+        "这些选择很重要，",
+        "然而，持久的改变更有可能发生，",
+        "当机构让负责任的行为变得方便且负担得起时。"
+      ],
+      "groups": [
+        {
+          "en": [
+            0,
+            1,
+            2
+          ],
+          "zh": [
+            0
+          ],
+          "note": "按语义词组理解，冠词、助动词等随所属表达合译。"
+        },
+        {
+          "en": [
+            3,
+            4,
+            5,
+            6,
+            7,
+            8
+          ],
+          "zh": [
+            1
+          ],
+          "note": "按语义词组理解，冠词、助动词等随所属表达合译。"
+        },
+        {
+          "en": [
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16
+          ],
+          "zh": [
+            2
+          ],
+          "note": "按语义词组理解，冠词、助动词等随所属表达合译。"
+        }
+      ]
+    },
+    {
+      "english": "Consider the use of reusable containers in a university dining hall, where students often have limited time between classes.",
+      "meaning": "以使用可重复使用的容器为例，在大学食堂中，学生在课间往往时间有限。",
+      "zhParts": [
+        "以使用可重复使用的容器为例，",
+        "在大学食堂中，",
+        "学生在课间往往时间有限。"
+      ],
+      "groups": [
+        {
+          "en": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5
+          ],
+          "zh": [
+            0
+          ],
+          "note": "按语义词组理解，冠词、助动词等随所属表达合译。"
+        },
+        {
+          "en": [
+            6,
+            7,
+            8,
+            9,
+            10
+          ],
+          "zh": [
+            1
+          ],
+          "note": "按语义词组理解，冠词、助动词等随所属表达合译。"
+        },
+        {
+          "en": [
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18
+          ],
+          "zh": [
+            2
+          ],
+          "note": "按语义词组理解，冠词、助动词等随所属表达合译。"
+        }
+      ]
+    },
+    {
+      "english": "Simply asking everyone to avoid disposable packaging may achieve little if washing facilities are unavailable or reusable options cost much more.",
+      "meaning": "仅仅要求每个人避免使用一次性包装可能收效甚微，如果没有清洗设施，或可重复使用的用品贵得多。",
+      "zhParts": [
+        "仅仅要求每个人避免使用一次性包装",
+        "可能收效甚微，",
+        "如果没有清洗设施，或可重复使用的用品贵得多。"
+      ],
+      "groups": [
+        {
+          "en": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6
+          ],
+          "zh": [
+            0
+          ],
+          "note": "按语义词组理解，冠词、助动词等随所属表达合译。"
+        },
+        {
+          "en": [
+            7,
+            8,
+            9
+          ],
+          "zh": [
+            1
+          ],
+          "note": "按语义词组理解，冠词、助动词等随所属表达合译。"
+        },
+        {
+          "en": [
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20
+          ],
+          "zh": [
+            2
+          ],
+          "note": "按语义词组理解，冠词、助动词等随所属表达合译。"
+        }
+      ]
+    },
+    {
+      "english": "By providing convenient collection points and clear instructions, the university can remove barriers that prevent good intentions from becoming regular habits.",
+      "meaning": "通过提供方便的回收点和清晰的指引，大学能够消除障碍，这些障碍妨碍良好意愿转化为日常习惯。",
+      "zhParts": [
+        "通过提供方便的回收点和清晰的指引，",
+        "大学能够消除障碍，",
+        "这些障碍妨碍良好意愿转化为日常习惯。"
+      ],
+      "groups": [
+        {
+          "en": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7
+          ],
+          "zh": [
+            0
+          ],
+          "note": "按语义词组理解，冠词、助动词等随所属表达合译。"
+        },
+        {
+          "en": [
+            8,
+            9,
+            10,
+            11,
+            12
+          ],
+          "zh": [
+            1
+          ],
+          "note": "按语义词组理解，冠词、助动词等随所属表达合译。"
+        },
+        {
+          "en": [
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20
+          ],
+          "zh": [
+            2
+          ],
+          "note": "按语义词组理解，冠词、助动词等随所属表达合译。"
+        }
+      ]
+    },
+    {
+      "english": "The same principle applies to transport: safe bicycle routes and reliable buses make alternatives to private cars more attractive.",
+      "meaning": "同样的原则适用于交通：安全的自行车道和可靠的公交服务让私家车以外的出行方式更有吸引力。",
+      "zhParts": [
+        "同样的原则适用于交通：",
+        "安全的自行车道和可靠的公交服务",
+        "让私家车以外的出行方式更有吸引力。"
+      ],
+      "groups": [
+        {
+          "en": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5
+          ],
+          "zh": [
+            0
+          ],
+          "note": "按语义词组理解，冠词、助动词等随所属表达合译。"
+        },
+        {
+          "en": [
+            6,
+            7,
+            8,
+            9,
+            10,
+            11
+          ],
+          "zh": [
+            1
+          ],
+          "note": "按语义词组理解，冠词、助动词等随所属表达合译。"
+        },
+        {
+          "en": [
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18
+          ],
+          "zh": [
+            2
+          ],
+          "note": "按语义词组理解，冠词、助动词等随所属表达合译。"
+        }
+      ]
+    },
+    {
+      "english": "Students still have an important role in using these services responsibly and reporting problems that discourage participation.",
+      "meaning": "学生仍然发挥重要作用，包括负责任地使用这些服务，以及报告阻碍参与的问题。",
+      "zhParts": [
+        "学生仍然发挥重要作用，",
+        "包括负责任地使用这些服务，",
+        "以及报告阻碍参与的问题。"
+      ],
+      "groups": [
+        {
+          "en": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5
+          ],
+          "zh": [
+            0
+          ],
+          "note": "按语义词组理解，冠词、助动词等随所属表达合译。"
+        },
+        {
+          "en": [
+            6,
+            7,
+            8,
+            9,
+            10
+          ],
+          "zh": [
+            1
+          ],
+          "note": "按语义词组理解，冠词、助动词等随所属表达合译。"
+        },
+        {
+          "en": [
+            11,
+            12,
+            13,
+            14,
+            15,
+            16
+          ],
+          "zh": [
+            2
+          ],
+          "note": "按语义词组理解，冠词、助动词等随所属表达合译。"
+        }
+      ]
+    },
+    {
+      "english": "Meanwhile, campus managers should evaluate actual reductions in waste instead of judging success only by the number of posters displayed.",
+      "meaning": "与此同时，校园管理者应该评估垃圾的实际减少量，而不是判断成功与否仅凭张贴的海报数量。",
+      "zhParts": [
+        "与此同时，校园管理者应该评估垃圾的实际减少量，",
+        "而不是判断成功与否",
+        "仅凭张贴的海报数量。"
+      ],
+      "groups": [
+        {
+          "en": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8
+          ],
+          "zh": [
+            0
+          ],
+          "note": "按语义词组理解，冠词、助动词等随所属表达合译。"
+        },
+        {
+          "en": [
+            9,
+            10,
+            11,
+            12
+          ],
+          "zh": [
+            1
+          ],
+          "note": "按语义词组理解，冠词、助动词等随所属表达合译。"
+        },
+        {
+          "en": [
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19
+          ],
+          "zh": [
+            2
+          ],
+          "note": "按语义词组理解，冠词、助动词等随所属表达合译。"
+        }
+      ]
+    },
+    {
+      "english": "When personal commitment is supported by thoughtful design, sustainability can become an ordinary part of campus life rather than an occasional campaign.",
+      "meaning": "当周到的设计支持个人投入时，可持续发展就能成为校园生活的日常部分，而非偶尔开展的活动。",
+      "zhParts": [
+        "当周到的设计支持个人投入时，",
+        "可持续发展就能成为校园生活的日常部分，",
+        "而非偶尔开展的活动。"
+      ],
+      "groups": [
+        {
+          "en": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7
+          ],
+          "zh": [
+            0
+          ],
+          "note": "按语义词组理解，冠词、助动词等随所属表达合译。"
+        },
+        {
+          "en": [
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16
+          ],
+          "zh": [
+            1
+          ],
+          "note": "按语义词组理解，冠词、助动词等随所属表达合译。"
+        },
+        {
+          "en": [
+            17,
+            18,
+            19,
+            20,
+            21
+          ],
+          "zh": [
+            2
+          ],
+          "note": "按语义词组理解，冠词、助动词等随所属表达合译。"
+        }
+      ]
+    },
+    {
+      "english": "Volunteering offers university students an opportunity to contribute to their communities while gaining a deeper understanding of lives different from their own.",
+      "meaning": "志愿服务为大学生提供机会，让他们为社区作出贡献，同时更深入地了解与自己不同的生活。",
+      "zhParts": [
+        "志愿服务为大学生提供机会，",
+        "让他们为社区作出贡献，",
+        "同时更深入地了解与自己不同的生活。"
+      ],
+      "groups": [
+        {
+          "en": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5
+          ],
+          "zh": [
+            0
+          ],
+          "note": "按语义词组理解，冠词、助动词等随所属表达合译。"
+        },
+        {
+          "en": [
+            6,
+            7,
+            8,
+            9,
+            10
+          ],
+          "zh": [
+            1
+          ],
+          "note": "按语义词组理解，冠词、助动词等随所属表达合译。"
+        },
+        {
+          "en": [
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21
+          ],
+          "zh": [
+            2
+          ],
+          "note": "按语义词组理解，冠词、助动词等随所属表达合译。"
+        }
+      ]
+    },
+    {
+      "english": "However, enthusiasm alone is insufficient if a project is designed mainly for publicity rather than the needs of the people it serves.",
+      "meaning": "然而，仅有热情还不够，如果一个项目主要是为了宣传，而不是为了服务对象的需求。",
+      "zhParts": [
+        "然而，仅有热情还不够，",
+        "如果一个项目主要是为了宣传，",
+        "而不是为了服务对象的需求。"
+      ],
+      "groups": [
+        {
+          "en": [
+            0,
+            1,
+            2,
+            3,
+            4
+          ],
+          "zh": [
+            0
+          ],
+          "note": "按语义词组理解，冠词、助动词等随所属表达合译。"
+        },
+        {
+          "en": [
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12
+          ],
+          "zh": [
+            1
+          ],
+          "note": "按语义词组理解，冠词、助动词等随所属表达合译。"
+        },
+        {
+          "en": [
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21
+          ],
+          "zh": [
+            2
+          ],
+          "note": "按语义词组理解，冠词、助动词等随所属表达合译。"
+        }
+      ]
+    },
+    {
+      "english": "Before organizing an activity, student groups should consult local residents and ask what kind of assistance would genuinely be helpful.",
+      "meaning": "在组织活动之前，学生团体应该咨询当地居民，询问哪种帮助才真正有用。",
+      "zhParts": [
+        "在组织活动之前，",
+        "学生团体应该咨询当地居民，",
+        "询问哪种帮助才真正有用。"
+      ],
+      "groups": [
+        {
+          "en": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "zh": [
+            0
+          ],
+          "note": "按语义词组理解，冠词、助动词等随所属表达合译。"
+        },
+        {
+          "en": [
+            4,
+            5,
+            6,
+            7,
+            8,
+            9
+          ],
+          "zh": [
+            1
+          ],
+          "note": "按语义词组理解，冠词、助动词等随所属表达合译。"
+        },
+        {
+          "en": [
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19
+          ],
+          "zh": [
+            2
+          ],
+          "note": "按语义词组理解，冠词、助动词等随所属表达合译。"
+        }
+      ]
+    },
+    {
+      "english": "For example, older residents may prefer regular help with digital services to a single performance that attracts attention but leaves practical difficulties unresolved.",
+      "meaning": "例如，老年居民可能更希望定期获得数字服务方面的帮助，而不是一场演出，演出虽然引人关注，却没有解决实际困难。",
+      "zhParts": [
+        "例如，老年居民可能更希望定期获得数字服务方面的帮助，",
+        "而不是一场演出，",
+        "演出虽然引人关注，却没有解决实际困难。"
+      ],
+      "groups": [
+        {
+          "en": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10
+          ],
+          "zh": [
+            0
+          ],
+          "note": "按语义词组理解，冠词、助动词等随所属表达合译。"
+        },
+        {
+          "en": [
+            11,
+            12,
+            13,
+            14
+          ],
+          "zh": [
+            1
+          ],
+          "note": "按语义词组理解，冠词、助动词等随所属表达合译。"
+        },
+        {
+          "en": [
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21,
+            22
+          ],
+          "zh": [
+            2
+          ],
+          "note": "按语义词组理解，冠词、助动词等随所属表达合译。"
+        }
+      ]
+    },
+    {
+      "english": "Volunteers also need appropriate training, because even well-intentioned actions can cause confusion when participants lack relevant knowledge or communication skills.",
+      "meaning": "志愿者还需要适当的培训，因为即使出于好意的行动，也可能造成困扰，如果参与者缺乏相关知识或沟通技巧。",
+      "zhParts": [
+        "志愿者还需要适当的培训，",
+        "因为即使出于好意的行动，",
+        "也可能造成困扰，如果参与者缺乏相关知识或沟通技巧。"
+      ],
+      "groups": [
+        {
+          "en": [
+            0,
+            1,
+            2,
+            3,
+            4
+          ],
+          "zh": [
+            0
+          ],
+          "note": "按语义词组理解，冠词、助动词等随所属表达合译。"
+        },
+        {
+          "en": [
+            5,
+            6,
+            7,
+            8
+          ],
+          "zh": [
+            1
+          ],
+          "note": "按语义词组理解，冠词、助动词等随所属表达合译。"
+        },
+        {
+          "en": [
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19
+          ],
+          "zh": [
+            2
+          ],
+          "note": "按语义词组理解，冠词、助动词等随所属表达合译。"
+        }
+      ]
+    },
+    {
+      "english": "Maintaining a consistent schedule helps build trust and allows community partners to plan their work with greater confidence.",
+      "meaning": "保持稳定的服务安排有助于建立信任，并让社区合作方更有把握地规划工作。",
+      "zhParts": [
+        "保持稳定的服务安排",
+        "有助于建立信任，",
+        "并让社区合作方更有把握地规划工作。"
+      ],
+      "groups": [
+        {
+          "en": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "zh": [
+            0
+          ],
+          "note": "按语义词组理解，冠词、助动词等随所属表达合译。"
+        },
+        {
+          "en": [
+            4,
+            5,
+            6
+          ],
+          "zh": [
+            1
+          ],
+          "note": "按语义词组理解，冠词、助动词等随所属表达合译。"
+        },
+        {
+          "en": [
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17
+          ],
+          "zh": [
+            2
+          ],
+          "note": "按语义词组理解，冠词、助动词等随所属表达合译。"
+        }
+      ]
+    },
+    {
+      "english": "After each project, students should invite feedback from those they assisted and use it to improve future activities.",
+      "meaning": "每个项目结束后，学生应该邀请受助者提供反馈，并用反馈改进后续活动。",
+      "zhParts": [
+        "每个项目结束后，",
+        "学生应该邀请受助者提供反馈，",
+        "并用反馈改进后续活动。"
+      ],
+      "groups": [
+        {
+          "en": [
+            0,
+            1,
+            2
+          ],
+          "zh": [
+            0
+          ],
+          "note": "按语义词组理解，冠词、助动词等随所属表达合译。"
+        },
+        {
+          "en": [
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10
+          ],
+          "zh": [
+            1
+          ],
+          "note": "按语义词组理解，冠词、助动词等随所属表达合译。"
+        },
+        {
+          "en": [
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17
+          ],
+          "zh": [
+            2
+          ],
+          "note": "按语义词组理解，冠词、助动词等随所属表达合译。"
+        }
+      ]
+    },
+    {
+      "english": "The success of volunteering should therefore be measured not merely in hours recorded, but in the usefulness and reliability of the service provided.",
+      "meaning": "志愿服务的成功因此不应仅仅用记录的时长衡量，而应看所提供服务的实用性和可靠性。",
+      "zhParts": [
+        "志愿服务的成功",
+        "因此不应仅仅用记录的时长衡量，",
+        "而应看所提供服务的实用性和可靠性。"
+      ],
+      "groups": [
+        {
+          "en": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "zh": [
+            0
+          ],
+          "note": "按语义词组理解，冠词、助动词等随所属表达合译。"
+        },
+        {
+          "en": [
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12
+          ],
+          "zh": [
+            1
+          ],
+          "note": "按语义词组理解，冠词、助动词等随所属表达合译。"
+        },
+        {
+          "en": [
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21,
+            22
+          ],
+          "zh": [
+            2
+          ],
+          "note": "按语义词组理解，冠词、助动词等随所属表达合译。"
+        }
+      ]
+    },
+    {
+      "english": "Such an approach benefits the community and teaches students that responsible participation begins with listening rather than assuming.",
+      "meaning": "这种做法有益于社区，也让学生懂得，负责任的参与始于倾听，而不是主观假设。",
+      "zhParts": [
+        "这种做法有益于社区，",
+        "也让学生懂得，",
+        "负责任的参与始于倾听，而不是主观假设。"
+      ],
+      "groups": [
+        {
+          "en": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5
+          ],
+          "zh": [
+            0
+          ],
+          "note": "按语义词组理解，冠词、助动词等随所属表达合译。"
+        },
+        {
+          "en": [
+            6,
+            7,
+            8
+          ],
+          "zh": [
+            1
+          ],
+          "note": "按语义词组理解，冠词、助动词等随所属表达合译。"
+        },
+        {
+          "en": [
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17
+          ],
+          "zh": [
+            2
+          ],
+          "note": "按语义词组理解，冠词、助动词等随所属表达合译。"
+        }
+      ]
+    },
+    {
+      "english": "Graduation marks the completion of a degree, but it does not bring the need for learning to an end.",
+      "meaning": "毕业标志着一个学位的完成，但并不意味着学习需求的终结。",
+      "zhParts": [
+        "毕业标志着一个学位的完成，",
+        "但并不意味着学习需求的终结。"
+      ],
+      "groups": [
+        {
+          "en": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6
+          ],
+          "zh": [
+            0
+          ],
+          "note": "按语义词组理解，冠词、助动词等随所属表达合译。"
+        },
+        {
+          "en": [
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18
+          ],
+          "zh": [
+            1
+          ],
+          "note": "按语义词组理解，冠词、助动词等随所属表达合译。"
+        }
+      ]
+    },
+    {
+      "english": "As technologies and working practices evolve, people must regularly update their knowledge to remain capable of responding to unfamiliar challenges.",
+      "meaning": "随着技术和工作方式不断发展，人们必须定期更新知识，以保持应对陌生挑战的能力。",
+      "zhParts": [
+        "随着技术和工作方式不断发展，",
+        "人们必须定期更新知识，",
+        "以保持应对陌生挑战的能力。"
+      ],
+      "groups": [
+        {
+          "en": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5
+          ],
+          "zh": [
+            0
+          ],
+          "note": "按语义词组理解，冠词、助动词等随所属表达合译。"
+        },
+        {
+          "en": [
+            6,
+            7,
+            8,
+            9,
+            10,
+            11
+          ],
+          "zh": [
+            1
+          ],
+          "note": "按语义词组理解，冠词、助动词等随所属表达合译。"
+        },
+        {
+          "en": [
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19
+          ],
+          "zh": [
+            2
+          ],
+          "note": "按语义词组理解，冠词、助动词等随所属表达合译。"
+        }
+      ]
+    },
+    {
+      "english": "Lifelong learning is most effective when it begins with a specific question rather than a vague desire to collect more certificates.",
+      "meaning": "终身学习最有效，当它始于一个具体问题时，而不是模糊地想要收集更多证书。",
+      "zhParts": [
+        "终身学习最有效，",
+        "当它始于一个具体问题时，",
+        "而不是模糊地想要收集更多证书。"
+      ],
+      "groups": [
+        {
+          "en": [
+            0,
+            1,
+            2,
+            3,
+            4
+          ],
+          "zh": [
+            0
+          ],
+          "note": "按语义词组理解，冠词、助动词等随所属表达合译。"
+        },
+        {
+          "en": [
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11
+          ],
+          "zh": [
+            1
+          ],
+          "note": "按语义词组理解，冠词、助动词等随所属表达合译。"
+        },
+        {
+          "en": [
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20
+          ],
+          "zh": [
+            2
+          ],
+          "note": "按语义词组理解，冠词、助动词等随所属表达合译。"
+        }
+      ]
+    },
+    {
+      "english": "Someone who struggles to explain complex ideas at work, for instance, can study clear writing and immediately apply the lessons to everyday reports.",
+      "meaning": "一个在工作中难以解释复杂想法的人，例如，可以学习清晰写作，并立即将所学应用于日常报告。",
+      "zhParts": [
+        "一个在工作中难以解释复杂想法的人，",
+        "例如，可以学习清晰写作，",
+        "并立即将所学应用于日常报告。"
+      ],
+      "groups": [
+        {
+          "en": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8
+          ],
+          "zh": [
+            0
+          ],
+          "note": "按语义词组理解，冠词、助动词等随所属表达合译。"
+        },
+        {
+          "en": [
+            9,
+            10,
+            11,
+            12,
+            13,
+            14
+          ],
+          "zh": [
+            1
+          ],
+          "note": "按语义词组理解，冠词、助动词等随所属表达合译。"
+        },
+        {
+          "en": [
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21,
+            22
+          ],
+          "zh": [
+            2
+          ],
+          "note": "按语义词组理解，冠词、助动词等随所属表达合译。"
+        }
+      ]
+    },
+    {
+      "english": "Feedback from colleagues then reveals which strategies are helpful and which aspects still require further practice and reflection.",
+      "meaning": "同事的反馈随后能揭示哪些策略有帮助，以及哪些方面仍需要进一步练习和反思。",
+      "zhParts": [
+        "同事的反馈",
+        "随后能揭示哪些策略有帮助，",
+        "以及哪些方面仍需要进一步练习和反思。"
+      ],
+      "groups": [
+        {
+          "en": [
+            0,
+            1,
+            2
+          ],
+          "zh": [
+            0
+          ],
+          "note": "按语义词组理解，冠词、助动词等随所属表达合译。"
+        },
+        {
+          "en": [
+            3,
+            4,
+            5,
+            6,
+            7,
+            8
+          ],
+          "zh": [
+            1
+          ],
+          "note": "按语义词组理解，冠词、助动词等随所属表达合译。"
+        },
+        {
+          "en": [
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17
+          ],
+          "zh": [
+            2
+          ],
+          "note": "按语义词组理解，冠词、助动词等随所属表达合译。"
+        }
+      ]
+    },
+    {
+      "english": "This cycle of learning, application, and review turns information into usable skills instead of leaving it as forgotten notes.",
+      "meaning": "这种学习、应用和复盘的循环把信息转化为可用的技能，而不是让它变成被遗忘的笔记。",
+      "zhParts": [
+        "这种学习、应用和复盘的循环",
+        "把信息转化为可用的技能，",
+        "而不是让它变成被遗忘的笔记。"
+      ],
+      "groups": [
+        {
+          "en": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6
+          ],
+          "zh": [
+            0
+          ],
+          "note": "按语义词组理解，冠词、助动词等随所属表达合译。"
+        },
+        {
+          "en": [
+            7,
+            8,
+            9,
+            10,
+            11
+          ],
+          "zh": [
+            1
+          ],
+          "note": "按语义词组理解，冠词、助动词等随所属表达合译。"
+        },
+        {
+          "en": [
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18
+          ],
+          "zh": [
+            2
+          ],
+          "note": "按语义词组理解，冠词、助动词等随所属表达合译。"
+        }
+      ]
+    },
+    {
+      "english": "It is equally important to choose a sustainable pace, since ambitious plans often fail when they leave no room for rest or unexpected responsibilities.",
+      "meaning": "同样重要的是，选择可持续的节奏，因为过于雄心勃勃的计划常常失败，如果它们没有为休息或突发责任留出空间。",
+      "zhParts": [
+        "同样重要的是，",
+        "选择可持续的节奏，",
+        "因为过于雄心勃勃的计划常常失败，如果它们没有为休息或突发责任留出空间。"
+      ],
+      "groups": [
+        {
+          "en": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "zh": [
+            0
+          ],
+          "note": "按语义词组理解，冠词、助动词等随所属表达合译。"
+        },
+        {
+          "en": [
+            4,
+            5,
+            6,
+            7,
+            8
+          ],
+          "zh": [
+            1
+          ],
+          "note": "按语义词组理解，冠词、助动词等随所属表达合译。"
+        },
+        {
+          "en": [
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21,
+            22,
+            23
+          ],
+          "zh": [
+            2
+          ],
+          "note": "按语义词组理解，冠词、助动词等随所属表达合译。"
+        }
+      ]
+    },
+    {
+      "english": "A short period of focused study each week, combined with meaningful practice, can be more valuable than occasional bursts of exhausted effort.",
+      "meaning": "每周一段专注学习的时间，结合有意义的练习，可能比偶尔精疲力竭地突击更有价值。",
+      "zhParts": [
+        "每周一段专注学习的时间，",
+        "结合有意义的练习，",
+        "可能比偶尔精疲力竭地突击更有价值。"
+      ],
+      "groups": [
+        {
+          "en": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7
+          ],
+          "zh": [
+            0
+          ],
+          "note": "按语义词组理解，冠词、助动词等随所属表达合译。"
+        },
+        {
+          "en": [
+            8,
+            9,
+            10,
+            11
+          ],
+          "zh": [
+            1
+          ],
+          "note": "按语义词组理解，冠词、助动词等随所属表达合译。"
+        },
+        {
+          "en": [
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21
+          ],
+          "zh": [
+            2
+          ],
+          "note": "按语义词组理解，冠词、助动词等随所属表达合译。"
+        }
+      ]
+    },
+    {
+      "english": "By treating learning as a continuing habit, graduates can develop both professional competence and the confidence to adapt throughout their lives.",
+      "meaning": "通过把学习视为持续的习惯，毕业生能够同时培养职业能力与终身适应变化的信心。",
+      "zhParts": [
+        "通过把学习视为持续的习惯，",
+        "毕业生能够同时培养职业能力",
+        "与终身适应变化的信心。"
+      ],
+      "groups": [
+        {
+          "en": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6
+          ],
+          "zh": [
+            0
+          ],
+          "note": "按语义词组理解，冠词、助动词等随所属表达合译。"
+        },
+        {
+          "en": [
+            7,
+            8,
+            9,
+            10,
+            11,
+            12
+          ],
+          "zh": [
+            1
+          ],
+          "note": "按语义词组理解，冠词、助动词等随所属表达合译。"
+        },
+        {
+          "en": [
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20
+          ],
+          "zh": [
+            2
+          ],
+          "note": "按语义词组理解，冠词、助动词等随所属表达合译。"
+        }
+      ]
+    },
+    {
+      "english": "The growing popularity of online courses has raised questions about how universities should support independent learning.",
+      "meaning": "在线课程日益普及，这引发了大学应如何支持自主学习的问题。",
+      "zhParts": [
+        "在线课程日益普及，",
+        "这引发了大学应如何支持自主学习的问题。"
+      ],
+      "groups": [
+        {
+          "en": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5
+          ],
+          "zh": [
+            0
+          ],
+          "note": "按语义词组理解，冠词、助动词等随所属表达合译。"
+        },
+        {
+          "en": [
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15
+          ],
+          "zh": [
+            1
+          ],
+          "note": "按语义词组理解，冠词、助动词等随所属表达合译。"
+        }
+      ]
+    },
+    {
+      "english": "At a time when information is readily available, the ability to evaluate it deserves greater attention.",
+      "meaning": "在信息唾手可得的时代，评估信息的能力值得更多关注。",
+      "zhParts": [
+        "在信息唾手可得的时代，",
+        "评估信息的能力值得更多关注。"
+      ],
+      "groups": [
+        {
+          "en": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7
+          ],
+          "zh": [
+            0
+          ],
+          "note": "按语义词组理解，冠词、助动词等随所属表达合译。"
+        },
+        {
+          "en": [
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15
+          ],
+          "zh": [
+            1
+          ],
+          "note": "按语义词组理解，冠词、助动词等随所属表达合译。"
+        }
+      ]
+    },
+    {
+      "english": "Few would deny the convenience of digital tools, yet their effects on concentration remain worth discussing.",
+      "meaning": "很少有人会否认数字工具的便利，但它们对注意力的影响仍值得讨论。",
+      "zhParts": [
+        "很少有人会否认数字工具的便利，",
+        "但它们对注意力的影响仍值得讨论。"
+      ],
+      "groups": [
+        {
+          "en": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7
+          ],
+          "zh": [
+            0
+          ],
+          "note": "按语义词组理解，冠词、助动词等随所属表达合译。"
+        },
+        {
+          "en": [
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15
+          ],
+          "zh": [
+            1
+          ],
+          "note": "按语义词组理解，冠词、助动词等随所属表达合译。"
+        }
+      ]
+    },
+    {
+      "english": "Whether a career is rewarding depends on more than the salary it provides.",
+      "meaning": "一份职业是否令人满足，取决于薪酬以外的更多因素。",
+      "zhParts": [
+        "一份职业是否令人满足，",
+        "取决于薪酬以外的更多因素。"
+      ],
+      "groups": [
+        {
+          "en": [
+            0,
+            1,
+            2,
+            3,
+            4
+          ],
+          "zh": [
+            0
+          ],
+          "note": "按语义词组理解，冠词、助动词等随所属表达合译。"
+        },
+        {
+          "en": [
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12
+          ],
+          "zh": [
+            1
+          ],
+          "note": "按语义词组理解，冠词、助动词等随所属表达合译。"
+        }
+      ]
+    },
+    {
+      "english": "The question is not simply whether students should volunteer, but how their contribution can meet genuine needs.",
+      "meaning": "问题不只是学生是否应该参加志愿服务，而是他们的贡献如何回应真实需求。",
+      "zhParts": [
+        "问题不只是学生是否应该参加志愿服务，",
+        "而是他们的贡献如何回应真实需求。"
+      ],
+      "groups": [
+        {
+          "en": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8
+          ],
+          "zh": [
+            0
+          ],
+          "note": "按语义词组理解，冠词、助动词等随所属表达合译。"
+        },
+        {
+          "en": [
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16
+          ],
+          "zh": [
+            1
+          ],
+          "note": "按语义词组理解，冠词、助动词等随所属表达合译。"
+        }
+      ]
+    },
+    {
+      "english": "As environmental challenges become increasingly visible, universities have an opportunity to turn awareness into practical action.",
+      "meaning": "随着环境挑战日益显现，大学有机会将意识转化为实际行动。",
+      "zhParts": [
+        "随着环境挑战日益显现，",
+        "大学有机会将意识转化为实际行动。"
+      ],
+      "groups": [
+        {
+          "en": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5
+          ],
+          "zh": [
+            0
+          ],
+          "note": "按语义词组理解，冠词、助动词等随所属表达合译。"
+        },
+        {
+          "en": [
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15
+          ],
+          "zh": [
+            1
+          ],
+          "note": "按语义词组理解，冠词、助动词等随所属表达合译。"
+        }
+      ]
+    },
+    {
+      "english": "One reason this approach is effective is that it connects abstract knowledge with practical experience.",
+      "meaning": "这种方法有效的一个原因在于它把抽象知识与实践经验联系起来。",
+      "zhParts": [
+        "这种方法有效的一个原因",
+        "在于它把抽象知识与实践经验联系起来。"
+      ],
+      "groups": [
+        {
+          "en": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5
+          ],
+          "zh": [
+            0
+          ],
+          "note": "按语义词组理解，冠词、助动词等随所属表达合译。"
+        },
+        {
+          "en": [
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14
+          ],
+          "zh": [
+            1
+          ],
+          "note": "按语义词组理解，冠词、助动词等随所属表达合译。"
+        }
+      ]
+    },
+    {
+      "english": "By comparing several reliable sources, students can identify assumptions that might otherwise go unnoticed.",
+      "meaning": "通过比较多个可靠来源，学生能够识别原本可能被忽视的假设。",
+      "zhParts": [
+        "通过比较多个可靠来源，",
+        "学生能够识别原本可能被忽视的假设。"
+      ],
+      "groups": [
+        {
+          "en": [
+            0,
+            1,
+            2,
+            3,
+            4
+          ],
+          "zh": [
+            0
+          ],
+          "note": "按语义词组理解，冠词、助动词等随所属表达合译。"
+        },
+        {
+          "en": [
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13
+          ],
+          "zh": [
+            1
+          ],
+          "note": "按语义词组理解，冠词、助动词等随所属表达合译。"
+        }
+      ]
+    },
+    {
+      "english": "What makes regular practice valuable is the opportunity to receive feedback and adjust one's methods.",
+      "meaning": "让定期练习有价值的，是获得反馈并调整方法的机会。",
+      "zhParts": [
+        "让定期练习有价值的，",
+        "是获得反馈并调整方法的机会。"
+      ],
+      "groups": [
+        {
+          "en": [
+            0,
+            1,
+            2,
+            3,
+            4
+          ],
+          "zh": [
+            0
+          ],
+          "note": "按语义词组理解，冠词、助动词等随所属表达合译。"
+        },
+        {
+          "en": [
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14
+          ],
+          "zh": [
+            1
+          ],
+          "note": "按语义词组理解，冠词、助动词等随所属表达合译。"
+        }
+      ]
+    },
+    {
+      "english": "A useful example is campus recycling, where convenient facilities can encourage wider participation.",
+      "meaning": "校园回收是一个有用的例子，便利的设施能够促进更广泛的参与。",
+      "zhParts": [
+        "校园回收是一个有用的例子，",
+        "便利的设施能够促进更广泛的参与。"
+      ],
+      "groups": [
+        {
+          "en": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5
+          ],
+          "zh": [
+            0
+          ],
+          "note": "按语义词组理解，冠词、助动词等随所属表达合译。"
+        },
+        {
+          "en": [
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12
+          ],
+          "zh": [
+            1
+          ],
+          "note": "按语义词组理解，冠词、助动词等随所属表达合译。"
+        }
+      ]
+    },
+    {
+      "english": "The benefits extend beyond individual achievement to include stronger cooperation within the community.",
+      "meaning": "这些益处超越了个人成就，还包括社区内部更有力的合作。",
+      "zhParts": [
+        "这些益处超越了个人成就，",
+        "还包括社区内部更有力的合作。"
+      ],
+      "groups": [
+        {
+          "en": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5
+          ],
+          "zh": [
+            0
+          ],
+          "note": "按语义词组理解，冠词、助动词等随所属表达合译。"
+        },
+        {
+          "en": [
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12
+          ],
+          "zh": [
+            1
+          ],
+          "note": "按语义词组理解，冠词、助动词等随所属表达合译。"
+        }
+      ]
+    },
+    {
+      "english": "Without clear evidence of improvement, it is difficult to justify spending more resources on the same strategy.",
+      "meaning": "如果没有改进的明确证据，就很难证明继续在同一策略上投入更多资源是合理的。",
+      "zhParts": [
+        "如果没有改进的明确证据，",
+        "就很难证明继续在同一策略上投入更多资源是合理的。"
+      ],
+      "groups": [
+        {
+          "en": [
+            0,
+            1,
+            2,
+            3,
+            4
+          ],
+          "zh": [
+            0
+          ],
+          "note": "按语义词组理解，冠词、助动词等随所属表达合译。"
+        },
+        {
+          "en": [
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16
+          ],
+          "zh": [
+            1
+          ],
+          "note": "按语义词组理解，冠词、助动词等随所属表达合译。"
+        }
+      ]
+    },
+    {
+      "english": "Although immediate results may be limited, consistent effort can produce meaningful progress over time.",
+      "meaning": "虽然短期效果可能有限，但持续努力能够随着时间带来有意义的进步。",
+      "zhParts": [
+        "虽然短期效果可能有限，",
+        "但持续努力能够随着时间带来有意义的进步。"
+      ],
+      "groups": [
+        {
+          "en": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5
+          ],
+          "zh": [
+            0
+          ],
+          "note": "按语义词组理解，冠词、助动词等随所属表达合译。"
+        },
+        {
+          "en": [
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13
+          ],
+          "zh": [
+            1
+          ],
+          "note": "按语义词组理解，冠词、助动词等随所属表达合译。"
+        }
+      ]
+    },
+    {
+      "english": "This does not mean that technology should be rejected; rather, it should be used with informed judgment.",
+      "meaning": "这并不意味着应当拒绝技术；相反，使用技术时应作出有依据的判断。",
+      "zhParts": [
+        "这并不意味着应当拒绝技术；",
+        "相反，使用技术时应作出有依据的判断。"
+      ],
+      "groups": [
+        {
+          "en": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8
+          ],
+          "zh": [
+            0
+          ],
+          "note": "按语义词组理解，冠词、助动词等随所属表达合译。"
+        },
+        {
+          "en": [
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16
+          ],
+          "zh": [
+            1
+          ],
+          "note": "按语义词组理解，冠词、助动词等随所属表达合译。"
+        }
+      ]
+    },
+    {
+      "english": "While financial security is important, opportunities for development also deserve careful consideration.",
+      "meaning": "虽然经济保障很重要，但发展机会也值得认真考虑。",
+      "zhParts": [
+        "虽然经济保障很重要，",
+        "但发展机会也值得认真考虑。"
+      ],
+      "groups": [
+        {
+          "en": [
+            0,
+            1,
+            2,
+            3,
+            4
+          ],
+          "zh": [
+            0
+          ],
+          "note": "按语义词组理解，冠词、助动词等随所属表达合译。"
+        },
+        {
+          "en": [
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11
+          ],
+          "zh": [
+            1
+          ],
+          "note": "按语义词组理解，冠词、助动词等随所属表达合译。"
+        }
+      ]
+    },
+    {
+      "english": "In contrast to a one-time campaign, a lasting partnership allows volunteers to respond to changing needs.",
+      "meaning": "与一次性活动相比，长期合作让志愿者能够回应不断变化的需求。",
+      "zhParts": [
+        "与一次性活动相比，",
+        "长期合作让志愿者能够回应不断变化的需求。"
+      ],
+      "groups": [
+        {
+          "en": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5
+          ],
+          "zh": [
+            0
+          ],
+          "note": "按语义词组理解，冠词、助动词等随所属表达合译。"
+        },
+        {
+          "en": [
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15
+          ],
+          "zh": [
+            1
+          ],
+          "note": "按语义词组理解，冠词、助动词等随所属表达合译。"
+        }
+      ]
+    },
+    {
+      "english": "Despite its apparent convenience, an automated answer may still require careful verification.",
+      "meaning": "尽管看起来很方便，自动生成的回答仍可能需要仔细核查。",
+      "zhParts": [
+        "尽管看起来很方便，",
+        "自动生成的回答仍可能需要仔细核查。"
+      ],
+      "groups": [
+        {
+          "en": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "zh": [
+            0
+          ],
+          "note": "按语义词组理解，冠词、助动词等随所属表达合译。"
+        },
+        {
+          "en": [
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11
+          ],
+          "zh": [
+            1
+          ],
+          "note": "按语义词组理解，冠词、助动词等随所属表达合译。"
+        }
+      ]
+    },
+    {
+      "english": "Even if a policy is well designed, its success depends on how consistently it is implemented.",
+      "meaning": "即使一项政策设计良好，它的成功也取决于执行是否持续到位。",
+      "zhParts": [
+        "即使一项政策设计良好，",
+        "它的成功也取决于执行是否持续到位。"
+      ],
+      "groups": [
+        {
+          "en": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6
+          ],
+          "zh": [
+            0
+          ],
+          "note": "按语义词组理解，冠词、助动词等随所属表达合译。"
+        },
+        {
+          "en": [
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15
+          ],
+          "zh": [
+            1
+          ],
+          "note": "按语义词组理解，冠词、助动词等随所属表达合译。"
+        }
+      ]
+    },
+    {
+      "english": "Universities should combine practical training with reflection so that students understand both how and why a method works.",
+      "meaning": "大学应该将实践训练与反思结合，让学生既理解一种方法如何起效，也理解它为何起效。",
+      "zhParts": [
+        "大学应该将实践训练与反思结合，",
+        "让学生既理解一种方法如何起效，也理解它为何起效。"
+      ],
+      "groups": [
+        {
+          "en": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6
+          ],
+          "zh": [
+            0
+          ],
+          "note": "按语义词组理解，冠词、助动词等随所属表达合译。"
+        },
+        {
+          "en": [
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17
+          ],
+          "zh": [
+            1
+          ],
+          "note": "按语义词组理解，冠词、助动词等随所属表达合译。"
+        }
+      ]
+    },
+    {
+      "english": "Rather than seeking an immediate solution to every problem, we should build habits that support steady improvement.",
+      "meaning": "与其为每个问题寻找立刻见效的解决办法，不如培养支持稳步改进的习惯。",
+      "zhParts": [
+        "与其为每个问题寻找立刻见效的解决办法，",
+        "不如培养支持稳步改进的习惯。"
+      ],
+      "groups": [
+        {
+          "en": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8
+          ],
+          "zh": [
+            0
+          ],
+          "note": "按语义词组理解，冠词、助动词等随所属表达合译。"
+        },
+        {
+          "en": [
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16
+          ],
+          "zh": [
+            1
+          ],
+          "note": "按语义词组理解，冠词、助动词等随所属表达合译。"
+        }
+      ]
+    },
+    {
+      "english": "Only when reliable facilities are available can environmentally responsible choices become convenient for everyone.",
+      "meaning": "只有在可靠设施可用时，负责任的环保选择才能对每个人都变得方便。",
+      "zhParts": [
+        "只有在可靠设施可用时，",
+        "负责任的环保选择才能对每个人都变得方便。"
+      ],
+      "groups": [
+        {
+          "en": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5
+          ],
+          "zh": [
+            0
+          ],
+          "note": "按语义词组理解，冠词、助动词等随所属表达合译。"
+        },
+        {
+          "en": [
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13
+          ],
+          "zh": [
+            1
+          ],
+          "note": "按语义词组理解，冠词、助动词等随所属表达合译。"
+        }
+      ]
+    },
+    {
+      "english": "It is therefore advisable to set realistic goals and review them regularly in light of new evidence.",
+      "meaning": "因此，明智的做法是设定现实的目标，并根据新证据定期审视目标。",
+      "zhParts": [
+        "因此，明智的做法是设定现实的目标，",
+        "并根据新证据定期审视目标。"
+      ],
+      "groups": [
+        {
+          "en": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7
+          ],
+          "zh": [
+            0
+          ],
+          "note": "按语义词组理解，冠词、助动词等随所属表达合译。"
+        },
+        {
+          "en": [
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16
+          ],
+          "zh": [
+            1
+          ],
+          "note": "按语义词组理解，冠词、助动词等随所属表达合译。"
+        }
+      ]
+    },
+    {
+      "english": "Ultimately, the value of education lies not only in acquiring knowledge, but also in learning to use it responsibly.",
+      "meaning": "归根结底，教育的价值不仅在于获取知识，也在于学会负责任地运用知识。",
+      "zhParts": [
+        "归根结底，教育的价值不仅在于获取知识，",
+        "也在于学会负责任地运用知识。"
+      ],
+      "groups": [
+        {
+          "en": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10
+          ],
+          "zh": [
+            0
+          ],
+          "note": "按语义词组理解，冠词、助动词等随所属表达合译。"
+        },
+        {
+          "en": [
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18
+          ],
+          "zh": [
+            1
+          ],
+          "note": "按语义词组理解，冠词、助动词等随所属表达合译。"
+        }
+      ]
+    },
+    {
+      "english": "With sustained cooperation between students and institutions, small improvements can develop into lasting change.",
+      "meaning": "通过学生与机构之间持续的合作，小的改进能够发展为持久的改变。",
+      "zhParts": [
+        "通过学生与机构之间持续的合作，",
+        "小的改进能够发展为持久的改变。"
+      ],
+      "groups": [
+        {
+          "en": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6
+          ],
+          "zh": [
+            0
+          ],
+          "note": "按语义词组理解，冠词、助动词等随所属表达合译。"
+        },
+        {
+          "en": [
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13
+          ],
+          "zh": [
+            1
+          ],
+          "note": "按语义词组理解，冠词、助动词等随所属表达合译。"
+        }
+      ]
     }
   ]
 }

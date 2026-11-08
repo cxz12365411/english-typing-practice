@@ -1,27 +1,32 @@
-/* Shared CET-4 content and full-essay preview for both practice sites. */
+/* Shared CET-4 and CET-6 content and full-essay preview for both practice sites. */
 (function (root) {
   "use strict";
   function text(value) { return typeof value === "string" && value.trim().length > 0; }
   function wordCount(value) { return (value.match(/[A-Za-z0-9]+(?:['’\-][A-Za-z0-9]+)*/g) || []).length; }
 
   function parse(data) {
-    if (!data || data.version !== 1 || !Array.isArray(data.essays) || data.essays.length !== 10
+    const advanced = data?.level === 6;
+    const prefix = advanced ? "cet6" : "cet4";
+    const label = advanced ? "六级" : "四级";
+    const essayCount = advanced ? 6 : 10;
+    const expressionCount = advanced ? 6 : 10;
+    if (!data || data.version !== 1 || !Array.isArray(data.essays) || data.essays.length !== essayCount
       || !Array.isArray(data.expressionGroups) || data.expressionGroups.length !== 4) {
       throw new Error("Invalid CET-4 writing resource");
     }
     const categories = [], items = [], keys = new Set(), slugs = new Set();
     function addCategory(group, essay) {
-      if (!text(group.id) || !/^cet4-[a-z0-9-]+$/.test(group.id) || slugs.has(group.id) || !text(group.title)) {
+      if (!text(group.id) || !new RegExp(`^${prefix}-[a-z0-9-]+$`).test(group.id) || slugs.has(group.id) || !text(group.title)) {
         throw new Error("Invalid CET-4 category");
       }
       slugs.add(group.id);
-      const category = { slug: group.id, name: `${essay ? "四级作文" : "四级句型"}：${group.title}`, kind: "sentence", sortOrder: 100 + categories.length };
+      const category = { slug: group.id, name: `${label}${essay ? "作文" : "句型"}：${group.title}`, kind: "sentence", sortOrder: (advanced ? 200 : 100) + categories.length };
       categories.push(category);
       let sentences;
       let keyPrefix;
       if (essay) {
-        if (!/^cet4-essay-(?:0[1-9]|10)$/.test(group.id)) throw new Error("Invalid essay ID");
-        keyPrefix = `cet4-e${group.id.slice(-2)}-s`;
+        if (!new RegExp(`^${prefix}-essay-(?:0[1-9]|10)$`).test(group.id)) throw new Error("Invalid essay ID");
+        keyPrefix = `${prefix}-e${group.id.slice(-2)}-s`;
         if (!text(group.titleEnglish) || !text(group.prompt) || !Array.isArray(group.outline) || !group.outline.length
           || group.outline.some(note => !text(note)) || !Array.isArray(group.paragraphs) || !group.paragraphs.length
           || group.paragraphs.some(paragraph => !Array.isArray(paragraph) || !paragraph.length)) throw new Error("Invalid CET-4 essay");
@@ -31,14 +36,14 @@
         sentences = group.paragraphs.flat();
       } else {
         const groups = { opening: "开头引入", argument: "观点论证", transition: "衔接转折", conclusion: "总结建议" };
-        const suffix = group.id.replace(/^cet4-phrases-/, "");
-        if (groups[suffix] !== group.title || !Array.isArray(group.items) || group.items.length !== 10) throw new Error("Invalid expression group");
-        keyPrefix = `cet4-${suffix}-`;
+        const suffix = group.id.replace(new RegExp(`^${prefix}-phrases-`), "");
+        if (groups[suffix] !== group.title || !Array.isArray(group.items) || group.items.length !== expressionCount) throw new Error("Invalid expression group");
+        keyPrefix = `${prefix}-${suffix}-`;
         sentences = group.items;
       }
       if (!Array.isArray(sentences) || !sentences.length) throw new Error("Empty CET-4 category");
       sentences.forEach((sentence, index) => {
-        if (!sentence || !text(sentence.key) || !/^cet4-[a-z0-9-]+$/.test(sentence.key) || keys.has(sentence.key)
+        if (!sentence || !text(sentence.key) || !new RegExp(`^${prefix}-[a-z0-9-]+$`).test(sentence.key) || keys.has(sentence.key)
           || !text(sentence.english) || !text(sentence.meaning)) throw new Error("Invalid CET-4 sentence");
         const suffix = sentence.key.slice(keyPrefix.length);
         if (!sentence.key.startsWith(keyPrefix) || !/^\d{2,}$/.test(suffix) || Number(suffix) <= 0) throw new Error("Invalid stable sentence ID");
@@ -48,7 +53,7 @@
       });
       if (essay) {
         const count = wordCount(sentences.map(sentence => sentence.english).join(" "));
-        if (count < 120 || count > 180) throw new Error("Essay body must contain 120–180 words");
+        if (count < (advanced ? 150 : 120) || count > (advanced ? 200 : 180)) throw new Error("Essay body must contain 120–180 words");
       }
     }
     data.essays.forEach(essay => addCategory(essay, true));
@@ -86,7 +91,11 @@
       container.replaceChildren(this.position, this.unavailable);
       container.hidden = true;
     }
-    setData(data) { this.data = parse(data); }
+    setData(data) {
+      const parsed = parse(data);
+      const prefix = data.level === 6 ? "cet6-" : "cet4-";
+      this.data = { ...parsed, essays: [...(this.data?.essays || []).filter(essay => !essay.id.startsWith(prefix)), ...parsed.essays] };
+    }
     build(essay) {
       const details = node("details", "cet4-preview");
       details.append(node("summary", "", "查看全文"));
@@ -132,7 +141,7 @@
       if (!essay) {
         if (this.details) this.details.open = false;
         this.essay = null;
-        this.container.hidden = !item?.key?.startsWith("cet4-e");
+        this.container.hidden = !/^cet[46]-e/.test(item?.key || "");
         this.position.textContent = "";
         this.unavailable.hidden = this.container.hidden;
         if (this.details) this.details.hidden = true;
@@ -151,7 +160,7 @@
       const paragraphIndex = essay.paragraphs.findIndex(paragraph => paragraph.some(sentence => sentence.key === item?.key));
       this.position.textContent = valid && sentenceIndex >= 0
         ? `${essay.title} · 第 ${paragraphIndex + 1} 段 · 第 ${sentenceIndex + 1} / ${sentences.length} 句`
-        : "四级作文";
+        : (essay.id.startsWith("cet6-") ? "六级作文" : "四级作文");
       this.container.hidden = false;
       this.unavailable.hidden = valid;
       if (!this.details) return;

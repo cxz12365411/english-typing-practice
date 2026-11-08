@@ -1,0 +1,537 @@
+{
+  "version": 1,
+  "level": 6,
+  "sourceLabel": "原创参考范文，非考试真题或官方范文",
+  "essays": [
+    {
+      "id": "cet6-essay-01",
+      "title": "人工智能与独立思考",
+      "titleEnglish": "AI and Independent Thinking",
+      "prompt": "讨论大学生如何利用人工智能辅助学习，同时保持独立思考。 请用英语写一篇150～200词的短文。",
+      "outline": [
+        "引出工具便利与思考能力之间的关系。",
+        "用写作和资料核验说明合理用法与风险。",
+        "提出先思考、再使用、后反思的步骤。"
+      ],
+      "paragraphs": [
+        [
+          {
+            "key": "cet6-e01-s01",
+            "english": "As artificial intelligence enters university classrooms, students are gaining access to instant explanations and personalized feedback.",
+            "meaning": "随着人工智能进入大学课堂，学生正在获得即时讲解和个性化反馈。"
+          },
+          {
+            "key": "cet6-e01-s02",
+            "english": "However, the educational value of these tools depends less on their speed than on how thoughtfully students use them.",
+            "meaning": "然而，这些工具的教育价值与其说取决于速度，不如说取决于学生使用时是否认真思考。"
+          }
+        ],
+        [
+          {
+            "key": "cet6-e01-s03",
+            "english": "Used appropriately, an AI assistant can suggest alternative arguments and help learners identify weaknesses in an essay.",
+            "meaning": "使用得当时，人工智能助手可以提出不同的论点，并帮助学习者发现文章中的不足。"
+          },
+          {
+            "key": "cet6-e01-s04",
+            "english": "This support is particularly useful when students compare the suggestions with their own reasoning instead of accepting every answer.",
+            "meaning": "这种支持尤其有用，当学生把建议与自己的推理进行比较，而不是接受每一个答案时。"
+          },
+          {
+            "key": "cet6-e01-s05",
+            "english": "Yet fluent language does not guarantee factual accuracy, and a convincing response may contain information that cannot be verified.",
+            "meaning": "然而，流畅的语言并不能保证事实准确，看似可信的回答也可能包含无法核实的信息。"
+          },
+          {
+            "key": "cet6-e01-s06",
+            "english": "For example, students should check original sources before including an unfamiliar statistic in an academic assignment.",
+            "meaning": "例如，学生应该核查原始来源，再把不熟悉的统计数据写入学术作业。"
+          }
+        ],
+        [
+          {
+            "key": "cet6-e01-s07",
+            "english": "Universities should therefore teach students to question automated advice and explain the decisions they make after receiving it.",
+            "meaning": "因此，大学应该教会学生质疑自动生成的建议，并解释他们在获得建议后作出的决定。"
+          },
+          {
+            "key": "cet6-e01-s08",
+            "english": "A practical approach is to draft independently, consult the tool selectively, and then revise with clear reasons.",
+            "meaning": "一个可行的做法是独立起草，有选择地使用工具，然后依据明确的理由修改。"
+          },
+          {
+            "key": "cet6-e01-s09",
+            "english": "In this way, technology becomes a partner in learning rather than a substitute for the intellectual effort that meaningful education requires.",
+            "meaning": "这样一来，技术就成为学习伙伴，而非替代智力投入的工具，而有意义的教育恰恰需要这种投入。"
+          }
+        ]
+      ]
+    },
+    {
+      "id": "cet6-essay-02",
+      "title": "信息辨别与理性判断",
+      "titleEnglish": "Thinking Critically in an Information Age",
+      "prompt": "讨论大学生应如何辨别网络信息，并提出可执行的方法。 请用英语写一篇150～200词的短文。",
+      "outline": [
+        "指出信息数量与可靠性并不等同。",
+        "分析情绪化标题和脱离语境的数字。",
+        "提出来源核查、交叉验证和暂缓判断。"
+      ],
+      "paragraphs": [
+        [
+          {
+            "key": "cet6-e02-s01",
+            "english": "University students encounter an enormous amount of information through social media, online lectures, and everyday conversations.",
+            "meaning": "大学生接触到海量信息，来源包括社交媒体、在线讲座和日常交流。"
+          },
+          {
+            "key": "cet6-e02-s02",
+            "english": "Although this abundance makes learning convenient, it also requires us to distinguish reliable evidence from attractive but misleading claims.",
+            "meaning": "虽然信息丰富让学习更方便，但它也要求我们区分可靠证据和吸引眼球却具有误导性的说法。"
+          }
+        ],
+        [
+          {
+            "key": "cet6-e02-s03",
+            "english": "One common problem is that dramatic headlines encourage readers to react emotionally before examining the details of a story.",
+            "meaning": "一个常见的问题是，夸张的标题促使读者作出情绪化反应，却还没有查看报道的细节。"
+          },
+          {
+            "key": "cet6-e02-s04",
+            "english": "A second difficulty arises when numbers are presented without context, making a small change appear far more important than it really is.",
+            "meaning": "第二个困难出现在数字脱离语境呈现时，这会让微小的变化显得比实际重要得多。"
+          },
+          {
+            "key": "cet6-e02-s05",
+            "english": "To avoid such mistakes, readers should ask who produced the information, what evidence supports it, and whether other credible sources agree.",
+            "meaning": "为了避免此类错误，读者应该追问信息由谁制作、有什么证据支持，以及其他可信来源是否持相同看法。"
+          },
+          {
+            "key": "cet6-e02-s06",
+            "english": "Checking the publication date is equally necessary, because an accurate report from several years ago may no longer describe current conditions.",
+            "meaning": "核查发布日期同样必要，因为数年前准确的报道可能已无法描述当前情况。"
+          }
+        ],
+        [
+          {
+            "key": "cet6-e02-s07",
+            "english": "Critical thinking does not mean rejecting every unfamiliar idea or assuming that all sources are dishonest.",
+            "meaning": "批判性思维并不意味着拒绝每一种陌生观点，或认定所有来源都不诚实。"
+          },
+          {
+            "key": "cet6-e02-s08",
+            "english": "Rather, it means remaining open to new evidence while being willing to postpone judgment when the available information is incomplete.",
+            "meaning": "相反，它意味着对新证据保持开放，同时愿意暂缓判断，当现有信息不完整时。"
+          },
+          {
+            "key": "cet6-e02-s09",
+            "english": "By developing this habit, students can become more responsible participants in both academic discussions and public debate.",
+            "meaning": "通过培养这一习惯，学生能够成为更负责任的参与者，无论在学术讨论还是公共辩论中。"
+          }
+        ]
+      ]
+    },
+    {
+      "id": "cet6-essay-03",
+      "title": "就业选择与长远成长",
+      "titleEnglish": "Choosing a Career for Long-Term Growth",
+      "prompt": "讨论毕业生选择工作时如何权衡薪酬、兴趣与成长机会。 请用英语写一篇150～200词的短文。",
+      "outline": [
+        "说明第一份工作不是单一的收入选择。",
+        "平衡经济现实、岗位职责与学习机会。",
+        "建议通过调查和实践减少盲目决定。"
+      ],
+      "paragraphs": [
+        [
+          {
+            "key": "cet6-e03-s01",
+            "english": "For many university graduates, choosing a first job means balancing immediate financial needs with expectations about future development.",
+            "meaning": "对许多大学毕业生而言，选择第一份工作意味着平衡眼前的经济需求与对未来发展的期待。"
+          },
+          {
+            "key": "cet6-e03-s02",
+            "english": "A high salary is understandably attractive, but it should not be the only factor that determines a career decision.",
+            "meaning": "高薪具有吸引力是可以理解的，但它不应成为唯一因素，用来决定职业选择。"
+          }
+        ],
+        [
+          {
+            "key": "cet6-e03-s03",
+            "english": "A position that offers meaningful training may help a beginner acquire transferable skills and gradually discover where their strengths lie.",
+            "meaning": "一个提供有意义培训的岗位可能帮助新人获得可迁移的技能，并逐渐发现自己的优势所在。"
+          },
+          {
+            "key": "cet6-e03-s04",
+            "english": "For instance, working with an experienced team can improve communication and problem-solving abilities, which remain valuable even when industries change.",
+            "meaning": "例如，与经验丰富的团队共事能够提升沟通和解决问题的能力，即使行业发生变化，这些能力仍然有价值。"
+          },
+          {
+            "key": "cet6-e03-s05",
+            "english": "Nevertheless, advice to follow one's passion should not ignore practical responsibilities, especially for graduates who need to support their families.",
+            "meaning": "然而，追随个人热情的建议不应忽略实际责任，尤其是对需要支持家庭的毕业生而言。"
+          },
+          {
+            "key": "cet6-e03-s06",
+            "english": "The challenge is to find a reasonable balance between personal interests, acceptable working conditions, and realistic financial requirements.",
+            "meaning": "难点在于找到合理的平衡，在个人兴趣、可以接受的工作条件与现实的经济需求之间。"
+          }
+        ],
+        [
+          {
+            "key": "cet6-e03-s07",
+            "english": "Before accepting an offer, graduates can speak with current employees and investigate what their daily responsibilities would actually involve.",
+            "meaning": "在接受录用之前，毕业生可以与在职员工交流，并了解日常职责实际包含哪些内容。"
+          },
+          {
+            "key": "cet6-e03-s08",
+            "english": "Internships and small projects also provide evidence that is more useful than an impressive job title alone.",
+            "meaning": "实习和小型项目也能提供依据，比仅仅一个听起来不错的职位名称更有用。"
+          },
+          {
+            "key": "cet6-e03-s09",
+            "english": "Ultimately, a thoughtful career choice should leave room for learning and adjustment, rather than promise a perfect path from the very beginning.",
+            "meaning": "最终，经过深思熟虑的职业选择应该为学习和调整留出空间，而不是承诺从一开始就拥有完美的道路。"
+          }
+        ]
+      ]
+    },
+    {
+      "id": "cet6-essay-04",
+      "title": "环保行动与制度支持",
+      "titleEnglish": "Making Sustainable Choices Practical",
+      "prompt": "讨论个人环保行动与学校制度支持的关系。 请用英语写一篇150～200词的短文。",
+      "outline": [
+        "承认个人行为的价值，同时指出行动障碍。",
+        "用可重复使用容器和校园交通举例。",
+        "提出衡量效果而非只宣传口号。"
+      ],
+      "paragraphs": [
+        [
+          {
+            "key": "cet6-e04-s01",
+            "english": "Environmental protection is often discussed as a matter of individual responsibility, and students are encouraged to make greener choices in daily life.",
+            "meaning": "环境保护经常被讨论，被视为个人责任的问题，学生也被鼓励在日常生活中作出更环保的选择。"
+          },
+          {
+            "key": "cet6-e04-s02",
+            "english": "Such choices matter, yet lasting change becomes more likely when institutions make responsible behavior convenient and affordable.",
+            "meaning": "这些选择很重要，然而，持久的改变更有可能发生，当机构让负责任的行为变得方便且负担得起时。"
+          }
+        ],
+        [
+          {
+            "key": "cet6-e04-s03",
+            "english": "Consider the use of reusable containers in a university dining hall, where students often have limited time between classes.",
+            "meaning": "以使用可重复使用的容器为例，在大学食堂中，学生在课间往往时间有限。"
+          },
+          {
+            "key": "cet6-e04-s04",
+            "english": "Simply asking everyone to avoid disposable packaging may achieve little if washing facilities are unavailable or reusable options cost much more.",
+            "meaning": "仅仅要求每个人避免使用一次性包装可能收效甚微，如果没有清洗设施，或可重复使用的用品贵得多。"
+          },
+          {
+            "key": "cet6-e04-s05",
+            "english": "By providing convenient collection points and clear instructions, the university can remove barriers that prevent good intentions from becoming regular habits.",
+            "meaning": "通过提供方便的回收点和清晰的指引，大学能够消除障碍，这些障碍妨碍良好意愿转化为日常习惯。"
+          },
+          {
+            "key": "cet6-e04-s06",
+            "english": "The same principle applies to transport: safe bicycle routes and reliable buses make alternatives to private cars more attractive.",
+            "meaning": "同样的原则适用于交通：安全的自行车道和可靠的公交服务让私家车以外的出行方式更有吸引力。"
+          }
+        ],
+        [
+          {
+            "key": "cet6-e04-s07",
+            "english": "Students still have an important role in using these services responsibly and reporting problems that discourage participation.",
+            "meaning": "学生仍然发挥重要作用，包括负责任地使用这些服务，以及报告阻碍参与的问题。"
+          },
+          {
+            "key": "cet6-e04-s08",
+            "english": "Meanwhile, campus managers should evaluate actual reductions in waste instead of judging success only by the number of posters displayed.",
+            "meaning": "与此同时，校园管理者应该评估垃圾的实际减少量，而不是判断成功与否仅凭张贴的海报数量。"
+          },
+          {
+            "key": "cet6-e04-s09",
+            "english": "When personal commitment is supported by thoughtful design, sustainability can become an ordinary part of campus life rather than an occasional campaign.",
+            "meaning": "当周到的设计支持个人投入时，可持续发展就能成为校园生活的日常部分，而非偶尔开展的活动。"
+          }
+        ]
+      ]
+    },
+    {
+      "id": "cet6-essay-05",
+      "title": "志愿服务与真实需求",
+      "titleEnglish": "Volunteering That Responds to Real Needs",
+      "prompt": "讨论大学生志愿服务如何避免形式化，真正回应社区需求。 请用英语写一篇150～200词的短文。",
+      "outline": [
+        "区分参与热情与服务效果。",
+        "论述倾听需求、必要培训和持续合作。",
+        "以反馈和可靠服务评价项目。"
+      ],
+      "paragraphs": [
+        [
+          {
+            "key": "cet6-e05-s01",
+            "english": "Volunteering offers university students an opportunity to contribute to their communities while gaining a deeper understanding of lives different from their own.",
+            "meaning": "志愿服务为大学生提供机会，让他们为社区作出贡献，同时更深入地了解与自己不同的生活。"
+          },
+          {
+            "key": "cet6-e05-s02",
+            "english": "However, enthusiasm alone is insufficient if a project is designed mainly for publicity rather than the needs of the people it serves.",
+            "meaning": "然而，仅有热情还不够，如果一个项目主要是为了宣传，而不是为了服务对象的需求。"
+          }
+        ],
+        [
+          {
+            "key": "cet6-e05-s03",
+            "english": "Before organizing an activity, student groups should consult local residents and ask what kind of assistance would genuinely be helpful.",
+            "meaning": "在组织活动之前，学生团体应该咨询当地居民，询问哪种帮助才真正有用。"
+          },
+          {
+            "key": "cet6-e05-s04",
+            "english": "For example, older residents may prefer regular help with digital services to a single performance that attracts attention but leaves practical difficulties unresolved.",
+            "meaning": "例如，老年居民可能更希望定期获得数字服务方面的帮助，而不是一场演出，演出虽然引人关注，却没有解决实际困难。"
+          },
+          {
+            "key": "cet6-e05-s05",
+            "english": "Volunteers also need appropriate training, because even well-intentioned actions can cause confusion when participants lack relevant knowledge or communication skills.",
+            "meaning": "志愿者还需要适当的培训，因为即使出于好意的行动，也可能造成困扰，如果参与者缺乏相关知识或沟通技巧。"
+          },
+          {
+            "key": "cet6-e05-s06",
+            "english": "Maintaining a consistent schedule helps build trust and allows community partners to plan their work with greater confidence.",
+            "meaning": "保持稳定的服务安排有助于建立信任，并让社区合作方更有把握地规划工作。"
+          }
+        ],
+        [
+          {
+            "key": "cet6-e05-s07",
+            "english": "After each project, students should invite feedback from those they assisted and use it to improve future activities.",
+            "meaning": "每个项目结束后，学生应该邀请受助者提供反馈，并用反馈改进后续活动。"
+          },
+          {
+            "key": "cet6-e05-s08",
+            "english": "The success of volunteering should therefore be measured not merely in hours recorded, but in the usefulness and reliability of the service provided.",
+            "meaning": "志愿服务的成功因此不应仅仅用记录的时长衡量，而应看所提供服务的实用性和可靠性。"
+          },
+          {
+            "key": "cet6-e05-s09",
+            "english": "Such an approach benefits the community and teaches students that responsible participation begins with listening rather than assuming.",
+            "meaning": "这种做法有益于社区，也让学生懂得，负责任的参与始于倾听，而不是主观假设。"
+          }
+        ]
+      ]
+    },
+    {
+      "id": "cet6-essay-06",
+      "title": "终身学习与持续进步",
+      "titleEnglish": "Learning Beyond Graduation",
+      "prompt": "评论“毕业不是学习的终点”，说明毕业后如何持续学习。 请用英语写一篇150～200词的短文。",
+      "outline": [
+        "说明知识更新与毕业后学习的必要性。",
+        "提出具体目标、实践应用和反馈循环。",
+        "强调可持续节奏，避免证书数量导向。"
+      ],
+      "paragraphs": [
+        [
+          {
+            "key": "cet6-e06-s01",
+            "english": "Graduation marks the completion of a degree, but it does not bring the need for learning to an end.",
+            "meaning": "毕业标志着一个学位的完成，但并不意味着学习需求的终结。"
+          },
+          {
+            "key": "cet6-e06-s02",
+            "english": "As technologies and working practices evolve, people must regularly update their knowledge to remain capable of responding to unfamiliar challenges.",
+            "meaning": "随着技术和工作方式不断发展，人们必须定期更新知识，以保持应对陌生挑战的能力。"
+          }
+        ],
+        [
+          {
+            "key": "cet6-e06-s03",
+            "english": "Lifelong learning is most effective when it begins with a specific question rather than a vague desire to collect more certificates.",
+            "meaning": "终身学习最有效，当它始于一个具体问题时，而不是模糊地想要收集更多证书。"
+          },
+          {
+            "key": "cet6-e06-s04",
+            "english": "Someone who struggles to explain complex ideas at work, for instance, can study clear writing and immediately apply the lessons to everyday reports.",
+            "meaning": "一个在工作中难以解释复杂想法的人，例如，可以学习清晰写作，并立即将所学应用于日常报告。"
+          },
+          {
+            "key": "cet6-e06-s05",
+            "english": "Feedback from colleagues then reveals which strategies are helpful and which aspects still require further practice and reflection.",
+            "meaning": "同事的反馈随后能揭示哪些策略有帮助，以及哪些方面仍需要进一步练习和反思。"
+          },
+          {
+            "key": "cet6-e06-s06",
+            "english": "This cycle of learning, application, and review turns information into usable skills instead of leaving it as forgotten notes.",
+            "meaning": "这种学习、应用和复盘的循环把信息转化为可用的技能，而不是让它变成被遗忘的笔记。"
+          }
+        ],
+        [
+          {
+            "key": "cet6-e06-s07",
+            "english": "It is equally important to choose a sustainable pace, since ambitious plans often fail when they leave no room for rest or unexpected responsibilities.",
+            "meaning": "同样重要的是，选择可持续的节奏，因为过于雄心勃勃的计划常常失败，如果它们没有为休息或突发责任留出空间。"
+          },
+          {
+            "key": "cet6-e06-s08",
+            "english": "A short period of focused study each week, combined with meaningful practice, can be more valuable than occasional bursts of exhausted effort.",
+            "meaning": "每周一段专注学习的时间，结合有意义的练习，可能比偶尔精疲力竭地突击更有价值。"
+          },
+          {
+            "key": "cet6-e06-s09",
+            "english": "By treating learning as a continuing habit, graduates can develop both professional competence and the confidence to adapt throughout their lives.",
+            "meaning": "通过把学习视为持续的习惯，毕业生能够同时培养职业能力与终身适应变化的信心。"
+          }
+        ]
+      ]
+    }
+  ],
+  "expressionGroups": [
+    {
+      "id": "cet6-phrases-opening",
+      "title": "开头引入",
+      "items": [
+        {
+          "key": "cet6-opening-01",
+          "english": "The growing popularity of online courses has raised questions about how universities should support independent learning.",
+          "meaning": "在线课程日益普及，这引发了大学应如何支持自主学习的问题。"
+        },
+        {
+          "key": "cet6-opening-02",
+          "english": "At a time when information is readily available, the ability to evaluate it deserves greater attention.",
+          "meaning": "在信息唾手可得的时代，评估信息的能力值得更多关注。"
+        },
+        {
+          "key": "cet6-opening-03",
+          "english": "Few would deny the convenience of digital tools, yet their effects on concentration remain worth discussing.",
+          "meaning": "很少有人会否认数字工具的便利，但它们对注意力的影响仍值得讨论。"
+        },
+        {
+          "key": "cet6-opening-04",
+          "english": "Whether a career is rewarding depends on more than the salary it provides.",
+          "meaning": "一份职业是否令人满足，取决于薪酬以外的更多因素。"
+        },
+        {
+          "key": "cet6-opening-05",
+          "english": "The question is not simply whether students should volunteer, but how their contribution can meet genuine needs.",
+          "meaning": "问题不只是学生是否应该参加志愿服务，而是他们的贡献如何回应真实需求。"
+        },
+        {
+          "key": "cet6-opening-06",
+          "english": "As environmental challenges become increasingly visible, universities have an opportunity to turn awareness into practical action.",
+          "meaning": "随着环境挑战日益显现，大学有机会将意识转化为实际行动。"
+        }
+      ]
+    },
+    {
+      "id": "cet6-phrases-argument",
+      "title": "观点论证",
+      "items": [
+        {
+          "key": "cet6-argument-01",
+          "english": "One reason this approach is effective is that it connects abstract knowledge with practical experience.",
+          "meaning": "这种方法有效的一个原因在于它把抽象知识与实践经验联系起来。"
+        },
+        {
+          "key": "cet6-argument-02",
+          "english": "By comparing several reliable sources, students can identify assumptions that might otherwise go unnoticed.",
+          "meaning": "通过比较多个可靠来源，学生能够识别原本可能被忽视的假设。"
+        },
+        {
+          "key": "cet6-argument-03",
+          "english": "What makes regular practice valuable is the opportunity to receive feedback and adjust one's methods.",
+          "meaning": "让定期练习有价值的，是获得反馈并调整方法的机会。"
+        },
+        {
+          "key": "cet6-argument-04",
+          "english": "A useful example is campus recycling, where convenient facilities can encourage wider participation.",
+          "meaning": "校园回收是一个有用的例子，便利的设施能够促进更广泛的参与。"
+        },
+        {
+          "key": "cet6-argument-05",
+          "english": "The benefits extend beyond individual achievement to include stronger cooperation within the community.",
+          "meaning": "这些益处超越了个人成就，还包括社区内部更有力的合作。"
+        },
+        {
+          "key": "cet6-argument-06",
+          "english": "Without clear evidence of improvement, it is difficult to justify spending more resources on the same strategy.",
+          "meaning": "如果没有改进的明确证据，就很难证明继续在同一策略上投入更多资源是合理的。"
+        }
+      ]
+    },
+    {
+      "id": "cet6-phrases-transition",
+      "title": "衔接转折",
+      "items": [
+        {
+          "key": "cet6-transition-01",
+          "english": "Although immediate results may be limited, consistent effort can produce meaningful progress over time.",
+          "meaning": "虽然短期效果可能有限，但持续努力能够随着时间带来有意义的进步。"
+        },
+        {
+          "key": "cet6-transition-02",
+          "english": "This does not mean that technology should be rejected; rather, it should be used with informed judgment.",
+          "meaning": "这并不意味着应当拒绝技术；相反，使用技术时应作出有依据的判断。"
+        },
+        {
+          "key": "cet6-transition-03",
+          "english": "While financial security is important, opportunities for development also deserve careful consideration.",
+          "meaning": "虽然经济保障很重要，但发展机会也值得认真考虑。"
+        },
+        {
+          "key": "cet6-transition-04",
+          "english": "In contrast to a one-time campaign, a lasting partnership allows volunteers to respond to changing needs.",
+          "meaning": "与一次性活动相比，长期合作让志愿者能够回应不断变化的需求。"
+        },
+        {
+          "key": "cet6-transition-05",
+          "english": "Despite its apparent convenience, an automated answer may still require careful verification.",
+          "meaning": "尽管看起来很方便，自动生成的回答仍可能需要仔细核查。"
+        },
+        {
+          "key": "cet6-transition-06",
+          "english": "Even if a policy is well designed, its success depends on how consistently it is implemented.",
+          "meaning": "即使一项政策设计良好，它的成功也取决于执行是否持续到位。"
+        }
+      ]
+    },
+    {
+      "id": "cet6-phrases-conclusion",
+      "title": "总结建议",
+      "items": [
+        {
+          "key": "cet6-conclusion-01",
+          "english": "Universities should combine practical training with reflection so that students understand both how and why a method works.",
+          "meaning": "大学应该将实践训练与反思结合，让学生既理解一种方法如何起效，也理解它为何起效。"
+        },
+        {
+          "key": "cet6-conclusion-02",
+          "english": "Rather than seeking an immediate solution to every problem, we should build habits that support steady improvement.",
+          "meaning": "与其为每个问题寻找立刻见效的解决办法，不如培养支持稳步改进的习惯。"
+        },
+        {
+          "key": "cet6-conclusion-03",
+          "english": "Only when reliable facilities are available can environmentally responsible choices become convenient for everyone.",
+          "meaning": "只有在可靠设施可用时，负责任的环保选择才能对每个人都变得方便。"
+        },
+        {
+          "key": "cet6-conclusion-04",
+          "english": "It is therefore advisable to set realistic goals and review them regularly in light of new evidence.",
+          "meaning": "因此，明智的做法是设定现实的目标，并根据新证据定期审视目标。"
+        },
+        {
+          "key": "cet6-conclusion-05",
+          "english": "Ultimately, the value of education lies not only in acquiring knowledge, but also in learning to use it responsibly.",
+          "meaning": "归根结底，教育的价值不仅在于获取知识，也在于学会负责任地运用知识。"
+        },
+        {
+          "key": "cet6-conclusion-06",
+          "english": "With sustained cooperation between students and institutions, small improvements can develop into lasting change.",
+          "meaning": "通过学生与机构之间持续的合作，小的改进能够发展为持久的改变。"
+        }
+      ]
+    }
+  ]
+}

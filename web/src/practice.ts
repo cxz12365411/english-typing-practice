@@ -288,7 +288,7 @@ function practiceMarkup(
             <progress class="progress-bar" id="progressBar" value="0" max="1">0%</progress>
           </div>
 
-          <section id="cet4Writing" class="cet4-writing" aria-label="四级作文全文" hidden></section>
+          <section id="cet4Writing" class="cet4-writing" aria-label="四六级作文全文" hidden></section>
           <div class="prompt">
             <div class="alignment-scroll" id="alignmentScroll">
               <div class="alignment-stage" id="alignmentStage">
