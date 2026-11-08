@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-readonly BASE_URL="https://english-47-120-37-63.sslip.io"
-readonly HTTP_URL="http://english-47-120-37-63.sslip.io"
+readonly BASE_URL="https://english.47.120.37.63.sslip.io"
+readonly HTTP_URL="http://english.47.120.37.63.sslip.io"
 readonly ROBOT_URL="https://robot-47-120-37-63.sslip.io"
 readonly ROBOT_LOCAL_URL="http://127.0.0.1:8080/"
 readonly CURRENT_SERVER="/opt/english-typing-practice/current/server"
@@ -92,7 +92,7 @@ assert_status "$status" 200 "HTTPS root"
 
 http_status="$(/usr/bin/curl --silent --show-error --max-time 10 --output /dev/null --dump-header "${temp_dir}/redirect.headers" --write-out '%{http_code}' "$HTTP_URL/")"
 [[ "$http_status" =~ ^30[1278]$ ]] || die "HTTP did not redirect to HTTPS (status ${http_status})"
-/usr/bin/grep -Eiq '^location:[[:space:]]*https://english-47-120-37-63\.sslip\.io/' "${temp_dir}/redirect.headers" || die "redirect target is not the canonical HTTPS origin"
+/usr/bin/grep -Eiq '^location:[[:space:]]*https://english\.47\.120\.37\.63\.sslip\.io/' "${temp_dir}/redirect.headers" || die "redirect target is not the canonical HTTPS origin"
 
 status="$(/usr/bin/curl --silent --show-error --max-time 15 \
   --cookie-jar "${temp_dir}/guest-cookies.txt" \

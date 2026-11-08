@@ -5,7 +5,7 @@ administrator console, content publishing, and an installable PWA shell.
 
 ## Live website
 
-Use the [Aliyun account site](https://english-47-120-37-63.sslip.io/login).
+Use the [Aliyun account site](https://english.47.120.37.63.sslip.io/login).
 At the owner's request, all GitHub Pages website entrances were disabled on
 2026-10-27. GitHub retains the source and history; standalone HTML files remain
 available for local development and regression checks. Do not deploy

@@ -1,4 +1,4 @@
-english-47-120-37-63.sslip.io {
+english.47.120.37.63.sslip.io {
 	encode zstd gzip
 
 	@api path /api /api/*
@@ -36,4 +36,8 @@ english-47-120-37-63.sslip.io {
 	# root-owned files during `caddy validate`, then fail when the caddy service
 	# reloads as its unprivileged account.
 	log
+}
+
+english-47-120-37-63.sslip.io {
+	redir https://english.47.120.37.63.sslip.io{uri} 308
 }

@@ -73,7 +73,7 @@ require_env_value() {
 require_env_value HOST 127.0.0.1
 require_env_value PORT 8091
 require_env_value DATABASE_PATH "$DATABASE_PATH"
-require_env_value APP_ORIGIN https://english-47-120-37-63.sslip.io
+require_env_value APP_ORIGIN https://english.47.120.37.63.sslip.io
 require_env_value TRUST_PROXY loopback
 guest_secret_count="$(/usr/bin/grep -Ec '^GUEST_TOKEN_SECRET=' "$ENV_FILE" || true)"
 [[ "$guest_secret_count" == "1" ]] || die "environment must define GUEST_TOKEN_SECRET exactly once"

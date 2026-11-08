@@ -12,7 +12,7 @@ SQLite data. It is intentionally tied to the following production layout:
 - environment: `/etc/english-typing-practice/env`
 - backups: `/var/backups/english-typing-practice`
 - API listener: `127.0.0.1:8091`
-- public origin: `https://english-47-120-37-63.sslip.io`
+- public origin: `https://english.47.120.37.63.sslip.io`
 
 English-site access logs are written to the existing Caddy systemd journal rather
 than a separate file, so configuration validation and runtime use the same permissions.
@@ -364,3 +364,26 @@ root, in addition to the Vite-bundled preview asset. Verify the Aliyun site afte
 deployment; private accounts, imports, and learning records stay on Aliyun.
 Historical content-sync notes describe former Pages releases, not permission to
 restore them. Reopening Pages requires a new explicit request from the user.
+
+
+## 2026-10-29 domain migration
+
+The canonical origin is now `https://english.47.120.37.63.sslip.io`.
+The previous hyphen hostname remains an HTTPS 308 alias and preserves the complete
+path and query. Domain migration changes only the English Caddy site, its durable
+candidate template, `APP_ORIGIN`, and installed helper canonical checks; it does not
+switch the active release or replace the learner database. Preserve all existing
+non-origin environment bytes, root:englishapp 0640, and both signing secrets.
+
+Take the English deployment lock and the shared laboratory Caddy deployment lock
+before changing the imported site. Keep `/etc/caddy/Caddyfile` byte-for-byte unchanged.
+First serve the new hostname alongside the old one and verify its real HTTPS
+certificate. Then change `APP_ORIGIN`, restart only `englishapp.service`, verify
+anonymous Origin/CSRF handling, and turn the old hostname into its permanent redirect.
+Use saved hashes before every write and rollback; never overwrite an external edit.
+Configuration rollback must not restore an old learner database.
+
+Users must sign in again because session cookies are host-only. Cloud learning
+records remain in the existing database; browser-local layout/voice preferences and
+PWA installation belong to their original origin and are not migrated automatically.
+Keep GitHub Pages disabled. Source-only preparation is not proof of production activation.

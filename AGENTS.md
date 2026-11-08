@@ -4,7 +4,7 @@
 
 用户于 2026-10-27 明确要求关停 GitHub 上所有英语打字网站入口。本约定取代 2026-10-19 的双站同步要求：
 
-- 阿里云账号版继续运行：<https://english-47-120-37-63.sslip.io/login>。
+- 阿里云账号版继续运行：<https://english.47.120.37.63.sslip.io/login>。
 - GitHub 保留源码仓库及历史分支；GitHub Pages 保持关闭，包括首页、`index.html`、`typing-practice.html` 和带版本参数的旧链接。
 - 后续开发默认更新源码 `main` 并发布阿里云，不再更新或部署 `codex/static-pages`，不得自动重新启用 Pages。只有用户明确要求重新开放时才能恢复。
 
