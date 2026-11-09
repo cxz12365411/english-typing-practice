@@ -116,7 +116,7 @@ test("fresh 270-sentence installations publish 26 categories once without any ne
     assert.equal(count(db, "categories WHERE status = 'published'"), 26);
     assert.equal(count(db, "items WHERE status = 'published'"), 1120);
     assert.equal(count(db, "item_revisions"), 1120);
-    assert.equal(count(db, "schema_migrations"), 4);
+    assert.equal(count(db, "schema_migrations"), 5);
     const before = snapshot(db);
     assert.deepEqual(migratePreCet4Fixture(db, "Z:\\missing-source-directory"), { categoriesInserted: 0, itemsInserted: 0, words: 850, sentences: 270 });
     assert.equal(snapshot(db), before);

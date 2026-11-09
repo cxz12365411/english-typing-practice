@@ -391,8 +391,8 @@ test("schema 4 upgrades an actual schema 3 without touching legacy rows and a pr
     const before = db.prepare("SELECT * FROM users").all();
     const historicalChecksums = db.prepare("SELECT * FROM schema_migrations").all();
     await db.backup(join(folder, "before.db"));
-    assert.equal(migrateDatabase(db), 4);
-    assert.equal(migrateDatabase(db), 4);
+    assert.equal(migrateDatabase(db), 5);
+    assert.equal(migrateDatabase(db), 5);
     assert.deepEqual(db.prepare("SELECT * FROM users").all(), before);
     assert.deepEqual(db.prepare("SELECT * FROM schema_migrations WHERE version <= 3").all(), historicalChecksums);
     assert.equal((db.prepare("SELECT format FROM import_previews WHERE id = 'old-csv'").get() as { format: string }).format, "csv");

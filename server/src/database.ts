@@ -294,6 +294,48 @@ const MIGRATIONS: ReadonlyArray<{ version: number; sql: string }> = [
       CREATE INDEX practice_sessions_batch_idx ON practice_sessions(import_batch_id);
       CREATE INDEX items_category_answer_idx ON items(category_id, normalized_answer);
     `
+  },
+  {
+    version: 5,
+    sql: `
+      CREATE TABLE user_memberships (
+        user_id TEXT PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE,
+        access_kind TEXT NOT NULL CHECK (access_kind IN ('legacy_free', 'metered')),
+        trial_started_at INTEGER,
+        trial_ends_at INTEGER,
+        paid_until INTEGER,
+        updated_at INTEGER NOT NULL,
+        CHECK (trial_ends_at IS NULL OR trial_ends_at >= trial_started_at)
+      ) STRICT;
+
+      INSERT INTO user_memberships(user_id, access_kind, updated_at)
+        SELECT id, 'legacy_free', updated_at FROM users;
+
+      CREATE TRIGGER users_start_membership_trial AFTER INSERT ON users
+      BEGIN
+        INSERT INTO user_memberships(user_id, access_kind, trial_started_at, trial_ends_at, updated_at)
+          VALUES (NEW.id, 'metered', NEW.created_at, NEW.created_at + 86400000, NEW.created_at);
+      END;
+
+      CREATE TABLE payment_orders (
+        id TEXT PRIMARY KEY,
+        user_id TEXT NOT NULL REFERENCES users(id) ON DELETE RESTRICT,
+        amount_fen INTEGER NOT NULL CHECK (amount_fen = 100),
+        duration_days INTEGER NOT NULL CHECK (duration_days = 30),
+        provider_mode TEXT NOT NULL CHECK (provider_mode IN ('sandbox', 'live', 'test')),
+        app_id TEXT NOT NULL,
+        seller_id TEXT NOT NULL,
+        status TEXT NOT NULL DEFAULT 'pending' CHECK (status IN ('pending', 'paid', 'closed')),
+        created_at INTEGER NOT NULL,
+        expires_at INTEGER NOT NULL,
+        paid_at INTEGER,
+        provider_trade_no TEXT UNIQUE,
+        credited_until INTEGER,
+        last_checked_at INTEGER,
+        updated_at INTEGER NOT NULL
+      ) STRICT;
+      CREATE INDEX payment_orders_user_created_idx ON payment_orders(user_id, created_at DESC);
+    `
   }
 ];
 
@@ -378,7 +420,7 @@ export function migrateDatabase(db: SqliteDatabase): number {
   return latestVersion;
 }
 
-function locateContentSource(explicit?: string): string {
+export function locateContentSource(explicit?: string): string {
   const moduleDir = dirname(fileURLToPath(import.meta.url));
   const candidates = [explicit, resolve(process.cwd(), ".."), resolve(moduleDir, "../.."), process.cwd()].filter(
     (candidate): candidate is string => Boolean(candidate)
