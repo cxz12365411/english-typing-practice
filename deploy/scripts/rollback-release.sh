@@ -13,6 +13,8 @@ readonly SERVICE_NAME="englishapp.service"
 readonly HEALTH_URL="http://127.0.0.1:8091/api/healthz"
 readonly LIBEXEC_DIR="/usr/local/libexec/english-typing-practice"
 readonly DEPLOY_LOCK="/var/lib/english-typing-practice-locks/deploy.lock"
+readonly DATABASE_LOCK="/var/lib/english-typing-practice-locks/database.lock"
+readonly PAYMENT_RESTORE_CHECK="${LIBEXEC_DIR}/check-payment-restore.py"
 readonly CADDY_MAIN="/etc/caddy/Caddyfile"
 readonly CADDY_SITE="/etc/caddy/english-typing-practice.caddy"
 
@@ -37,10 +39,13 @@ esac
 if [[ "$rollback_mode" == "--automatic" && "${ETP_DEPLOY_LOCK_HELD:-0}" != "1" ]]; then
   die "--automatic is reserved for deploy-release.sh"
 fi
+restore_database=0
+[[ "$rollback_mode" == "--automatic" || "$rollback_mode" == "--restore-database" ]] && restore_database=1
 
-for command_path in /usr/bin/awk /usr/bin/caddy /usr/bin/curl /usr/bin/flock /usr/bin/mktemp /usr/bin/realpath /usr/bin/sha256sum /usr/bin/sqlite3 /usr/bin/systemctl; do
+for command_path in /usr/bin/awk /usr/bin/caddy /usr/bin/curl /usr/bin/flock /usr/bin/mktemp /usr/bin/realpath /usr/bin/sha256sum /usr/bin/sqlite3 /usr/bin/systemctl /usr/bin/python3; do
   [[ -x "$command_path" ]] || die "required command is missing: ${command_path}"
 done
+[[ -f "$PAYMENT_RESTORE_CHECK" && ! -L "$PAYMENT_RESTORE_CHECK" ]] || die "payment restore check is missing or unsafe"
 for helper in backup-sqlite.sh restore-sqlite.sh restore-caddy-state.sh; do
   [[ -x "${LIBEXEC_DIR}/${helper}" ]] || die "rollback helper is missing: ${LIBEXEC_DIR}/${helper}"
 done
@@ -197,6 +202,7 @@ restore_entry_caddy() {
 quarantine_active_database() {
   local label="$1"
   local quarantine_dir
+  /usr/bin/python3 "$PAYMENT_RESTORE_CHECK" "$DATABASE_PATH" NO_DATABASE || return 1
   [[ -d "$FAILED_ROOT" && ! -L "$FAILED_ROOT" ]] || return 1
   quarantine_dir="$(/usr/bin/mktemp -d "${FAILED_ROOT}/${release_id}-${label}.XXXXXX")" || return 1
   /usr/bin/chown root:root "$quarantine_dir" || return 1
@@ -231,13 +237,19 @@ caddy_changed=0
 recover_entry_state() {
   local recovery_failed=0
   /usr/bin/systemctl stop "$SERVICE_NAME" >/dev/null 2>&1 || true
+  if [[ "$restore_database" -eq 1 ]]; then
+    /usr/bin/python3 "$PAYMENT_RESTORE_CHECK" "$DATABASE_PATH" "$entry_database_backup" || return 1
+  fi
   set_current_target "$entry_current_target" || recovery_failed=1
-  if [[ "$entry_database_backup" == "NO_DATABASE" ]]; then
-    quarantine_active_database rollback-recovery || recovery_failed=1
-  elif [[ -n "$entry_database_backup" ]]; then
-    ETP_DEPLOY_LOCK_HELD=1 "${LIBEXEC_DIR}/restore-sqlite.sh" "$entry_database_backup" --leave-stopped >/dev/null || recovery_failed=1
-  else
-    recovery_failed=1
+  # A code-only rollback and its recovery must never rewind the database.
+  if [[ "$restore_database" -eq 1 ]]; then
+    if [[ "$entry_database_backup" == "NO_DATABASE" ]]; then
+      quarantine_active_database rollback-recovery || recovery_failed=1
+    elif [[ -n "$entry_database_backup" ]]; then
+      ETP_DEPLOY_LOCK_HELD=1 ETP_DATABASE_LOCK_HELD=1 "${LIBEXEC_DIR}/restore-sqlite.sh" "$entry_database_backup" --leave-stopped >/dev/null || recovery_failed=1
+    else
+      recovery_failed=1
+    fi
   fi
   if [[ "$caddy_changed" -eq 1 ]]; then
     restore_entry_caddy || recovery_failed=1
@@ -269,18 +281,25 @@ trap 'exit 143' TERM
 entry_database_backup="$("${LIBEXEC_DIR}/backup-sqlite.sh" pre-restore)"
 printf '%s\n' "$entry_database_backup" >"${attempt_dir}/rollback-entry-database"
 /usr/bin/chmod 0600 "${attempt_dir}/rollback-entry-database"
+# backup-sqlite has released its own lock. Hold it across the comparison,
+# symlink switch, restore and failure recovery; nested restore inherits it.
+[[ -f "$DATABASE_LOCK" && ! -L "$DATABASE_LOCK" ]] || die "database lock is missing or unsafe"
+exec 8>"$DATABASE_LOCK"
+/usr/bin/flock -w 60 8 || die "timed out waiting for the database maintenance lock"
+if [[ "$restore_database" -eq 1 ]]; then
+  /usr/bin/python3 "$PAYMENT_RESTORE_CHECK" "$DATABASE_PATH" "$database_before" ||
+    die "payment records prevent this database rollback; keep the database or reconcile payments manually"
+fi
 transaction_armed=1
 restart_only_armed=0
 
 set_current_target "$previous_target" || die "could not atomically switch to the previous release"
 
-restore_database=0
-[[ "$rollback_mode" == "--automatic" || "$rollback_mode" == "--restore-database" ]] && restore_database=1
 if [[ "$restore_database" -eq 1 ]]; then
   if [[ "$database_before" == "NO_DATABASE" ]]; then
     quarantine_active_database failed-deployment || die "could not quarantine the failed deployment database"
   else
-    ETP_DEPLOY_LOCK_HELD=1 "${LIBEXEC_DIR}/restore-sqlite.sh" "$database_before" --leave-stopped >/dev/null
+    ETP_DEPLOY_LOCK_HELD=1 ETP_DATABASE_LOCK_HELD=1 "${LIBEXEC_DIR}/restore-sqlite.sh" "$database_before" --leave-stopped >/dev/null
   fi
 fi
 

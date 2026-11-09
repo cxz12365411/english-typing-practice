@@ -60,6 +60,7 @@ for source_file in \
   "${SCRIPT_DIR}/robot-regression.sh" \
   "${SCRIPT_DIR}/prune-deployments.sh" \
   "${SCRIPT_DIR}/rewrite-caddy.py" \
+  "${SCRIPT_DIR}/check-payment-restore.py" \
   "${SCRIPT_DIR}/stage-release.sh" \
   "${SCRIPT_DIR}/deploy-release.sh" \
   "${SCRIPT_DIR}/rollback-release.sh" \
@@ -146,6 +147,7 @@ for script_name in backup-sqlite.sh restore-sqlite.sh activate-caddy-site.sh res
   install_managed "${SCRIPT_DIR}/${script_name}" "${LIBEXEC_DIR}/${script_name}" 0755
 done
 install_managed "${SCRIPT_DIR}/rewrite-caddy.py" "${LIBEXEC_DIR}/rewrite-caddy.py" 0755
+install_managed "${SCRIPT_DIR}/check-payment-restore.py" "${LIBEXEC_DIR}/check-payment-restore.py" 0755
 install_managed "${DEPLOY_DIR}/caddy/english-typing-practice.caddy" "${SHARE_DIR}/caddy-site.caddy" 0644
 install_managed "${DEPLOY_DIR}/README.md" "${SHARE_DIR}/README.md" 0644
 
@@ -198,6 +200,12 @@ guest_secret_value="$(/usr/bin/sed -n 's/^GUEST_TOKEN_SECRET=//p' "$ENV_FILE")"
 # All missing, non-secret email settings are appended in one atomic replacement;
 # rerunning provisioning is a no-op once every key exists exactly once.
 email_default_lines=(
+  'MEMBERSHIP_ENABLED=false'
+  'PAYMENT_MODE=disabled'
+  'ALIPAY_APP_ID='
+  'ALIPAY_SELLER_ID='
+  'ALIPAY_PRIVATE_KEY_PATH='
+  'ALIPAY_PUBLIC_KEY_PATH='
   'EMAIL_DELIVERY=disabled'
   'EMAIL_SELF_REGISTRATION=false'
   'EMAIL_DAILY_SEND_LIMIT=180'

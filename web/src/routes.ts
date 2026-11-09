@@ -2,7 +2,12 @@
 export function normaliseAppRoute(input: string, origin: string, fallback: "/login" | "/practice"): string {
   let url: URL;
   try { url = new URL(input, origin); } catch { return fallback; }
-  if (url.origin !== origin || !["/login", "/admin", "/practice"].includes(url.pathname)) return fallback;
+  if (url.origin !== origin || !["/login", "/admin", "/practice", "/membership"].includes(url.pathname)) return fallback;
+  if (url.pathname === "/membership") {
+    const orders = url.searchParams.getAll("order");
+    return orders.length === 1 && /^[a-zA-Z0-9_-]{1,100}$/.test(orders[0]!)
+      ? `/membership?order=${encodeURIComponent(orders[0]!)}` : "/membership";
+  }
   if (url.pathname !== "/practice" || !url.searchParams.has("batch")) return url.pathname;
   const values = url.searchParams.getAll("batch");
   // Preserve invalid batch requests as an explicit error, never silently open the whole bank.

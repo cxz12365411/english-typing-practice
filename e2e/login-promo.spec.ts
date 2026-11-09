@@ -1,4 +1,7 @@
+import { mockContentResources } from "./resource-fixtures";
 import { expect, test, type Page, type Route } from "@playwright/test";
+
+test.beforeEach(async ({ page }) => { await mockContentResources(page); });
 import { mkdirSync, writeFileSync } from "node:fs";
 
 const user = {
@@ -22,6 +25,7 @@ async function mockLogin(page: Page, emailEnabled = false) {
   await page.route("**/api/**", async route => {
     const request = route.request();
     const path = new URL(request.url()).pathname;
+    if (path.startsWith("/api/content-resources/")) return route.fallback();
     const body = request.postDataJSON();
     if (request.method() === "POST") requests.push({ path, body });
     if (path === "/api/auth/session") return json(route, { user: currentUser, csrfToken: "promo-csrf", capabilities });
@@ -219,7 +223,7 @@ test("email-enabled auth tabs remain keyboard accessible beside the demo", async
   await page.locator('#passwordLoginForm [name="password"]').fill("UnsubmittedDraft!2026");
   await page.getByRole("tab", { name: "账号密码", exact: true }).focus();
   await page.keyboard.press("ArrowLeft");
-  await expect(page.getByRole("tab", { name: "找回密码", exact: true })).toHaveAttribute("aria-selected", "true");
+  await expect(page.getByRole("tab", { name: "设置／找回密码", exact: true })).toHaveAttribute("aria-selected", "true");
   await page.getByRole("tab", { name: "账号密码", exact: true }).click();
   await expect(page.locator('#passwordLoginForm [name="username"]')).toHaveValue("tab.draft");
   await expect(page.locator('#passwordLoginForm [name="password"]')).toHaveValue("UnsubmittedDraft!2026");

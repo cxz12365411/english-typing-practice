@@ -10,7 +10,6 @@ const ADMIN_PASSWORD = "E2eChangedAdmin!2026";
 const LEARNER_PASSWORD = "E2eChangedLearner!2026";
 const OTHER_PASSWORD = "E2eChangedOther!2026";
 const EMAIL_RESET_PASSWORD = "E2eEmailResetChanged!2026";
-const EMAIL_REGISTER_PASSWORD = "E2eEmailRegistered!2026";
 const EMAIL_OUTBOX_FILE = join(tmpdir(), "english-typing-practice-e2e-mail-outbox-8091.jsonl");
 
 let learnerTemporaryPassword = "";
@@ -297,6 +296,41 @@ test.describe.serial("multi-user application", () => {
     await expect(page.locator("#lifetimeAttempts")).toHaveText(String(after.totals.attempts));
   });
 
+  test("disabled membership keeps real account history and a working practice return", async ({ page }) => {
+    await login(page, "learner1", LEARNER_PASSWORD);
+    await expect(page.locator("#answerInput")).toBeEnabled();
+    const session = await (await page.request.get("/api/auth/session")).json();
+    expect(session.capabilities.membershipEnabled).not.toBe(true);
+    expect((await (await page.request.get("/api/membership")).json()).enabled).toBe(false);
+    await page.locator("#answerInput").fill("history-retention-check");
+    await page.locator("#answerInput").press("Enter");
+    await expect(page.locator("#feedback")).toContainText("应输入：");
+    const before = await (await page.request.get("/api/me/summary")).json();
+    expect(before.totals.attempts).toBeGreaterThan(0);
+    expect(before.totals.mistakes).toBeGreaterThan(0);
+
+    await page.getByRole("link", { name: "会员与记录", exact: true }).click();
+    await expect(page).toHaveURL(/\/membership$/);
+    await expect(page.locator("#membershipStatus")).toHaveText("当前免费开放");
+    await expect(page.locator("#createMembershipOrder")).toBeHidden();
+    await expect(page.getByText(/24 小时试用|1 元开通 30 天/)).toHaveCount(0);
+    const totals = page.locator(".membership-stats strong");
+    await expect(totals).toHaveText([
+      String(before.totals.sessions), String(before.totals.attempts),
+      String(before.totals.correct), String(before.totals.mistakes)
+    ]);
+    await expect(page.locator("#membershipOrders")).toContainText("还没有购买记录");
+    await page.getByText("最近练习", { exact: true }).click();
+    await expect(page.locator(".membership-history li").first()).toBeVisible();
+    await page.reload();
+    await expect(page.locator("#membershipStatus")).toHaveText("当前免费开放");
+    await page.getByRole("button", { name: "返回练习", exact: true }).click();
+    await expect(page).toHaveURL(/\/practice$/);
+    await expect(page.locator("#answerInput")).toBeEnabled();
+    const after = await (await page.request.get("/api/me/summary")).json();
+    for (const key of ["attempts", "correct", "mistakes"]) expect(after.totals[key]).toBe(before.totals[key]);
+  });
+
   test("an existing user can bind a verified email", async ({ page }) => {
     const email = "learner2@example.com";
     await login(page, "learner2", OTHER_PASSWORD);
@@ -330,7 +364,7 @@ test.describe.serial("multi-user application", () => {
   test("email verification code resets a password and revokes the old password", async ({ page }) => {
     const email = "email.reset@example.com";
     await page.goto("/login");
-    await page.getByRole("tab", { name: "找回密码" }).click();
+    await page.getByRole("tab", { name: "设置／找回密码" }).click();
     const form = page.locator("#resetPasswordForm");
     await form.locator('[name="email"]').fill(email);
     await form.getByRole("button", { name: "发送验证码" }).click();
@@ -358,10 +392,8 @@ test.describe.serial("multi-user application", () => {
     await form.getByRole("button", { name: "发送验证码" }).click();
     const code = await waitForCapturedCode(email, "register");
     await form.locator('[name="code"]').fill(code);
-    await form.locator('[name="username"]').fill("email.register");
-    await form.locator('[name="displayName"]').fill("邮箱注册学员");
-    await form.locator('[name="password"]').fill(EMAIL_REGISTER_PASSWORD);
-    await form.locator('[name="confirmPassword"]').fill(EMAIL_REGISTER_PASSWORD);
+    await expect(form.locator('[name="username"]')).toHaveCount(0);
+    await expect(form.locator('[name="password"]')).toHaveCount(0);
     await form.getByRole("button", { name: "注册并登录" }).click();
     await expect(page).toHaveURL(/\/practice$/);
     const adminStatus = await page.evaluate(async () => (await fetch("/api/admin/stats", { credentials: "include" })).status);

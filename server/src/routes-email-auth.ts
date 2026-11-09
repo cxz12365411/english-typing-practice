@@ -1,4 +1,4 @@
-import { randomUUID } from "node:crypto";
+import { randomBytes, randomUUID } from "node:crypto";
 import type { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 import {
   createSession,
@@ -397,6 +397,7 @@ function createAuthenticatedResponse(
 export interface EmailAuthCapabilities {
   emailAuthEnabled: boolean;
   selfRegistrationEnabled: boolean;
+  membershipEnabled?: boolean;
 }
 
 export interface EmailAuthOptions {
@@ -404,12 +405,14 @@ export interface EmailAuthOptions {
   dailySendLimit: number;
   registrationDailySendLimit: number;
   registrationIpDailyLimit: number;
+  membershipEnabled?: boolean;
 }
 
 export function emailAuthCapabilities(provider: EmailProvider, options: EmailAuthOptions): EmailAuthCapabilities {
   return {
     emailAuthEnabled: provider.enabled,
-    selfRegistrationEnabled: provider.enabled && options.selfRegistrationEnabled
+    selfRegistrationEnabled: provider.enabled && options.selfRegistrationEnabled,
+    ...(options.membershipEnabled ? { membershipEnabled: true } : {})
   };
 }
 
@@ -578,16 +581,22 @@ export async function registerEmailAuthRoutes(
     let username: string;
     let password: string;
     try {
-      username = validateUsername(stringField(body, "username", { min: 3, max: 32 })!);
+      username = body.username === undefined
+        ? `u_${randomBytes(12).toString("hex")}`
+        : validateUsername(stringField(body, "username", { min: 3, max: 32 })!);
     } catch (error) {
       badRequest("INVALID_USERNAME", (error as Error).message, { field: "username" });
     }
     try {
-      password = validatePassword(stringField(body, "password", { min: 1, max: 128, trim: false })!);
+      // A passwordless registration still stores a unique, unknowable Argon2 hash
+      // for compatibility with legacy accounts. A password can later be set by email.
+      password = body.password === undefined
+        ? randomBytes(48).toString("base64url")
+        : validatePassword(stringField(body, "password", { min: 1, max: 128, trim: false })!);
     } catch (error) {
       badRequest("INVALID_PASSWORD", (error as Error).message, { field: "password" });
     }
-    const displayName = stringField(body, "displayName", { min: 1, max: 80 })!;
+    const displayName = stringField(body, "displayName", { optional: true, min: 1, max: 80 }) ?? "英语学习者";
     const blocked = reserveCodeVerification(db, email, request.ip, sessionHash);
     if (blocked) throwRateLimit(blocked);
     const candidateCodeId = assertCodeCandidate(
@@ -621,7 +630,7 @@ export async function registerEmailAuthRoutes(
       directAudit(db, request, id, "auth.email_registered", id);
       return createAuthenticatedResponse(db, reply, request, user);
     });
-    return created;
+    return { ...created, capabilities: emailAuthCapabilities(provider, options) };
   });
 
   app.post("/api/auth/email/login", { bodyLimit: EMAIL_AUTH_BODY_LIMIT }, async (request, reply) => {
@@ -663,7 +672,7 @@ export async function registerEmailAuthRoutes(
       }
     );
     if (!response) throw invalidCodeError();
-    return response;
+    return { ...response, capabilities: emailAuthCapabilities(provider, options) };
   });
 
   app.post("/api/auth/email/reset-password", { bodyLimit: EMAIL_AUTH_BODY_LIMIT }, async (request, reply) => {

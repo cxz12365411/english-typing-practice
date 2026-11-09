@@ -1,6 +1,13 @@
 english.47.120.37.63.sslip.io {
 	encode zstd gzip
 
+	# Older public learning-data URLs are retired. Current data is served through
+	# authenticated /api/content-resources endpoints, never through the SPA fallback.
+	@retired_content path_regexp retired_content ^/(?:assets/)?(?:sentence-alignments|cet4-writing|cet6-writing)(?:-[A-Za-z0-9_-]+)?\.json$
+	handle @retired_content {
+		respond 404
+	}
+
 	@api path /api /api/*
 	handle @api {
 		header Cache-Control "no-store"
@@ -16,7 +23,7 @@ english.47.120.37.63.sslip.io {
 	@immutable path_regexp immutable ^/assets/.+-[A-Za-z0-9_-]{8,}\.(?:css|js|mjs|png|jpe?g|gif|svg|webp|avif|ico|woff2?)$
 	header @immutable Cache-Control "public, max-age=31536000, immutable"
 
-	@no_store path / /index.html /login /practice /admin /manifest.webmanifest /sw.js
+	@no_store path / /index.html /login /practice /admin /membership /manifest.webmanifest /sw.js
 	header @no_store Cache-Control "no-store"
 	@manifest path /manifest.webmanifest
 	header @manifest Content-Type "application/manifest+json; charset=utf-8"

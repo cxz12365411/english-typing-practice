@@ -1,3 +1,4 @@
+import { renderMembership, disposeMembership } from "./membership";
 import "./styles.css";
 import { renderAdmin, disposeAdmin } from "./admin";
 import { ApiError, api } from "./api";
@@ -26,10 +27,11 @@ function disposePage(): void {
   clearVerificationCountdowns();
   disposePractice();
   disposeAdmin();
+  disposeMembership();
 }
 
-function normalisePath(pathname: string): "/login" | "/practice" | "/admin" {
-  if (pathname === "/login" || pathname === "/practice" || pathname === "/admin") return pathname;
+function normalisePath(pathname: string): "/login" | "/practice" | "/admin" | "/membership" {
+  if (pathname === "/login" || pathname === "/practice" || pathname === "/admin" || pathname === "/membership") return pathname;
   return currentUser ? "/practice" : "/login";
 }
 
@@ -53,7 +55,7 @@ function bindRouteLinks(): void {
   });
 }
 
-function renderShell(content: string, activeRoute: "/practice" | "/admin"): void {
+function renderShell(content: string, activeRoute: "/practice" | "/admin" | "/membership"): void {
   if (!currentUser) return;
   app.innerHTML = shellMarkup(currentUser, activeRoute, content);
   bindRouteLinks();
@@ -64,6 +66,8 @@ function renderShell(content: string, activeRoute: "/practice" | "/admin"): void
 
 function onUserChanged(user: User): void {
   currentUser = user;
+  const label = document.querySelector<HTMLElement>(".user-chip strong");
+  if (label) { label.textContent = user.displayName || user.username; label.title = user.username; }
 }
 
 function handleAuthError(error: unknown): boolean {
@@ -110,7 +114,7 @@ async function recoverLoginSession(): Promise<void> {
   recoveringSession = true;
   const sequence = ++renderSequence;
   const requestedPath = `${location.pathname}${location.search}`;
-  if (location.pathname === "/practice" && location.search) pendingReturnRoute = requestedPath;
+  if ((location.pathname === "/practice" || location.pathname === "/membership") && location.search) pendingReturnRoute = requestedPath;
   currentUser = null;
   disposePage();
   history.replaceState({}, "", "/login");
@@ -149,7 +153,7 @@ function pageContext(user: User): PageContext {
 
 function renderLogin(): void {
   disposePage();
-  if (location.pathname === "/practice" && location.search) {
+  if ((location.pathname === "/practice" || location.pathname === "/membership") && location.search) {
     pendingReturnRoute = normaliseAppRoute(`${location.pathname}${location.search}`, location.origin, "/login");
   }
   if (location.pathname !== "/login") history.replaceState({}, "", "/login");
@@ -268,7 +272,7 @@ async function renderRoute(): Promise<void> {
     return;
   }
   if (currentUser.mustChangePassword) {
-    if (location.pathname === "/practice" && location.search) {
+    if ((location.pathname === "/practice" || location.pathname === "/membership") && location.search) {
       pendingReturnRoute = normaliseAppRoute(`${location.pathname}${location.search}`, location.origin, "/practice");
     }
     renderForcedPassword();
@@ -290,7 +294,10 @@ async function renderRoute(): Promise<void> {
 
   disposePage();
   const context = pageContext(currentUser);
-  if (route === "/admin") {
+  if (route === "/membership") {
+    document.title = "会员与记录 · 英语打字练习";
+    await renderMembership(context);
+  } else if (route === "/admin") {
     document.title = "管理后台 · 英语打字练习";
     await renderAdmin(context);
   } else {

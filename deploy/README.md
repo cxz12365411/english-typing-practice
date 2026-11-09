@@ -258,6 +258,85 @@ Restoring an env does not alter the database, and restoring a database does not 
 env. The robot host, its Caddy block, and `robot-control.service` are outside this email
 configuration and remain unchanged in both stages.
 
+## Membership rollout (schema 5)
+
+Keep the existing `https://english.47.120.37.63.sslip.io` origin. This release does
+not activate `cxzenglish.cn`, reopen GitHub Pages, send email or collect payments.
+The default settings are `MEMBERSHIP_ENABLED=false`, `PAYMENT_MODE=disabled`,
+`EMAIL_DELIVERY=disabled`, `EMAIL_SELF_REGISTRATION=false`.
+
+Use two commits: a compatibility release containing migration 5 and its tests,
+then the complete feature release. Deploy the compatibility release using the
+existing host helpers first (the existing application still uses public bundled
+writing resources). After it passes acceptance, check out the feature commit and
+run `provision-host.sh`, then stage/deploy that exact feature commit. Installing
+the new Caddy template before the compatibility release would block its old
+public JSON assets, so keep this order. The new provisioner adds missing payment
+settings without overwriting configured values and installs the payment restore
+guard. The feature release can roll back to the compatibility release using
+`--keep-database`; it restores that release's previous Caddy configuration too.
+
+Migration 5 marks every existing account as `legacy_free`. Accounts created after
+that migration receive one 24-hour trial measured from account creation; restarting
+or changing an email/password does not restart it. Administrators are exempt.
+Trial timestamps exist even while enforcement is off: if registration is opened
+before enforcement, elapsed trials are not automatically reset on activation.
+Keep registration closed until the complete activation below is ready.
+
+The new `/membership` page retains history, account settings and order status even
+after expiry. Practice APIs and the three `/api/content-resources/*.json` endpoints
+enforce access on the server when enabled. Writing/alignment JSON lives outside the
+public Web root with `root:englishapp 0640`; old public resource URLs return 404.
+No identity, private import or study records are part of the source release.
+
+### Configuration needed before real use
+
+1. Configure and verify Aliyun Direct Mail SMTP as documented above. Verify an
+   existing administrator's email before opening public registration. Registration
+   asks only for email and code; the server generates the internal username and an
+   unknown random password. Users can set their own password afterward using the
+   verified email flow and choose a display name in account settings.
+2. Complete the applicable merchant/site review and enable Alipay **website payment**
+   for the actual site. This implementation uses `alipay.trade.page.pay`, which
+   opens the official Alipay cashier and its QR code; it does not use a personal
+   collection QR code or `precreate` face-to-face payment.
+3. In an isolated non-production environment, configure `PAYMENT_MODE=sandbox`,
+   sandbox app/seller IDs and RSA2 keys; verify a real sandbox cashier, signed
+   callback and query. Production rejects sandbox and test providers. Automated
+   tests use generated RSA keys and an injected test provider; they do not prove
+   merchant activation or actual Alipay payment.
+4. Put the production RSA2 app private key and Alipay public key under
+   `/etc/english-typing-practice/` (outside the release/Web tree). Set them
+   `root:englishapp 0640` and make every parent directory root-owned and not group
+   or world writable. Set `ALIPAY_APP_ID`, `ALIPAY_SELLER_ID`,
+   `ALIPAY_PRIVATE_KEY_PATH`, `ALIPAY_PUBLIC_KEY_PATH` only in the protected env.
+   The code uses public-key mode; certificate-mode merchants need a separate
+   reviewed implementation. Never put keys in Git, commands or chat.
+5. Back up env, then activate `MEMBERSHIP_ENABLED=true` and `PAYMENT_MODE=live` only
+   after merchant/configuration checks. Restart and run acceptance. Open
+   `EMAIL_SELF_REGISTRATION=true` last, after a controlled real-mail and payment
+   verification. A manual payment of ¥1 grants 30 days from the later of now,
+   remaining trial or paid expiry; there is no recurring payment mandate.
+
+The server fixes price at 100 fen and duration at 30 days. Browser-supplied amounts
+are rejected. Orders are account-bound and rate-limited; pending orders are reused.
+Only a verified Alipay signature with matching app ID, seller, order, paid status
+and amount can grant access. Notification retries and concurrent status queries
+credit once in a transaction. The return URL alone never unlocks practice. When
+callbacks are delayed, opening/checking the order reconciles with the signed query
+response. This release does not implement automatic refunds or subscription billing.
+
+### Rollback after any real order exists
+
+Prefer `--keep-database` with a schema-compatible release. `restore-sqlite.sh` and
+`rollback-release.sh --restore-database` refuse a snapshot that omits or changes
+any live-mode order or its associated account/entitlement, including pending
+orders that may settle later. The check runs with writers stopped and the database
+lock held; it reads WAL-aware live data. Failure recovery applies the same guard.
+Do not bypass the guard to make a rollback succeed: retain the current database,
+resolve code compatibility or reconcile every affected transaction first. The
+rollback guard does not replace encrypted off-host backups.
+
 ## Verification and routine updates
 
 Run anonymous production checks at any time:
@@ -359,8 +438,9 @@ re-enable GitHub Pages or deploy the historical `codex/static-pages` branch.
 
 Publish source changes on `main`, then stage and promote the exact tested account
 commit using the steps above. Standalone entries remain local regression fixtures.
-CET-4 releases require `cet4-writing.json` in both the staging and final release
-root, in addition to the Vite-bundled preview asset. Verify the Aliyun site after
+CET-4/CET-6 releases require both writing JSON sources and `sentence-alignments.json`
+in the protected staging and final release root. The membership release fetches
+them through authenticated APIs rather than bundling public preview data. Verify the Aliyun site after
 deployment; private accounts, imports, and learning records stay on Aliyun.
 Historical content-sync notes describe former Pages releases, not permission to
 restore them. Reopening Pages requires a new explicit request from the user.

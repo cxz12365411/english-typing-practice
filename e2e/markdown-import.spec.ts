@@ -1,4 +1,7 @@
+import { mockContentResources } from "./resource-fixtures";
 import { expect, test, type Page, type Route } from "@playwright/test";
+
+test.beforeEach(async ({ page }) => { await mockContentResources(page); });
 import type { MarkdownImportPreview } from "../web/src/types";
 
 const admin = { id: "markdown-admin", username: "markdown.admin", displayName: "导入管理员", role: "admin", status: "active", mustChangePassword: false, createdAt: "2026-10-09T00:00:00.000Z" };
@@ -25,6 +28,7 @@ async function json(route: Route, body: unknown, status = 200): Promise<void> {
 async function mockAdmin(page: Page): Promise<void> {
   await page.route("**/api/**", async (route) => {
     const path = new URL(route.request().url()).pathname;
+    if (path.startsWith("/api/content-resources/")) return route.fallback();
     if (path === "/api/auth/session") return json(route, { user: admin, csrfToken: "md-csrf", capabilities: { emailAuthEnabled: false, selfRegistrationEnabled: false } });
     if (path === "/api/admin/users") return json(route, { users: [admin] });
     if (path === "/api/admin/categories") return json(route, { categories: [category] });

@@ -3,7 +3,7 @@ import { escapeHtml } from "./utils";
 
 export type ToastKind = "success" | "error" | "info";
 
-export function shellMarkup(user: User, activeRoute: "/practice" | "/admin", content: string): string {
+export function shellMarkup(user: User, activeRoute: "/practice" | "/admin" | "/membership", content: string): string {
   const isAdmin = user.role === "admin";
   return `
     <div class="app-shell">
@@ -15,6 +15,7 @@ export function shellMarkup(user: User, activeRoute: "/practice" | "/admin", con
         <div class="header-actions">
           <nav class="nav-links" aria-label="主导航">
             <a class="nav-link${activeRoute === "/practice" ? " active" : ""}" href="/practice" data-route="/practice">练习</a>
+            <a class="nav-link${activeRoute === "/membership" ? " active" : ""}" href="/membership" data-route="/membership">会员与记录</a>
             ${isAdmin ? `<a class="nav-link${activeRoute === "/admin" ? " active" : ""}" href="/admin" data-route="/admin">管理后台</a>` : ""}
           </nav>
           <div class="user-chip">

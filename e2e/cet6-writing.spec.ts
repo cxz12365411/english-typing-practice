@@ -1,4 +1,7 @@
+import { mockContentResources } from "./resource-fixtures";
 import { test, expect, type Page } from "@playwright/test";
+
+test.beforeEach(async ({ page }) => { await mockContentResources(page); });
 import { readFileSync } from "node:fs";
 const writing = require("../cet4-writing.js");
 const source = JSON.parse(readFileSync("cet6-writing.json", "utf8"));
@@ -14,6 +17,7 @@ async function mockPractice(page: Page, mutate?: (items: any[]) => void) {
   let sessions = 0;
   await page.route("**/api/**", route => {
     const path = new URL(route.request().url()).pathname;
+    if (path.startsWith("/api/content-resources/")) return route.fallback();
     let body: unknown;
     if (path === "/api/auth/session") body = { user: { id: "cet6-test-user", username: "writer", displayName: "写作测试", role: "user", status: "active", mustChangePassword: false }, csrfToken: "cet6-test-csrf", capabilities: {} };
     else if (path === "/api/content") body = { categories, items, version: "cet6-test" };
@@ -32,7 +36,7 @@ async function mockPractice(page: Page, mutate?: (items: any[]) => void) {
 test("production preview and delayed resource preserve the answer and session", async ({ page }) => {
   let release!: () => void;
   const delay = new Promise<void>(resolve => { release = resolve; });
-  await page.route(dataUrl, async route => { await delay; await route.continue(); });
+  await page.route(dataUrl, async route => { await delay; await route.fallback(); });
   const app = await mockPractice(page);
   await page.locator("#categorySelect").selectOption(essay.id);
   await expect(page.locator("#targetWord")).toHaveText(first.english);

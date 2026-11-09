@@ -1,6 +1,6 @@
 import "../../alignment.js";
 import "../../alignment.css";
-import alignmentDataUrl from "../../sentence-alignments.json?url";
+const alignmentDataUrl = "/api/content-resources/sentence-alignments.json";
 import type { ContentItem } from "./types";
 import { mustElement } from "./ui";
 
@@ -81,7 +81,7 @@ export function createPracticeAlignment(options: {
   checkbox.addEventListener("change", onChange);
 
   if (renderer) {
-    void fetch(alignmentDataUrl, { signal: abort.signal })
+    void fetch(alignmentDataUrl, { signal: abort.signal, credentials: "same-origin", cache: "no-store" })
       .then((response) => {
         if (!response.ok) throw new Error("Alignment data unavailable");
         return response.json() as Promise<unknown>;

@@ -12,6 +12,10 @@ import { registerPracticeRoutes } from "./routes-practice.js";
 import { PasswordWorkQueueFullError } from "./security.js";
 import { createEmailProvider, type EmailProvider } from "./email-provider.js";
 import { emailAuthCapabilities, registerEmailAuthRoutes } from "./routes-email-auth.js";
+import { registerMembershipRoutes } from "./routes-membership.js";
+import { registerPaymentRoutes } from "./routes-payments.js";
+import { ALIPAY_NOTIFY_PATH, createPaymentProvider, type PaymentProvider } from "./payment-provider.js";
+import { registerContentResourceRoutes } from "./routes-content-resources.js";
 
 export interface BuildAppOptions {
   config?: Partial<AppConfig>;
@@ -20,6 +24,7 @@ export interface BuildAppOptions {
   seed?: boolean;
   logger?: boolean;
   emailProvider?: EmailProvider;
+  paymentProvider?: PaymentProvider;
 }
 
 const MUTATING_METHODS = new Set(["POST", "PUT", "PATCH", "DELETE"]);
@@ -31,6 +36,13 @@ function isLoopbackAddress(address: string): boolean {
 export async function buildApp(options: BuildAppOptions = {}): Promise<FastifyInstance> {
   const config = loadConfig(options.config);
   const emailProvider = options.emailProvider ?? createEmailProvider(config.emailDelivery, config.environment);
+  const paymentProvider = options.paymentProvider ?? createPaymentProvider(config.payment, config.appOrigin, config.environment);
+  if ((paymentProvider.kind === "test" || paymentProvider.mode === "test") && config.environment !== "test") {
+    throw new Error("The test payment provider is permitted only when NODE_ENV=test");
+  }
+  if (paymentProvider.mode === "sandbox" && config.environment === "production") {
+    throw new Error("Sandbox payments are not allowed in production");
+  }
   if (emailProvider.kind === "test" && config.environment !== "test") {
     throw new Error("The test email provider is permitted only when NODE_ENV=test");
   }
@@ -52,55 +64,7 @@ export async function buildApp(options: BuildAppOptions = {}): Promise<FastifyIn
   await app.register(cookie);
   app.decorateRequest("authSession", null);
 
-  app.addHook("onRequest", async (_request, reply) => {
-    reply.header("Cache-Control", "no-store");
-    reply.header("X-Content-Type-Options", "nosniff");
-    reply.header("Referrer-Policy", "same-origin");
-  });
-
-  const loadAndValidateRequestSecurity = (request: Parameters<typeof loadSession>[1], reply: Parameters<typeof loadSession>[2]): void => {
-    request.authSession = loadSession(db, request, reply, config.guestTokenSecret);
-    if (!MUTATING_METHODS.has(request.method)) return;
-    if (request.headers.origin !== config.appOrigin) {
-      throw new ApiError(403, "ORIGIN_INVALID", "Request origin is not allowed");
-    }
-    requireCsrf(request);
-  };
-
-  // Reject unauthenticated/cross-origin writes before Fastify parses a body. The
-  // preHandler check then reloads the session after parsing so a concurrent revoke,
-  // password reset or role change still wins before the handler mutates state.
-  app.addHook("onRequest", async (request, reply) => {
-    loadAndValidateRequestSecurity(request, reply);
-  });
-
-  app.addHook("preHandler", async (request, reply) => {
-    if (!MUTATING_METHODS.has(request.method)) return;
-    loadAndValidateRequestSecurity(request, reply);
-  });
-
-  app.get("/api/healthz", async () => {
-    db.prepare("SELECT 1").get();
-    const migration = db.prepare("SELECT COALESCE(MAX(version), 0) AS version FROM schema_migrations").get() as { version: number };
-    return { ok: true, database: "ok", schemaVersion: migration.version };
-  });
-
-  const emailOptions = {
-    selfRegistrationEnabled: config.emailSelfRegistration,
-    dailySendLimit: config.emailDailySendLimit,
-    registrationDailySendLimit: config.emailRegistrationDailySendLimit,
-    registrationIpDailyLimit: config.emailRegistrationIpDailyLimit
-  };
-  await registerAuthRoutes(app, db, config.guestTokenSecret, emailAuthCapabilities(emailProvider, emailOptions));
-  const closeEmailAuth = await registerEmailAuthRoutes(app, db, emailProvider, config.emailCodeSecret, emailOptions);
-  await registerPracticeRoutes(app, db);
-  await registerAdminRoutes(app, db);
-  await registerMarkdownImportRoutes(app, db);
-
-  app.setNotFoundHandler(async (_request, reply) => {
-    return reply.status(404).send({ error: { code: "NOT_FOUND", message: "API endpoint not found" } });
-  });
-
+  // Install before registering any encapsulated routes so all errors share the API contract.
   app.setErrorHandler(async (error, request, reply) => {
     if (error instanceof ApiError) {
       const retryAfter = (error.details as { retryAfterSeconds?: unknown } | undefined)?.retryAfterSeconds;
@@ -144,6 +108,71 @@ export async function buildApp(options: BuildAppOptions = {}): Promise<FastifyIn
     request.log.error({ err: error }, "Unhandled API error");
     return reply.status(500).send({ error: { code: "INTERNAL_ERROR", message: "Internal server error" } });
   });
+
+  app.addHook("onRequest", async (_request, reply) => {
+    reply.header("Cache-Control", "no-store");
+    reply.header("X-Content-Type-Options", "nosniff");
+    reply.header("Referrer-Policy", "same-origin");
+  });
+
+  const loadAndValidateRequestSecurity = (request: Parameters<typeof loadSession>[1], reply: Parameters<typeof loadSession>[2]): void => {
+    // Alipay's server callback has no browser session or Origin. Only this exact
+    // registered POST route uses independent RSA2 verification in its handler.
+    if (request.method === "POST" && request.routeOptions.url === ALIPAY_NOTIFY_PATH) return;
+    request.authSession = loadSession(db, request, reply, config.guestTokenSecret);
+    if (!MUTATING_METHODS.has(request.method)) return;
+    if (request.headers.origin !== config.appOrigin) {
+      throw new ApiError(403, "ORIGIN_INVALID", "Request origin is not allowed");
+    }
+    requireCsrf(request);
+  };
+
+  // Reject unauthenticated/cross-origin writes before Fastify parses a body. The
+  // preHandler check then reloads the session after parsing so a concurrent revoke,
+  // password reset or role change still wins before the handler mutates state.
+  app.addHook("onRequest", async (request, reply) => {
+    loadAndValidateRequestSecurity(request, reply);
+  });
+
+  app.addHook("preHandler", async (request, reply) => {
+    if (!MUTATING_METHODS.has(request.method)) return;
+    loadAndValidateRequestSecurity(request, reply);
+  });
+
+  app.get("/api/healthz", async () => {
+    db.prepare("SELECT 1").get();
+    const migration = db.prepare("SELECT COALESCE(MAX(version), 0) AS version FROM schema_migrations").get() as { version: number };
+    return { ok: true, database: "ok", schemaVersion: migration.version };
+  });
+
+  const emailOptions = {
+    membershipEnabled: config.membershipEnabled,
+    selfRegistrationEnabled: config.emailSelfRegistration,
+    dailySendLimit: config.emailDailySendLimit,
+    registrationDailySendLimit: config.emailRegistrationDailySendLimit,
+    registrationIpDailyLimit: config.emailRegistrationIpDailyLimit
+  };
+  await registerAuthRoutes(app, db, config.guestTokenSecret, emailAuthCapabilities(emailProvider, emailOptions));
+  const closeEmailAuth = await registerEmailAuthRoutes(app, db, emailProvider, config.emailCodeSecret, emailOptions);
+  await registerPracticeRoutes(app, db, { membershipEnabled: config.membershipEnabled });
+  await registerMembershipRoutes(app, db, {
+    membershipEnabled: config.membershipEnabled,
+    paymentEnabled: paymentProvider.mode !== "disabled",
+    paymentMode: paymentProvider.mode
+  });
+  await registerPaymentRoutes(app, db, paymentProvider, { membershipEnabled: config.membershipEnabled });
+  await registerContentResourceRoutes(app, db, {
+    membershipEnabled: config.membershipEnabled,
+    ...(config.contentSourceDir ? { contentSourceDir: config.contentSourceDir } : {})
+  });
+  await registerAdminRoutes(app, db);
+  await registerMarkdownImportRoutes(app, db);
+
+  app.setNotFoundHandler(async (_request, reply) => {
+    return reply.status(404).send({ error: { code: "NOT_FOUND", message: "API endpoint not found" } });
+  });
+
+
 
   const cleanupTimer = setInterval(() => {
     try { cleanupExpiredSecurityRows(db); }

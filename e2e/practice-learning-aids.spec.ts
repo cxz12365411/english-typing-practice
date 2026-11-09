@@ -1,4 +1,7 @@
+import { mockContentResources } from "./resource-fixtures";
 import { expect, test, type Page, type Route } from "@playwright/test";
+
+test.beforeEach(async ({ page }) => { await mockContentResources(page); });
 import { readFileSync } from "node:fs";
 import type { ContentItem } from "../web/src/types";
 
@@ -50,6 +53,7 @@ async function mockApp(page: Page, items = [item(hey, 0), item(longest, 1), item
   await page.route("**/api/**", async route => {
     const request = route.request();
     const path = new URL(request.url()).pathname;
+    if (path.startsWith("/api/content-resources/")) return route.fallback();
     const body = request.postDataJSON() as Record<string, unknown> | null;
     if (body) requests.push({ path, body });
     if (path === "/api/auth/session") return json(route, {
@@ -170,7 +174,7 @@ test("account practice loads the real 270 alignments and highlights the screensh
   if (process.env.E2E_WEB_MODE !== "development") {
     await expect(page.locator('script[type="module"][src^="/assets/index-"]')).toHaveCount(1);
     await expect(page.locator('script[src*="/@vite/client"]')).toHaveCount(0);
-    expect(new URL(response.url()).pathname).toMatch(/^\/assets\/sentence-alignments-[^/]+\.json$/);
+    expect(new URL(response.url()).pathname).toBe("/api/content-resources/sentence-alignments.json");
   }
   const writing = require("../cet4-writing.js").parse(JSON.parse(readFileSync("cet4-writing.json", "utf8")));
   expect(alignmentData.entries).toHaveLength(270 + writing.items.length + require("../cet4-writing.js").parse(JSON.parse(readFileSync("cet6-writing.json", "utf8"))).items.length);
@@ -232,10 +236,10 @@ test("delayed alignment data preserves the answer currently being typed", async 
   const delayed = deferred();
   let requested = false;
   await page.route(dataUrl, async route => {
-    if (route.request().resourceType() !== "fetch") return route.continue();
+    if (route.request().resourceType() !== "fetch") return route.fallback();
     requested = true;
     await delayed.promise;
-    await route.continue();
+    await route.fallback();
   });
   try {
     await readyPractice(page);
@@ -318,7 +322,7 @@ test("account typing progress resumes after inspection and hide or arrow toggles
 
 test("an unavailable alignment asset leaves typing and the original prompt usable", async ({ page }) => {
   const mocked = await mockApp(page);
-  await page.route(dataUrl, route => route.request().resourceType() === "fetch" ? route.abort("failed") : route.continue());
+  await page.route(dataUrl, route => route.request().resourceType() === "fetch" ? route.abort("failed") : route.fallback());
   await readyPractice(page);
   await expect(page.locator("#targetWord")).toHaveText(hey.english);
   await expect(page.locator("#meaningText")).toHaveText(hey.meaning);
@@ -376,13 +380,13 @@ test("leaving practice disposes delayed data and returning creates only the curr
   const delayed = deferred();
   let loads = 0;
   await page.route(dataUrl, async route => {
-    if (route.request().resourceType() !== "fetch") return route.continue();
+    if (route.request().resourceType() !== "fetch") return route.fallback();
     loads += 1;
     if (loads === 1) {
       await delayed.promise;
       // The first controller aborts its fetch on navigation.
-      await route.continue().catch(() => undefined);
-    } else await route.continue();
+      await route.fallback().catch(() => undefined);
+    } else await route.fallback();
   });
   try {
     await readyPractice(page);

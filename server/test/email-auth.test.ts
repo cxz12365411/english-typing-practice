@@ -8,6 +8,7 @@ import { loadConfig } from "../src/config.js";
 import { openDatabase, type SqliteDatabase } from "../src/database.js";
 import type { EmailProvider, VerificationEmail } from "../src/email-provider.js";
 import { hashPassword, passwordWorkPoolStats, validateEmail } from "../src/security.js";
+import type { MembershipRow } from "../src/membership.js";
 
 const ORIGIN = "https://english.test";
 const CODE_SECRET = "test-email-code-secret-that-is-longer-than-32-bytes";
@@ -139,6 +140,53 @@ async function requestCode(
 function clearEmailGuards(db: SqliteDatabase): void {
   db.prepare("DELETE FROM email_auth_guards").run();
 }
+
+test("email-only registration creates a single trial and later password setup does not reset it", async () => {
+  const provider = new CaptureEmailProvider();
+  const { app, db } = await fixture({ provider, selfRegistration: true });
+  try {
+    const anonymous = await guest(app);
+    const email = "passwordless@example.com";
+    const challengeId = await requestCode(app, anonymous, email, "register");
+    const registered = await app.inject({ method: "POST", url: "/api/auth/email/register", headers: writeHeaders(anonymous),
+      payload: { email, challengeId, code: provider.messages.at(-1)!.code, role: "admin", paidUntil: "2099-01-01" } });
+    assert.equal(registered.statusCode, 200, registered.body);
+    const user = registered.json().user;
+    assert.match(user.username, /^u_[0-9a-f]{24}$/);
+    assert.equal(user.displayName, "英语学习者");
+    assert.equal(user.role, "user");
+    assert.equal(user.emailVerified, true);
+    assert.equal(user.mustChangePassword, false);
+    assert.equal(registered.json().temporaryPassword, undefined);
+    assert.equal(registered.json().user.passwordHash, undefined);
+    const membership = db.prepare("SELECT * FROM user_memberships WHERE user_id = ?").get(user.id) as MembershipRow;
+    assert.equal(membership.trial_ends_at! - membership.trial_started_at!, 86_400_000);
+    assert.equal(membership.paid_until, null);
+    assert.equal(membership.access_kind, "metered");
+
+    const beforeSetup = await app.inject({ method: "POST", url: "/api/auth/login", headers: writeHeaders(anonymous),
+      payload: { username: user.username, password: "passwordless@example.com" } });
+    assert.equal(beforeSetup.statusCode, 401);
+    clearEmailGuards(db);
+    const loginClient = await guest(app);
+    const loginChallenge = await requestCode(app, loginClient, email, "login");
+    const loggedIn = await app.inject({ method: "POST", url: "/api/auth/email/login", headers: writeHeaders(loginClient),
+      payload: { email, challengeId: loginChallenge, code: provider.messages.at(-1)!.code } });
+    assert.equal(loggedIn.statusCode, 200, loggedIn.body);
+    assert.equal(loggedIn.json().user.id, user.id);
+
+    clearEmailGuards(db);
+    const resetClient = await guest(app);
+    const resetChallenge = await requestCode(app, resetClient, email, "reset_password");
+    const newPassword = "Chosen-After-Email-Registration!";
+    const reset = await app.inject({ method: "POST", url: "/api/auth/email/reset-password", headers: writeHeaders(resetClient),
+      payload: { email, challengeId: resetChallenge, code: provider.messages.at(-1)!.code, newPassword } });
+    assert.equal(reset.statusCode, 200, reset.body);
+    await passwordLogin(app, user.username, newPassword);
+    assert.deepEqual(db.prepare("SELECT * FROM user_memberships WHERE user_id = ?").get(user.id), membership);
+    assert.equal((db.prepare("SELECT COUNT(*) AS n FROM users").get() as { n: number }).n, 1);
+  } finally { await closeFixture(app, db); }
+});
 
 test("email capability defaults off and unconfigured delivery cannot create usable codes", async () => {
   const { app, db } = await fixture({ selfRegistration: true });

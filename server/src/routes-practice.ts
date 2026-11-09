@@ -2,6 +2,7 @@ import { randomUUID } from "node:crypto";
 import type { FastifyInstance } from "fastify";
 import type { SqliteDatabase } from "./database.js";
 import { audit, requireUser, revalidateAuthenticatedActor } from "./auth.js";
+import { getMembershipAccess, requirePracticeAccess } from "./membership.js";
 import { ApiError, badRequest, conflict, notFound } from "./errors.js";
 import { normalizeAnswer, tokenHash } from "./security.js";
 import { enumField, idParam, integerField, objectBody, stringField } from "./validation.js";
@@ -216,9 +217,12 @@ function recomputeSessionAggregates(db: SqliteDatabase, sessionId: string, userI
   return getOwnedSession(db, sessionId, userId);
 }
 
-export async function registerPracticeRoutes(app: FastifyInstance, db: SqliteDatabase): Promise<void> {
+export async function registerPracticeRoutes(
+  app: FastifyInstance, db: SqliteDatabase, options: { membershipEnabled?: boolean } = {}
+): Promise<void> {
+  const membershipEnabled = options.membershipEnabled ?? false;
   app.get("/api/practice/import-batches/:id", async (request) => {
-    const user = requireUser(request);
+    const user = requirePracticeAccess(db, request, membershipEnabled);
     const batchId = idParam(request.params);
     return db.transaction(() => {
       const batch = getOwnedImportBatch(db, batchId, user.id);
@@ -245,7 +249,7 @@ export async function registerPracticeRoutes(app: FastifyInstance, db: SqliteDat
   });
 
   app.get("/api/content", async (request) => {
-    requireUser(request);
+    requirePracticeAccess(db, request, membershipEnabled);
     const version = (db.prepare("SELECT value FROM app_meta WHERE key = 'content_version'").get() as { value: string } | undefined)
       ?.value ?? "0";
     const categories = db.prepare(`
@@ -273,7 +277,7 @@ export async function registerPracticeRoutes(app: FastifyInstance, db: SqliteDat
   });
 
   app.post("/api/practice/sessions", async (request) => {
-    const user = requireUser(request);
+    const user = requirePracticeAccess(db, request, membershipEnabled);
     const body = objectBody(request.body);
     const mode = enumField(body, "mode", ["sequential", "random", "mistakes"] as const)!;
     const categoryId = stringField(body, "categoryId", { optional: true, min: 1, max: 100 });
@@ -283,6 +287,7 @@ export async function registerPracticeRoutes(app: FastifyInstance, db: SqliteDat
     const startedAt = Date.now();
     db.transaction(() => {
       revalidateAuthenticatedActor(db, request, user);
+      requirePracticeAccess(db, request, membershipEnabled);
       if (categoryId) {
         const category = db.prepare("SELECT id FROM categories WHERE id = ? AND status = 'published'").get(categoryId);
         if (!category) badRequest("INVALID_CATEGORY", "Category is not published", { field: "categoryId" });
@@ -353,6 +358,7 @@ export async function registerPracticeRoutes(app: FastifyInstance, db: SqliteDat
       revalidateAuthenticatedActor(db, request, user);
       const raced = readExisting();
       if (raced) return { replay: raced };
+      requirePracticeAccess(db, request, membershipEnabled);
       const now = Date.now();
       const recent = db.prepare("SELECT COUNT(*) AS count FROM attempts WHERE user_id = ? AND created_at >= ?").get(
         user.id,
@@ -538,6 +544,10 @@ export async function registerPracticeRoutes(app: FastifyInstance, db: SqliteDat
 
   app.get("/api/me/mistakes", async (request) => {
     const user = requireUser(request);
+    if (!getMembershipAccess(db, user, membershipEnabled).canPractice) {
+      // Keep historical counts without returning a second practice-content endpoint.
+      return { items: [], locked: true, total: availableMistakeCount(db, user.id) };
+    }
     const rows = db.prepare(`
       SELECT i.*, p.wrong_count, p.last_wrong_at
       FROM progress p JOIN items i ON i.id = p.item_id JOIN categories c ON c.id = i.category_id
@@ -570,6 +580,7 @@ export async function registerPracticeRoutes(app: FastifyInstance, db: SqliteDat
       user.id
     ) as { imported_count: number } | undefined;
     if (existing) return { alreadyImported: true, imported: existing.imported_count, unmatched: 0 };
+    requirePracticeAccess(db, request, membershipEnabled);
 
     const uniqueAnswers = [...new Set((body.answers as string[]).map(normalizeAnswer).filter(Boolean))];
     const find = db.prepare("SELECT id FROM items WHERE normalized_answer = ?");
@@ -582,6 +593,8 @@ export async function registerPracticeRoutes(app: FastifyInstance, db: SqliteDat
     }
     const now = Date.now();
     db.transaction(() => {
+      revalidateAuthenticatedActor(db, request, user);
+      requirePracticeAccess(db, request, membershipEnabled);
       const insert = db.prepare(`
         INSERT INTO progress(
           user_id, item_id, attempt_count, correct_count, first_try_correct_count,

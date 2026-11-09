@@ -1,3 +1,4 @@
+import { readFileSync } from "node:fs";
 import { expect, test, type Page, type Route } from "@playwright/test";
 
 const user = {
@@ -29,6 +30,7 @@ async function mockApp(page: Page, options: { anonymous?: boolean; mistakes?: bo
   await page.route("**/api/**", async (route) => {
     const request = route.request();
     const path = new URL(request.url()).pathname;
+    if (path.startsWith("/api/content-resources/")) return json(route, JSON.parse(readFileSync(path.split("/").pop()!, "utf8")));
     const body = request.postDataJSON() as Record<string, unknown> | null;
     if (body) requests.push({ path, body });
     if (path === "/api/auth/session") return json(route, { user: currentUser, csrfToken: "test-csrf", capabilities });

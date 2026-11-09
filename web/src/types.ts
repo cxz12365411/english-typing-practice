@@ -21,6 +21,7 @@ export interface User {
 export interface AuthCapabilities {
   emailAuthEnabled: boolean;
   selfRegistrationEnabled: boolean;
+  membershipEnabled?: boolean;
 }
 
 export interface SessionResponse {
@@ -105,7 +106,7 @@ export interface AttemptResponse {
 export interface PageContext {
   user: User;
   capabilities: AuthCapabilities;
-  renderShell: (content: string, activeRoute: "/practice" | "/admin") => void;
+  renderShell: (content: string, activeRoute: "/practice" | "/admin" | "/membership") => void;
   navigate: (path: string, replace?: boolean) => void;
   onUserChanged: (user: User) => void;
   handleAuthError: (error: unknown) => boolean;
@@ -119,6 +120,8 @@ export interface MistakeRecord {
 
 export interface MistakesResponse {
   items: MistakeRecord[];
+  locked?: boolean;
+  total?: number;
 }
 
 export interface ImportMistakesResponse {
@@ -268,4 +271,19 @@ export interface MarkdownImportCommitResponse {
 export interface ImportBatchContentResponse extends ContentResponse {
   batch: { id: string; fileName: string; createdAt: string };
   unavailableCount: number;
+}
+
+export interface MembershipResponse {
+  enabled: boolean;
+  access: { status: "disabled" | "admin" | "legacy_free" | "trial" | "active" | "expired"; canPractice: boolean; trialEndsAt: string | null; paidUntil: string | null; expiresAt: string | null };
+  plan: { id: "monthly"; priceFen: number; durationDays: number };
+  paymentEnabled: boolean;
+  paymentMode: "disabled" | "sandbox" | "live" | "test";
+}
+export interface PaymentOrder {
+  id: string; status: "pending" | "paid" | "closed" | "expired"; amountFen: number; durationDays: number;
+  createdAt: string; expiresAt: string; paidAt: string | null; creditedUntil: string | null;
+}
+export interface PaymentResponse {
+  order: PaymentOrder; paymentUrl: string | null; paymentMode: "sandbox" | "live" | "test"; retryAfterSeconds: number;
 }

@@ -1,4 +1,5 @@
 import type {
+  MembershipResponse, PaymentResponse, PaymentOrder,
   AdminCategoryListResponse,
   AdminItemListResponse,
   AdminStatsResponse,
@@ -55,6 +56,15 @@ const FRIENDLY_ERRORS: Record<string, string> = {
   INVALID_OR_EXPIRED_CODE: "验证码不正确或已过期，请重新获取",
   EMAIL_RATE_LIMITED: "验证码操作过于频繁，请稍后再试",
   EMAIL_DAILY_LIMIT_REACHED: "今日验证码发送额度已用完，请明天再试",
+  MEMBERSHIP_REQUIRED: "试用或会员已到期，请开通会员后继续练习",
+  PAYMENTS_DISABLED: "支付宝支付尚未开放，请稍后再试",
+  MEMBERSHIP_NOT_REQUIRED: "当前账号可持续免费使用，无需购买会员",
+  MEMBERSHIP_UNAVAILABLE: "会员状态暂不可用，请刷新重试",
+  PAYMENT_QUERY_UNAVAILABLE: "付款结果暂时无法核实，请稍后刷新状态，避免重复付款",
+  INVALID_PAYMENT_PLAN: "会员方案已变化，请刷新页面重试",
+  PAYMENT_UNAVAILABLE: "支付宝暂时无法连接，请稍后重试",
+  PAYMENT_RATE_LIMITED: "订单操作过于频繁，请稍后再试",
+  PAYMENT_ORDER_NOT_FOUND: "未找到当前账号的这笔订单",
   AUTH_REQUIRED: "登录已失效，请重新登录",
   SESSION_EXPIRED: "登录已过期，请重新登录",
   MUST_CHANGE_PASSWORD: "请先修改初始密码",
@@ -222,9 +232,9 @@ class ApiClient {
     email: string;
     challengeId: string;
     code: string;
-    username: string;
-    displayName: string;
-    password: string;
+    username?: string;
+    displayName?: string;
+    password?: string;
   }): Promise<SessionResponse> {
     const response = await this.request<SessionResponse>("/api/auth/email/register", {
       method: "POST",
@@ -265,6 +275,11 @@ class ApiClient {
     return response;
   }
 
+  updateProfile(displayName: string): Promise<{ user: User }> { return this.request("/api/me/profile", { method: "PATCH", body: { displayName } }); }
+  membership(): Promise<MembershipResponse> { return this.request("/api/membership"); }
+  createPaymentOrder(): Promise<PaymentResponse> { return this.request("/api/payments/orders", { method: "POST", body: { planId: "monthly" } }); }
+  paymentOrder(id: string): Promise<PaymentResponse> { return this.request(`/api/payments/orders/${encodeURIComponent(id)}`); }
+  paymentOrders(): Promise<{ orders: PaymentOrder[] }> { return this.request("/api/payments/orders"); }
   content(): Promise<ContentResponse> {
     return this.request<ContentResponse>("/api/content");
   }

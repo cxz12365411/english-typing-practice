@@ -70,7 +70,7 @@ function enabledAuthMarkup(capabilities: AuthCapabilities): string {
     <div class="auth-tabs" role="tablist" aria-label="登录方式">
       <button class="auth-tab active" id="email-login-tab" type="button" role="tab" aria-selected="true" aria-controls="email-login-panel" data-auth-mode="email-login">验证码登录</button>
       ${capabilities.selfRegistrationEnabled ? `<button class="auth-tab" id="register-tab" type="button" role="tab" aria-selected="false" aria-controls="register-panel" tabindex="-1" data-auth-mode="register">注册账号</button>` : ""}
-      <button class="auth-tab" id="reset-password-tab" type="button" role="tab" aria-selected="false" aria-controls="reset-password-panel" tabindex="-1" data-auth-mode="reset-password">找回密码</button>
+      <button class="auth-tab" id="reset-password-tab" type="button" role="tab" aria-selected="false" aria-controls="reset-password-panel" tabindex="-1" data-auth-mode="reset-password">设置／找回密码</button>
       <button class="auth-tab" id="password-login-tab" type="button" role="tab" aria-selected="false" aria-controls="password-login-panel" tabindex="-1" data-auth-mode="password-login">账号密码</button>
     </div>
 
@@ -89,10 +89,8 @@ function enabledAuthMarkup(capabilities: AuthCapabilities): string {
         <form class="form-stack" id="registerForm">
           ${verificationField("register", "邮箱")}
           <label class="field"><span>邮箱验证码</span><input class="input code-input" name="code" inputmode="numeric" autocomplete="one-time-code" minlength="6" maxlength="6" pattern="[0-9]{6}" title="请输入 6 位数字验证码" required></label>
-          <label class="field"><span>登录账号</span><input class="input" name="username" autocomplete="username" autocapitalize="off" minlength="3" maxlength="32" pattern="[A-Za-z0-9._-]{3,32}" title="使用 3–32 位英文字母、数字、点、下划线或短横线" required></label>
-          <label class="field"><span>显示名称</span><input class="input" name="displayName" autocomplete="name" maxlength="80" required></label>
-          <label class="field"><span>密码（12–128 个字符）</span><input class="input" name="password" type="password" autocomplete="new-password" minlength="12" maxlength="128" required></label>
-          <label class="field"><span>确认密码</span><input class="input" name="confirmPassword" type="password" autocomplete="new-password" minlength="12" maxlength="128" required></label>
+          <p class="helper">验证邮箱即可创建账号，稍后可在账号设置中设置密码。</p>
+          ${capabilities.membershipEnabled ? '<p class="message info">新账号享 24 小时试用；之后 1 元开通 30 天，不自动续费。</p>' : ''}
           <div class="message error" id="registerMessage" role="alert" hidden></div>
           <button class="btn primary" type="submit">注册并登录</button>
         </form>
@@ -320,27 +318,12 @@ function bindRegistration(callbacks: LoginCallbacks): void {
     if (!code) return;
     const challengeId = requireChallengeId(form, message);
     if (!challengeId) return;
-    const data = new FormData(form);
-    const password = String(data.get("password") ?? "");
-    const confirmation = String(data.get("confirmPassword") ?? "");
-    const validation = validatePassword(password);
-    if (validation || password !== confirmation) {
-      setMessage(message, validation ?? "两次输入的密码不一致");
-      return;
-    }
     const submit = mustElement<HTMLButtonElement>('button[type="submit"]', form);
     if (submit.disabled) return;
     clearMessage(message);
     setBusy(submit, true, "正在注册…");
     try {
-      const response = await api.registerWithEmail({
-        email,
-        challengeId,
-        code,
-        username: String(data.get("username") ?? "").trim().toLocaleLowerCase("en-US"),
-        displayName: String(data.get("displayName") ?? "").trim(),
-        password
-      });
+      const response = await api.registerWithEmail({ email, challengeId, code });
       if (!form.isConnected) return;
       if (!response.user) throw new Error("注册成功但服务器未返回账号信息");
       callbacks.onAuthenticated(response);

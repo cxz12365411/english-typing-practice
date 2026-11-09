@@ -1338,3 +1338,18 @@ a {
   .markdown-import input[type="file"] { width: 100%; min-width: 0; }
   .markdown-import #commitMarkdownImportButton { width: 100%; white-space: normal; }
 }
+
+.membership-page { display: grid; gap: 20px; max-width: 1040px; margin: 0 auto; min-width: 0; }
+.membership-page .page-title { margin-bottom: 0; }
+.membership-order { border: 1px solid var(--border, #d9ded9); border-radius: 16px; padding: 20px; background: #f5faf7; overflow-wrap: anywhere; }
+.membership-order p { margin: 12px 0; }
+.membership-stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; margin: 20px 0; }
+.membership-stats div { display: grid; gap: 5px; padding: 16px; background: #f5f7f4; border-radius: 12px; }
+.membership-stats strong { font-size: 24px; }
+.membership-stats span, .membership-history { color: #5e685f; font-size: 14px; }
+.membership-history { padding: 0; list-style: none; }
+.membership-history li, .membership-history-row { display: flex; justify-content: space-between; gap: 14px; flex-wrap: wrap; padding: 12px 0; border-bottom: 1px solid #e7ebe7; }
+.membership-notice { margin-bottom: 16px; display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
+.membership-page .button-row { flex-wrap: wrap; }
+.membership-page .account-email strong { overflow-wrap: anywhere; min-width: 0; }
+@media (max-width: 600px) { .membership-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); } .membership-page .panel-body { padding: 18px; } .membership-page .btn { white-space: normal; } }

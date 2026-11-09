@@ -1,6 +1,7 @@
 import path from "node:path";
 import { randomBytes } from "node:crypto";
 import { validateEmail } from "./security.js";
+import { loadPaymentConfig, type PaymentConfig } from "./payment-config.js";
 
 export type AppEnvironment = "development" | "test" | "production";
 
@@ -32,6 +33,8 @@ export interface AppConfig {
   emailDailySendLimit: number;
   emailRegistrationDailySendLimit: number;
   emailRegistrationIpDailyLimit: number;
+  membershipEnabled: boolean;
+  payment: PaymentConfig;
   contentSourceDir?: string;
 }
 
@@ -186,6 +189,8 @@ export function loadConfig(overrides: Partial<AppConfig> = {}): AppConfig {
     emailDailySendLimit,
     emailRegistrationDailySendLimit,
     emailRegistrationIpDailyLimit,
+    membershipEnabled: overrides.membershipEnabled ?? booleanSetting(process.env.MEMBERSHIP_ENABLED, false, "MEMBERSHIP_ENABLED"),
+    payment: overrides.payment ?? loadPaymentConfig(process.env, environment),
     ...(overrides.contentSourceDir || process.env.CONTENT_SOURCE_DIR
       ? { contentSourceDir: path.resolve(overrides.contentSourceDir ?? process.env.CONTENT_SOURCE_DIR!) }
       : {})

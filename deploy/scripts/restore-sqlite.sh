@@ -9,6 +9,7 @@ readonly LOCK_PATH="/var/lib/english-typing-practice-locks/database.lock"
 readonly DEPLOY_LOCK="/var/lib/english-typing-practice-locks/deploy.lock"
 readonly SERVICE_NAME="englishapp.service"
 readonly HEALTH_URL="http://127.0.0.1:8091/api/healthz"
+readonly PAYMENT_RESTORE_CHECK="/usr/local/libexec/english-typing-practice/check-payment-restore.py"
 
 log() {
   printf '[englishapp-restore] %s\n' "$*" >&2
@@ -25,9 +26,10 @@ readonly requested_backup="$1"
 readonly start_mode="${2:-}"
 [[ -z "$start_mode" || "$start_mode" == "--leave-stopped" ]] || die "unknown option: ${start_mode}"
 
-for command_path in /usr/bin/sqlite3 /usr/bin/realpath /usr/bin/systemctl /usr/bin/curl /usr/bin/flock /usr/bin/mktemp; do
+for command_path in /usr/bin/sqlite3 /usr/bin/realpath /usr/bin/systemctl /usr/bin/curl /usr/bin/flock /usr/bin/mktemp /usr/bin/python3; do
   [[ -x "$command_path" ]] || die "required command is missing: ${command_path}"
 done
+[[ -f "$PAYMENT_RESTORE_CHECK" && ! -L "$PAYMENT_RESTORE_CHECK" ]] || die "payment restore check is missing or unsafe"
 for fixed_dir in "$DATA_DIR" "$BACKUP_ROOT" "$QUARANTINE_ROOT"; do
   [[ -d "$fixed_dir" && ! -L "$fixed_dir" ]] || die "unsafe fixed directory: ${fixed_dir}"
 done
@@ -38,9 +40,11 @@ if [[ "${ETP_DEPLOY_LOCK_HELD:-0}" != "1" ]]; then
   exec 8>"$DEPLOY_LOCK"
   /usr/bin/flock -w 60 8 || die "timed out waiting for the deployment lock"
 fi
-[[ -f "$LOCK_PATH" && ! -L "$LOCK_PATH" ]] || die "database lock is missing or unsafe"
-exec 9>"$LOCK_PATH"
-/usr/bin/flock -w 60 9 || die "timed out waiting for the database maintenance lock"
+if [[ "${ETP_DATABASE_LOCK_HELD:-0}" != "1" ]]; then
+  [[ -f "$LOCK_PATH" && ! -L "$LOCK_PATH" ]] || die "database lock is missing or unsafe"
+  exec 9>"$LOCK_PATH"
+  /usr/bin/flock -w 60 9 || die "timed out waiting for the database maintenance lock"
+fi
 
 validate_backup() {
   local candidate="$1"
@@ -83,9 +87,15 @@ printf '%s\n' "$backup_path" >"${quarantine_dir}/restore-source"
 mutation_started=0
 new_database_installed=0
 restore_committed=0
+previous_payment_snapshot="NO_DATABASE"
 
 reinstate_previous_database() {
   /usr/bin/systemctl stop "$SERVICE_NAME" >/dev/null 2>&1 || true
+  if [[ "$new_database_installed" -eq 1 ]]; then
+    # The health-check window can receive a real payment callback. Never erase
+    # it while recovering from an otherwise unrelated startup failure.
+    /usr/bin/python3 "$PAYMENT_RESTORE_CHECK" "$DATABASE_PATH" "$previous_payment_snapshot" || return 1
+  fi
   if [[ "$new_database_installed" -eq 1 && -e "$DATABASE_PATH" ]]; then
     if [[ -f "$DATABASE_PATH" && ! -L "$DATABASE_PATH" ]]; then
       /usr/bin/mv -f -- "$DATABASE_PATH" "${quarantine_dir}/app.db.failed-restore" || return 1
@@ -143,6 +153,18 @@ readonly locked_backup_path="$(validate_backup "$requested_backup")"
   die "backup identity changed while restore was preparing"
 readonly locked_integrity="$(/usr/bin/sqlite3 -readonly "file:${locked_backup_path}?immutable=1" 'PRAGMA integrity_check;' 2>&1)"
 [[ "$locked_integrity" == "ok" ]] || die "locked source backup failed integrity check: ${locked_integrity}"
+
+# Every live order matters: even a locally pending order may already be paid at
+# Alipay. Check under both locks after the last writer has stopped, before moves.
+/usr/bin/python3 "$PAYMENT_RESTORE_CHECK" "$DATABASE_PATH" "$locked_backup_path" ||
+  die "payment records prevent restoring this database snapshot"
+if [[ -e "$DATABASE_PATH" ]]; then
+  # Keep a closed logical snapshot for the failure trap, including crash-left
+  # WAL transactions. The displaced physical files remain the recovery source.
+  previous_payment_snapshot="${quarantine_dir}/payment-recovery.sqlite3"
+  /usr/bin/sqlite3 -readonly "$DATABASE_PATH" ".backup '${previous_payment_snapshot}'"
+  /usr/bin/chmod 0600 "$previous_payment_snapshot"
+fi
 
 # Managed backups are complete, closed snapshots. Ordinary -readonly can still
 # create WAL/SHM files; immutable prevents all sidecar writes beside the snapshot.

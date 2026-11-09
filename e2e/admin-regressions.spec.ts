@@ -1,4 +1,7 @@
+import { mockContentResources } from "./resource-fixtures";
 import { expect, test, type Page, type Route } from "@playwright/test";
+
+test.beforeEach(async ({ page }) => { await mockContentResources(page); });
 
 const admin = {
   id: "admin-original", username: "admin.original", displayName: "原管理员", role: "admin",
@@ -29,6 +32,7 @@ async function mockAdmin(page: Page): Promise<void> {
   await page.route("**/api/**", async (route) => {
     const request = route.request();
     const path = new URL(request.url()).pathname;
+    if (path.startsWith("/api/content-resources/")) return route.fallback();
     const session = () => ({ user: currentUser, csrfToken: "test-csrf", capabilities: { emailAuthEnabled: false, selfRegistrationEnabled: false } });
     if (path === "/api/auth/session") return json(route, session());
     if (path === "/api/auth/logout") {

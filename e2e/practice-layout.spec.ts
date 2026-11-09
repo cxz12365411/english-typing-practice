@@ -1,4 +1,7 @@
+import { mockContentResources } from "./resource-fixtures";
 import { test, expect, type Page } from "@playwright/test";
+
+test.beforeEach(async ({ page }) => { await mockContentResources(page); });
 import { readFileSync } from "node:fs";
 
 const writing = require("../cet4-writing.js");
@@ -16,6 +19,7 @@ async function mockPractice(page: Page) {
   let loggedOut = false;
   await page.route("**/api/**", route => {
     const path = new URL(route.request().url()).pathname;
+    if (path.startsWith("/api/content-resources/")) return route.fallback();
     let body: unknown;
     if (path === "/api/auth/session") body = { user: loggedOut ? null : { id: "layout-test-user", username: "layout", displayName: "布局测试", role: "user", status: "active", mustChangePassword: false }, csrfToken: "layout-test-csrf", capabilities: {} };
     else if (path === "/api/content") body = { categories, items, version: "layout-test" };

@@ -1,4 +1,7 @@
+import { mockContentResources } from "./resource-fixtures";
 import { expect, test, type Page, type Route } from "@playwright/test";
+
+test.beforeEach(async ({ page }) => { await mockContentResources(page); });
 import type { ContentCategory, ContentItem, ImportBatchContentResponse } from "../web/src/types";
 
 const batchA = "batch-A";
@@ -42,6 +45,7 @@ async function mockBatchApp(page: Page) {
   await page.route("**/api/**", async (route) => {
     const request = route.request();
     const path = new URL(request.url()).pathname;
+    if (path.startsWith("/api/content-resources/")) return route.fallback();
     paths.push(path);
     const body = request.postDataJSON() as Record<string, unknown> | null;
     if (body) writes.push({ path, body });

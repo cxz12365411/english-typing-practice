@@ -164,6 +164,28 @@ status="$(/usr/bin/curl --silent --show-error --max-time 15 \
   "${BASE_URL}/api/admin/stats")"
 assert_status "$status" 401 "anonymous admin access"
 
+# Compatibility releases do not expose the membership routes yet.
+if [[ -f "${CURRENT_SERVER}/dist/membership.js" ]]; then
+  for route in /api/membership /api/payments/orders /api/content-resources/sentence-alignments.json /api/content-resources/cet4-writing.json /api/content-resources/cet6-writing.json; do
+    status="$(curl_status "${BASE_URL}${route}" "${temp_dir}/protected.body" "${temp_dir}/protected.headers")"
+    assert_status "$status" 401 "anonymous ${route}"
+  done
+  for route in /sentence-alignments.json /cet4-writing.json /cet6-writing.json /assets/sentence-alignments-retired123.json /assets/cet4-writing-retired123.json; do
+    status="$(curl_status "${BASE_URL}${route}" "${temp_dir}/retired.body" "${temp_dir}/retired.headers")"
+    assert_status "$status" 404 "retired public learning resource ${route}"
+  done
+  status="$(curl_status "${BASE_URL}/membership" "${temp_dir}/membership.body" "${temp_dir}/membership.headers")"
+  assert_status "$status" 200 "membership SPA route"
+  /usr/bin/grep -Eiq '^cache-control:[[:space:]]*no-store' "${temp_dir}/membership.headers" || die "membership HTML must not be cached"
+  membership_enabled="$(/usr/bin/sed -n 's/^MEMBERSHIP_ENABLED=//p' "$ENV_FILE")"
+  /usr/bin/python3 -c '
+import json, sys
+payload = json.load(open(sys.argv[1], encoding="utf-8"))
+expected = sys.argv[2].lower() in ("true", "1")
+assert payload.get("capabilities", {}).get("membershipEnabled", False) is expected, "membership flag differs from protected config"
+' "${temp_dir}/anonymous-session.body" "$membership_enabled" || die "membership rollout flag check failed"
+fi
+
 robot_status="$(/usr/bin/curl --silent --show-error --max-time 15 --output "${temp_dir}/robot.body" --write-out '%{http_code}' "$ROBOT_URL/")"
 [[ "$robot_status" =~ ^[23][0-9]{2}$ ]] || die "robot site regression check failed (HTTP ${robot_status})"
 robot_local_status="$(/usr/bin/curl --silent --show-error --max-time 15 --header 'Host: robot-47-120-37-63.sslip.io' --output "${temp_dir}/robot-local.body" --write-out '%{http_code}' "$ROBOT_LOCAL_URL")"
@@ -236,6 +258,12 @@ assert payload.get("error", {}).get("code") == "MUST_CHANGE_PASSWORD"
 ' "${temp_dir}/content.body" || die "temporary-password account was not correctly gated"
   else
     assert_status "$content_status" 200 "published content"
+    if [[ -f "${CURRENT_SERVER}/dist/membership.js" ]]; then
+      for route in /api/membership /api/payments/orders /api/content-resources/sentence-alignments.json /api/content-resources/cet4-writing.json /api/content-resources/cet6-writing.json; do
+        status="$(/usr/bin/curl --silent --show-error --max-time 30 --cookie "${temp_dir}/cookies.txt" --output "${temp_dir}/member-resource.body" --write-out '%{http_code}' "${BASE_URL}${route}")"
+        assert_status "$status" 200 "authorized ${route}"
+      done
+    fi
     /usr/bin/python3 -c '
 # BEGIN_DYNAMIC_CONTENT_CHECK
 import json, sqlite3, sys
