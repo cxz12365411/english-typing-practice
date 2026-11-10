@@ -451,20 +451,20 @@ test("speech recommends enhanced Samantha and reads the original sentence despit
   });
 });
 
-test("manual speech voice and rate survive refresh and the longest sentence has no added slowdown", async ({ page }) => {
+test("Samantha and rate survive refresh and the longest sentence has no added slowdown", async ({ page }) => {
   await mockApp(page, [item(longest, 0)]);
   await readyPractice(page);
-  await page.locator("#voiceSelect").selectOption("test.alex");
+  await expect(page.locator("#voiceSelect option")).toHaveCount(1);
   await page.locator("#speechRate").fill("1.15");
   await page.locator("#speechRate").dispatchEvent("input");
   await expect(page.locator("#speechRateValue")).toHaveText("1.15 倍");
   await page.reload();
   await expect(page.locator("#answerInput")).toBeEnabled();
-  await expect(page.locator("#voiceSelect")).toHaveValue("test.alex");
+  await expect(page.locator("#voiceSelect")).toHaveValue("");
   await expect(page.locator("#speechRate")).toHaveValue("1.15");
   await page.locator("#speakButton").click();
   expect((await speechState(page)).calls).toEqual([
-    { text: longest.english, voiceURI: "test.alex", rate: 1.15, pitch: 1 }
+    { text: longest.english, voiceURI: "test.samantha.enhanced", rate: 1.15, pitch: 1 }
   ]);
 });
 

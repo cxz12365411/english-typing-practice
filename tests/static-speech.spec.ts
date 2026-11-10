@@ -119,7 +119,7 @@ test("both static entry points remain byte-identical", () => {
 test("automatically prefers premium, enhanced, and ordinary Samantha in order", async ({ page }) => {
   await openPractice(page, { voices: [...ordinaryVoices, enhanced, premium] });
   await expect(page.locator("#voiceSelect")).toHaveValue("");
-  await expect(page.locator("#voiceSelect option")).toHaveCount(7);
+  await expect(page.locator("#voiceSelect option")).toHaveCount(1);
   await page.locator("#previewVoiceBtn").click();
   expect((await calls(page)).at(-1)).toMatchObject({ voiceURI: premium.voiceURI, rate: 1, pitch: 1 });
 
@@ -132,55 +132,51 @@ test("automatically prefers premium, enhanced, and ordinary Samantha in order", 
   expect((await calls(page)).at(-1)?.voiceURI).toBe(samantha.voiceURI);
 });
 
-test("fallback prefers ordinary US English, never automatically selecting effects", async ({ page }) => {
+test("missing Samantha disables speech without offering a different system voice", async ({ page }) => {
   await openPractice(page, { voices: [effect, chinese, british, alex] });
-  await page.locator("#speakBtn").click();
-  expect((await calls(page)).at(-1)?.voiceURI).toBe(alex.voiceURI);
-  await page.evaluate(() => (window as any).__speechTest.finish());
-  await page.evaluate(voices => (window as any).__speechTest.setVoices(voices), [effect, chinese]);
+  await expect(page.locator("#voiceSelect option")).toHaveCount(1);
+  await expect(page.locator("#voiceSelect")).toContainText("Samantha · 当前设备不可用");
   await expect(page.locator("#speakBtn")).toBeDisabled();
-  await expect(page.locator("#speechStatus")).toContainText("英语声音");
+  await expect(page.locator("#previewVoiceBtn")).toBeDisabled();
+  await expect(page.locator("#speechStatus")).toContainText("当前设备未提供 Samantha");
   await expect(page.locator("#answerInput")).toBeEnabled();
-  await page.locator("#voiceSelect").selectOption(effect.voiceURI);
-  await expect(page.locator("#speakBtn")).toBeEnabled();
-  await page.locator("#speakBtn").click();
-  expect((await calls(page)).at(-1)?.voiceURI).toBe(effect.voiceURI);
+  expect(await calls(page)).toHaveLength(0);
+  await page.locator("#answerInput").fill("apple");
+  await expect(page.locator("#feedback")).toHaveText("正确");
 });
 
-test("manual voice and rate survive refresh and delayed voiceschanged events", async ({ page }) => {
-  await openPractice(page);
-  await page.locator("#voiceSelect").selectOption(alex.voiceURI);
+test("Samantha alone and the selected rate survive refresh and voiceschanged", async ({ page }) => {
+  await openPractice(page, { saved: { ...alex, rate: 0.85 } });
+  await expect(page.locator("#voiceSelect option")).toHaveCount(1);
+  await expect(page.locator("#voiceSelect")).toHaveValue("");
+  await expect(page.locator("#speechRate")).toHaveValue("0.85");
   await setRate(page, 1.15);
   await expect(page.locator("#speechRateValue")).toHaveText("1.15 倍");
   await page.evaluate(voices => (window as any).__speechTest.setVoices(voices), [...ordinaryVoices, premium]);
-  await expect(page.locator("#voiceSelect")).toHaveValue(alex.voiceURI);
   await page.locator("#previewVoiceBtn").click();
-  expect((await calls(page)).at(-1)).toMatchObject({ voiceURI: alex.voiceURI, rate: 1.15, pitch: 1 });
+  expect((await calls(page)).at(-1)).toMatchObject({ voiceURI: premium.voiceURI, rate: 1.15, pitch: 1 });
   await page.reload();
-  await expect(page.locator("#voiceSelect")).toHaveValue(alex.voiceURI);
+  await expect(page.locator("#voiceSelect option")).toHaveCount(1);
   await expect(page.locator("#speechRate")).toHaveValue("1.15");
   await page.locator("#speakBtn").click();
-  expect((await calls(page)).at(-1)).toMatchObject({ voiceURI: alex.voiceURI, rate: 1.15 });
-  await page.locator("#voiceSelect").selectOption("");
-  await page.reload();
-  await expect(page.locator("#voiceSelect")).toHaveValue("");
-  await page.locator("#speakBtn").click();
-  expect((await calls(page)).at(-1)?.voiceURI).toBe(samantha.voiceURI);
+  expect((await calls(page)).at(-1)).toMatchObject({ voiceURI: samantha.voiceURI, rate: 1.15 });
 });
 
-test("an initially absent saved voice is restored once voices arrive", async ({ page }) => {
+test("delayed voices ignore an old saved voice and never fall back when Samantha disappears", async ({ page }) => {
   await openPractice(page, { voices: [], saved: { ...alex, rate: 0.85 } });
   await expect(page.locator("#speakBtn")).toBeDisabled();
+  await expect(page.locator("#voiceSelect option")).toHaveCount(1);
   await expect(page.locator("#speechRate")).toHaveValue("0.85");
-  await page.evaluate(voices => (window as any).__speechTest.setVoices(voices), [samantha]);
-  await expect(page.locator("#speechStatus")).toContainText("暂不可用");
-  await page.locator("#speakBtn").click();
-  expect((await calls(page)).at(-1)?.voiceURI).toBe(samantha.voiceURI);
-  await page.evaluate(() => (window as any).__speechTest.finish());
   await page.evaluate(voices => (window as any).__speechTest.setVoices(voices), ordinaryVoices);
-  await expect(page.locator("#voiceSelect")).toHaveValue(alex.voiceURI);
+  await page.locator("#speakBtn").click();
+  expect((await calls(page)).at(-1)).toMatchObject({ voiceURI: samantha.voiceURI, rate: 0.85 });
+  await page.evaluate(() => (window as any).__speechTest.finish());
+  await page.evaluate(voices => (window as any).__speechTest.setVoices(voices), [alex, effect, british]);
+  await expect(page.locator("#speakBtn")).toBeDisabled();
+  await expect(page.locator("#voiceSelect option")).toHaveCount(1);
+  await page.evaluate(voices => (window as any).__speechTest.setVoices(voices), [samantha, enhanced, alex]);
   await page.locator("#previewVoiceBtn").click();
-  expect((await calls(page)).at(-1)).toMatchObject({ voiceURI: alex.voiceURI, rate: 0.85 });
+  expect((await calls(page)).at(-1)).toMatchObject({ voiceURI: enhanced.voiceURI, rate: 0.85 });
 });
 
 test("word, short sentence, long sentence, and preview use the selected rate", async ({ page }) => {

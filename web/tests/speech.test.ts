@@ -104,47 +104,45 @@ afterEach(() => {
 });
 
 describe("account practice speech", () => {
-  it("prefers Samantha quality variants and falls back to ordinary US voices", () => {
-    const env = setup();
-    env.controller.speakCurrent();
-    expect(env.synth.calls.at(-1)?.voice).toEqual(samantha);
-    env.setVoices([enhanced, premium, samantha]);
+  it("only offers Samantha and never falls back to another voice", () => {
+    const env = setup([], { ...alex, rate: 1.1 });
+    expect(env.elements.speakButton.disabled).toBe(true);
+    env.setVoices([samantha, alex, premium]);
+    expect(env.elements.voiceSelect.options.length).toBe(1);
     env.controller.speakCurrent();
     expect(env.synth.calls.at(-1)?.voice).toEqual(premium);
-    env.setVoices([samantha, enhanced]);
+    expect(env.synth.calls.at(-1)?.rate).toBe(1.1);
+    const count = env.synth.calls.length;
+    env.setVoices([alex, british, effect]);
     env.controller.speakCurrent();
-    expect(env.synth.calls.at(-1)?.voice).toEqual(enhanced);
-    env.setVoices([chinese, effect, british, alex]);
-    env.controller.speakCurrent();
-    expect(env.synth.calls.at(-1)?.voice).toEqual(alex);
-    expect(env.elements.voiceSelect.options.some((option) => option.value === chinese.voiceURI)).toBe(false);
-    env.setVoices([effect]);
+    expect(env.synth.calls.length).toBe(count);
     expect(env.elements.speakButton.disabled).toBe(true);
-  });
-
-  it("keeps an unavailable saved choice and restores it after delayed voice loading", () => {
-    const env = setup([], { ...alex, rate: 1.1 });
-    expect(env.elements.voiceSelect.value).toBe("alex");
-    expect(env.elements.voiceSelect.selectedOptions[0]?.disabled).toBe(true);
     env.setVoices([samantha]);
-    expect(env.elements.speechStatus.textContent).toContain("已保存的音色暂不可用");
     env.controller.speakCurrent();
     expect(env.synth.calls.at(-1)?.voice).toEqual(samantha);
-    env.setVoices([samantha, alex]);
-    env.controller.speakCurrent();
-    expect(env.synth.calls.at(-1)?.voice).toEqual(alex);
-    expect(env.synth.calls.at(-1)?.rate).toBe(1.1);
   });
 
-  it("preserves a manual choice through voiceschanged and stores changes locally", () => {
-    const env = setup();
-    env.elements.voiceSelect.value = alex.voiceURI;
-    env.elements.voiceSelect.dispatchEvent(new Event("change"));
-    env.setVoices([premium, alex]);
-    expect(env.elements.voiceSelect.value).toBe(alex.voiceURI);
+  it("selects Samantha quality variants while keeping a single option", () => {
+    const env = setup([samantha, enhanced, premium]);
     env.controller.speakCurrent();
-    expect(env.synth.calls.at(-1)?.voice).toEqual(alex);
-    expect(JSON.parse(env.storage.get("basicTypingSpeechSettings") || "{}")).toMatchObject({ voiceURI: "alex", rate: 1 });
+    expect(env.synth.calls.at(-1)?.voice).toEqual(premium);
+    env.setVoices([samantha, enhanced, alex]);
+    env.controller.speakCurrent();
+    expect(env.synth.calls.at(-1)?.voice).toEqual(enhanced);
+    expect(env.elements.voiceSelect.options).toHaveLength(1);
+  });
+
+  it("keeps speech working when preference storage is blocked", () => {
+    const env = setup([samantha]);
+    vi.stubGlobal("localStorage", {
+      getItem: () => { throw new Error("Storage blocked"); },
+      setItem: () => { throw new Error("Storage blocked"); }
+    });
+    env.elements.speechRate.value = "1.1";
+    env.elements.speechRate.dispatchEvent(new Event("input"));
+    env.controller.speakCurrent();
+    expect(env.synth.calls.at(-1)?.voice).toEqual(samantha);
+    expect(env.synth.calls.at(-1)?.rate).toBe(1.1);
   });
 
   it("uses the selected rate for words, long sentences and preview without slowing them", () => {
