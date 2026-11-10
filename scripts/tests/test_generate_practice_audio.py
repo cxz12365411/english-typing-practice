@@ -1,13 +1,16 @@
 """Offline regression checks for accepted-audio provenance and crop boundaries.
 
 Run: python3 -m unittest discover -s scripts/tests -p 'test_*.py'
-Uses temporary WAVs and mocked ASR/encoding only; never calls a speech model.
+Uses temporary WAVs, mocked ASR, and real ffmpeg encoding checks; never calls a speech model.
 """
 import copy
 import importlib.util
 import json
+import math
 from pathlib import Path
+import shutil
 import struct
+import subprocess
 import tempfile
 import unittest
 from unittest.mock import patch
@@ -20,6 +23,7 @@ SPEC = importlib.util.spec_from_file_location(
 GEN = importlib.util.module_from_spec(SPEC)
 SPEC.loader.exec_module(GEN)
 SAMPLE_RATE = 24000
+REAL_ENCODE = GEN.encode
 
 
 def pcm(*sections):
@@ -99,6 +103,7 @@ class AudioAcceptanceTests(unittest.TestCase):
             **self.item, "voiceId": "01", "fingerprint": GEN.generation_fingerprint(self.profile, self.item),
             "referenceSha256": self.profile["reference"]["sha256"],
             "path": f"voices/01/{self.item['textKey']}.mp3", "format": "mp3", "sampleRate": SAMPLE_RATE,
+            "encodingVersion": GEN.ENCODING_VERSION,
             "duration": sig["duration"], "signal": sig, "qa": qa(self.item["spokenText"]),
             "qaStatus": "passed", "qaVersion": GEN.QA_VERSION, "qaRulesSignature": GEN.qa_signature(),
             "asrWeightsSha256": GEN.MODEL_SHA, "auditProblems": [], "contextCrop": {"leadIn": "Hello."},
@@ -385,6 +390,252 @@ class AudioAcceptanceTests(unittest.TestCase):
                     GEN.audit_records([self.profile], items)
                     self.assertEqual(json.loads(self.record_path().read_text())["qaStatus"], "review")
                     self.assertEqual(json.loads(anchor_path.read_text())["asrWeightsSha256"], "older-asr-weights")
+
+    @unittest.skipUnless(shutil.which("ffmpeg"), "ffmpeg is required for the real encoding regression")
+    def test_real_encoding_lifts_quiet_audio_and_keeps_peak_and_timing_limits(self):
+        # The quiet case deliberately needs about 23 dB. It must fail against
+        # the former 12 dB cap, while the proposed 24 dB cap reaches -23 dBFS.
+        frames = SAMPLE_RATE * 2
+        quiet = [
+            round(240 * math.sin(2 * math.pi * 440 * index / SAMPLE_RATE)
+                  * min(1, index / 2400, (frames - 1 - index) / 2400))
+            for index in range(frames)
+        ]
+        high_crest = quiet.copy()
+        high_crest[frames // 2:frames // 2 + 48] = [
+            round(30000 * math.sin(2 * math.pi * 1000 * index / SAMPLE_RATE))
+            for index in range(48)
+        ]
+        for name, values in (("quiet", quiet), ("high-crest", high_crest)):
+            with self.subTest(signal=name):
+                raw = self.out / "encoding-fixtures" / f"{name}.wav"
+                target = raw.with_suffix(".mp3")
+                decoded = raw.with_name(f"{name}-decoded.wav")
+                write_wav(raw, struct.pack(f"<{len(values)}h", *values))
+                before_sha = GEN.sha(raw.read_bytes())
+                original = GEN.signal(raw)
+                initial_gain = min(24, -23 - original["rmsDbfs"], -2 - original["peakDbfs"])
+                gain = REAL_ENCODE(raw, target, original)
+                self.assertLessEqual(gain, initial_gain + 1e-6)
+                if name == "quiet":
+                    self.assertGreater(gain, 12)
+                    self.assertLessEqual(gain, 24)
+                    self.assertLessEqual(original["rmsDbfs"] + gain, -23 + 1e-6)
+                else:
+                    self.assertLess(gain, 0)
+                    self.assertLessEqual(original["peakDbfs"] + gain, -2 + 1e-6)
+                    self.assertLess(original["rmsDbfs"] + gain, -23)
+                subprocess.run([
+                    "ffmpeg", "-nostdin", "-y", "-v", "error", "-xerror", "-i", str(target),
+                    "-c:a", "pcm_s16le", str(decoded),
+                ], check=True, capture_output=True, timeout=30)
+                with wave.open(str(decoded)) as output:
+                    self.assertEqual(output.getframerate(), SAMPLE_RATE)
+                    self.assertEqual(output.getnchannels(), 1)
+                    self.assertEqual(output.getsampwidth(), 2)
+                    padding = output.getnframes() - frames
+                    self.assertGreaterEqual(padding, 0)
+                    self.assertLessEqual(padding, 47)
+                if padding:
+                    decoded_pcm = read_pcm(decoded)
+                    tail = [sample / 32768 for sample in struct.unpack(f"<{padding}h", decoded_pcm[-padding * 2:])]
+                    self.assertLessEqual(max(map(abs, tail)), 10 ** (-50 / 20))
+                    self.assertLessEqual(math.sqrt(sum(value * value for value in tail) / padding), 10 ** (-60 / 20))
+                actual = GEN.signal(decoded)
+                self.assertEqual(actual["clippedSamples"], 0)
+                self.assertLessEqual(actual["peakDbfs"], -2 + 1e-4)
+                self.assertEqual(GEN.sha(raw.read_bytes()), before_sha)
+                if name == "quiet":
+                    self.assertAlmostEqual(actual["rmsDbfs"], -23, delta=1.0)
+        self.request.assert_not_called()
+        self.transcribe.assert_not_called()
+
+    def test_encoder_rejects_three_decoded_peak_overshoots_without_replacing_output(self):
+        raw = self.out / "encoding-fixtures" / "overshoot.wav"
+        target = raw.with_suffix(".mp3")
+        write_wav(raw, self.clean_pcm)
+        target.write_bytes(b"previous-accepted-mp3")
+        raw_before = raw.read_bytes()
+        gains, decoded = [], []
+
+        def run_ffmpeg(args, **_kwargs):
+            if "-af" in args:
+                self.assertEqual(args[args.index("-i") + 1], str(raw))
+                gains.append(float(args[args.index("-af") + 1].removeprefix("volume=").removesuffix("dB")))
+                Path(args[-1]).write_bytes(b"new-unaccepted-mp3")
+                return subprocess.CompletedProcess(args, 0)
+            decoded.append(args)
+            return subprocess.CompletedProcess(args, 0, stdout=struct.pack("<f", 1.0) * SAMPLE_RATE, stderr=b"")
+
+        with patch.object(GEN.subprocess, "run", side_effect=run_ffmpeg):
+            with self.assertRaisesRegex(ValueError, "peak remained above -2 dBFS"):
+                REAL_ENCODE(raw, target, GEN.signal(raw))
+        self.assertEqual(len(gains), 3)
+        self.assertEqual(len(decoded), 3)
+        self.assertGreater(gains[0], gains[1])
+        self.assertGreater(gains[1], gains[2])
+        self.assertEqual(target.read_bytes(), b"previous-accepted-mp3")
+        self.assertEqual(raw.read_bytes(), raw_before)
+        self.request.assert_not_called()
+        self.transcribe.assert_not_called()
+
+    def test_old_encoding_is_excluded_then_upgraded_without_tts_or_raw_changes(self):
+        self.prepare_preview()
+        record = self.accepted_record()
+        record.update(encodingVersion=1, gainDb=12, generationMode="word-batch-v2-leadin", batchIndex=0)
+        GEN.atomic_json(self.record_path(), record)
+        raw = self.out / "raw" / "01" / f"{self.item['textKey']}.wav"
+        mp3 = self.out / "bundle" / record["path"]
+        raw_before = raw.read_bytes()
+        self.assertEqual(GEN.manifest([self.profile], [self.item])["assets"], [])
+        self.assertEqual(GEN.audit_records([self.profile], [self.item])["passed"], 0)
+        audited = json.loads(self.record_path().read_text())
+        self.assertEqual(audited["qaStatus"], "review")
+        self.assertEqual(audited["auditProblems"], ["encoding-version-mismatch"])
+
+        def reencode(source, destination, _sig):
+            self.assertEqual(source, raw)
+            self.assertEqual(destination, mp3)
+            destination.write_bytes(b"ID3-upgraded-from-original-wav")
+            return 21.5
+
+        with patch.object(GEN, "encode", side_effect=reencode) as encode, patch.object(
+            GEN, "prefaced_audio", side_effect=AssertionError("upgrade must not generate audio")
+        ) as generate:
+            result = GEN.job(self.profile, self.item, retries=0)
+        encode.assert_called_once()
+        generate.assert_not_called()
+        self.request.assert_not_called()
+        self.transcribe.assert_not_called()
+        self.assertEqual(raw.read_bytes(), raw_before)
+        self.assertEqual(result["encodingVersion"], GEN.ENCODING_VERSION)
+        self.assertEqual(result["qaStatus"], "passed")
+        self.assertEqual(result["auditProblems"], [])
+        self.assertEqual(result["gainDb"], 21.5)
+        self.assertEqual(result["sha256"], GEN.sha(mp3.read_bytes()))
+        self.assertEqual(result["qa"], record["qa"])
+        self.assertEqual(result["batchIndex"], 0)
+        self.assertEqual(result["generationMode"], "word-batch-v2-leadin")
+        self.assertEqual(result["encodingHistory"], [{"encodingVersion": 1, "gainDb": 12, "sha256": record["sha256"]}])
+        self.assertEqual(len(GEN.manifest([self.profile], [self.item])["assets"]), 1)
+
+    def test_encoding_upgrade_refuses_bad_hashes_and_expired_qa(self):
+        changes = {
+            "raw hash": {"rawSha256": "0" * 64},
+            "MP3 hash": {"sha256": "0" * 64},
+            "QA version": {"qaVersion": GEN.QA_VERSION - 1},
+            "QA rules": {"qaRulesSignature": "outdated"},
+            "ASR weights": {"asrWeightsSha256": "outdated"},
+            "other review problem": {"auditProblems": ["encoding-version-mismatch", "transcript-review"]},
+        }
+        for changed, updates in changes.items():
+            with self.subTest(changed=changed):
+                record = self.accepted_record()
+                record.update(encodingVersion=1, **updates)
+                GEN.atomic_json(self.record_path(), record)
+                raw = self.out / "raw" / "01" / f"{self.item['textKey']}.wav"
+                mp3 = self.out / "bundle" / record["path"]
+                before = {path: path.read_bytes() for path in (raw, mp3, self.record_path())}
+                with patch.object(GEN, "encode", side_effect=AssertionError("invalid asset cannot be upgraded")) as encode:
+                    result = GEN.upgrade_encoding(self.profile, self.item, record, raw, mp3, self.record_path())
+                encode.assert_not_called()
+                self.assertEqual(result["encodingVersion"], 1)
+                for path, content in before.items():
+                    self.assertEqual(path.read_bytes(), content)
+        self.request.assert_not_called()
+        self.transcribe.assert_not_called()
+
+    @unittest.skipUnless(shutil.which("ffmpeg"), "ffmpeg is required for the padding regression")
+    def test_real_short_mp3_retains_all_samples_with_only_quiet_subframe_padding(self):
+        frames = 17880  # The observed libmp3lame boundary that retains 23 samples.
+        values = [
+            round(3000 * math.sin(2 * math.pi * 440 * index / SAMPLE_RATE)
+                  * min(1, index / 1200, (frames - 1 - index) / 1200))
+            for index in range(frames)
+        ]
+        raw = self.out / "encoding-fixtures" / "short-boundary.wav"
+        target = raw.with_suffix(".mp3")
+        write_wav(raw, struct.pack(f"<{frames}h", *values))
+        before = raw.read_bytes()
+        REAL_ENCODE(raw, target, GEN.signal(raw))
+        decoded = subprocess.run([
+            "ffmpeg", "-nostdin", "-v", "error", "-xerror", "-i", str(target),
+            "-f", "f32le", "-c:a", "pcm_f32le", "-",
+        ], check=True, capture_output=True, timeout=30)
+        samples = struct.unpack(f"<{len(decoded.stdout) // 4}f", decoded.stdout)
+        self.assertGreaterEqual(len(samples), frames)
+        self.assertLessEqual(len(samples) - frames, 47)
+        tail = samples[frames:]
+        if tail:
+            self.assertLessEqual(max(map(abs, tail)), 10 ** (-50 / 20))
+            self.assertLessEqual(math.sqrt(sum(value * value for value in tail) / len(tail)), 10 ** (-60 / 20))
+        self.assertLessEqual(20 * math.log10(max(map(abs, samples))), -2 + 1e-4)
+        self.assertEqual(raw.read_bytes(), before)
+        self.request.assert_not_called()
+        self.transcribe.assert_not_called()
+
+    def test_encoder_rejects_truncation_excess_padding_and_energetic_padding(self):
+        raw = self.out / "encoding-fixtures" / "invalid-padding.wav"
+        target = raw.with_suffix(".mp3")
+        write_wav(raw, self.clean_pcm)
+        before = raw.read_bytes()
+        cases = {
+            "truncated": [0.1] * (SAMPLE_RATE - 1),
+            "too many samples": [0.1] * SAMPLE_RATE + [0.0] * 48,
+            "tail peak": [0.1] * SAMPLE_RATE + [0.004] + [0.0] * 46,
+            "tail RMS": [0.1] * SAMPLE_RATE + [0.002] * 47,
+        }
+        for name, samples in cases.items():
+            with self.subTest(invalid=name):
+                target.write_bytes(b"previous-accepted-mp3")
+
+                def run_ffmpeg(args, **_kwargs):
+                    if "-af" in args:
+                        Path(args[-1]).write_bytes(b"new-unaccepted-mp3")
+                        return subprocess.CompletedProcess(args, 0)
+                    return subprocess.CompletedProcess(args, 0, stdout=struct.pack(f"<{len(samples)}f", *samples), stderr=b"")
+
+                with patch.object(GEN.subprocess, "run", side_effect=run_ffmpeg):
+                    with self.assertRaisesRegex(ValueError, "duration or samples invalid|non-quiet trailing padding"):
+                        REAL_ENCODE(raw, target, GEN.signal(raw))
+                self.assertEqual(target.read_bytes(), b"previous-accepted-mp3")
+                self.assertEqual(raw.read_bytes(), before)
+
+    def test_preview_old_or_corrupted_encoding_is_rebuilt_then_reused_without_tts(self):
+        self.prepare_preview()
+        self.accepted_record()
+        GEN.manifest([self.profile], [self.item])
+        metadata = self.out / "preview-encoding.json"
+        baseline = json.loads(metadata.read_text())
+        raw = self.root / "out" / "breeze-voices-20261110" / self.profile["rawFile"]
+        raw_before = raw.read_bytes()
+        for reason in ("missing metadata", "old encoding", "bad MP3 hash", "bad raw hash"):
+            with self.subTest(reason=reason):
+                current = copy.deepcopy(baseline)
+                if reason == "missing metadata":
+                    metadata.unlink(missing_ok=True)
+                else:
+                    if reason == "old encoding":
+                        current[0]["encodingVersion"] = 1
+                    elif reason == "bad MP3 hash":
+                        current[0]["sha256"] = "0" * 64
+                    else:
+                        current[0]["rawSha256"] = "0" * 64
+                    GEN.atomic_json(metadata, current)
+                with patch.object(GEN, "encode", side_effect=self.fake_encode) as encode:
+                    manifest = GEN.manifest([self.profile], [self.item])
+                encode.assert_called_once()
+                self.assertEqual(encode.call_args.args[0], raw)
+                updated = json.loads(metadata.read_text())[0]
+                self.assertEqual(updated["encodingVersion"], GEN.ENCODING_VERSION)
+                self.assertEqual(updated["rawSha256"], self.profile["rawSha256"])
+                self.assertEqual(updated["sha256"], manifest["previews"][0]["sha256"])
+                with patch.object(GEN, "encode", side_effect=AssertionError("valid preview should be cached")) as encode:
+                    GEN.manifest([self.profile], [self.item])
+                encode.assert_not_called()
+                self.assertEqual(raw.read_bytes(), raw_before)
+        self.request.assert_not_called()
+        self.transcribe.assert_not_called()
 
 
 if __name__ == "__main__":

@@ -31,6 +31,7 @@ CACHE_LOCK = threading.Lock()
 CACHE_IDS = {}
 PROCESS_VERSION = 1
 QA_VERSION = 3
+ENCODING_VERSION = 2
 MODEL_SHA = None
 # Only identical pronunciations; retained as an explicit QA audit, never text keys.
 HOMOPHONE_GROUPS = [
@@ -270,6 +271,7 @@ def audit_records(profiles,items):
             context_valid=context_check_valid(r,raw,voice) if has_context else False
             if has_context and not context_valid:problems.append('context-proof-invalid')
             if spoken_equivalents(words(item['spokenText']))!=spoken_equivalents(words(r.get('qa',{}).get('transcript',''))) and not context_valid:problems.append('transcript-review')
+        if r.get('encodingVersion')!=ENCODING_VERSION:problems.append('encoding-version-mismatch')
         r['qaVersion']=QA_VERSION
         if not model_changed:
             r['qaRulesSignature']=signature;r['asrWeightsSha256']=MODEL_SHA
@@ -389,14 +391,58 @@ def request_audio(profile, item, seed):
 
 
 def encode(raw, target, sig):
-    # Constant gain only. Cap peak and gain; no limiter/time/pitch processing.
-    gain = min(12.0, -23.0-sig['rmsDbfs'], -2.0-sig['peakDbfs'])
+    # Constant gain only, always from the original WAV. Lossy reconstruction can
+    # overshoot the input peak, so validate the actual decoded MP3 and back off.
+    import numpy as np
+    gain = min(24.0, -23.0-sig['rmsDbfs'], -2.0-sig['peakDbfs'])
     temp = target.with_suffix('.part.mp3')
     target.parent.mkdir(parents=True,exist_ok=True)
-    subprocess.run(['ffmpeg','-nostdin','-y','-v','error','-i',str(raw),'-af',f'volume={gain:.5f}dB','-ar','24000','-ac','1','-c:a','libmp3lame','-b:a','64k',str(temp)],check=True)
-    subprocess.run(['ffmpeg','-nostdin','-v','error','-i',str(temp),'-f','null','-'],check=True, capture_output=True)
-    temp.replace(target)
-    return gain
+    for attempt in range(3):
+        subprocess.run(['ffmpeg','-nostdin','-y','-v','error','-i',str(raw),'-af',f'volume={gain:.5f}dB','-ar','24000','-ac','1','-c:a','libmp3lame','-b:a','64k',str(temp)],check=True)
+        decoded=subprocess.run(['ffmpeg','-nostdin','-v','error','-i',str(temp),'-f','f32le','-c:a','pcm_f32le','-'],check=True,capture_output=True)
+        samples=np.frombuffer(decoded.stdout,dtype='<f4')
+        expected_samples=round(sig['duration']*24000)
+        padding=len(samples)-expected_samples
+        if padding<0 or padding>47 or not np.isfinite(samples).all() or not len(samples):
+            raise ValueError(f'Decoded MP3 duration or samples invalid: {raw.name}, {len(samples)} vs {expected_samples}')
+        # libmp3lame/FFmpeg can retain up to 47 sub-frame tail samples at 24 kHz.
+        # Keep every original sample; tolerate only <2 ms of quiet added tail.
+        if padding:
+            tail=samples[expected_samples:]
+            if float(np.max(np.abs(tail)))>10**(-50/20) or float(np.sqrt(np.mean(tail**2)))>10**(-60/20):
+                raise ValueError(f'Decoded MP3 has non-quiet trailing padding: {raw.name}')
+        peak=float(np.max(np.abs(samples)))
+        if peak<=1e-8:raise ValueError('Decoded MP3 is silent')
+        peak_db=20*math.log10(peak)
+        if peak_db<=-2.0+1e-6:
+            temp.replace(target)
+            return gain
+        gain-=peak_db+2.0+0.05
+    raise ValueError('Decoded MP3 peak remained above -2 dBFS after gain-only retries')
+
+
+def upgrade_encoding(profile,item,prior,raw,mp3,meta):
+    """Migrate only a fully verified recording; never call TTS or rewrite raw PCM."""
+    if prior.get('encodingVersion')==ENCODING_VERSION:return prior
+    eligible=(prior.get('qaStatus') in ('passed','review') and
+        all(p=='encoding-version-mismatch' for p in prior.get('auditProblems',[])) and
+        prior.get('qaVersion')==QA_VERSION and prior.get('qaRulesSignature')==qa_signature() and
+        prior.get('asrWeightsSha256')==MODEL_SHA and prior.get('originalText')==item['originalText'] and
+        prior.get('spokenText')==item['spokenText'] and prior.get('fingerprint')==generation_fingerprint(profile,item) and
+        raw.is_file() and mp3.is_file() and sha(raw.read_bytes())==prior.get('rawSha256') and sha(mp3.read_bytes())==prior.get('sha256'))
+    if not eligible:return prior
+    sig=signal(raw)
+    context=prior.get('qa',{}).get('contextCheck')
+    context_valid=context_check_valid(prior,raw,profile) if context else False
+    transcript_valid=spoken_equivalents(words(prior.get('qa',{}).get('transcript','')))==spoken_equivalents(words(item['spokenText']))
+    if not clean_signal(sig) or (context and not context_valid) or not (transcript_valid or context_valid):return prior
+    if required_pronunciation(item) not in prior.get('requestFields',{}).get('instruction',''):return prior
+    history={'encodingVersion':prior.get('encodingVersion',1),'gainDb':prior.get('gainDb'),'sha256':prior['sha256']}
+    gain=encode(raw,mp3,sig)
+    prior.setdefault('encodingHistory',[]).append(history)
+    prior.update(encodingVersion=ENCODING_VERSION,gainDb=gain,sha256=sha(mp3.read_bytes()),bytes=mp3.stat().st_size,qaStatus='passed',auditProblems=[])
+    atomic_json(meta,prior)
+    return prior
 
 
 def job(profile, item, retries):
@@ -413,10 +459,11 @@ def job(profile, item, retries):
             qa['status']='passed';qa['homophoneEquivalent']=True
             prior['qaStatus']='passed';prior['auditProblems']=[];prior['qaRulesSignature']=qa_signature();prior['qaReclassification']='Explicit identical-pronunciation spelling equivalence, original transcript and differences retained'
             atomic_json(meta,prior)
+    prior=upgrade_encoding(profile,item,prior,raw,mp3,meta)
     context_ok=not prior.get('qa',{}).get('contextCheck') or (raw.exists() and context_check_valid(prior,raw,profile))
-    if prior.get('fingerprint')==fingerprint and prior.get('qaStatus')=='passed' and not prior.get('auditProblems') and context_ok and prior.get('qaVersion')==QA_VERSION and prior.get('qaRulesSignature')==qa_signature() and raw.exists() and mp3.exists() and sha(raw.read_bytes())==prior.get('rawSha256') and sha(mp3.read_bytes())==prior.get('sha256'):
+    if prior.get('fingerprint')==fingerprint and prior.get('qaStatus')=='passed' and not prior.get('auditProblems') and context_ok and prior.get('encodingVersion')==ENCODING_VERSION and prior.get('qaVersion')==QA_VERSION and prior.get('qaRulesSignature')==qa_signature() and raw.exists() and mp3.exists() and sha(raw.read_bytes())==prior.get('rawSha256') and sha(mp3.read_bytes())==prior.get('sha256'):
         return prior
-    base = {**item,'voiceId':voice,'fingerprint':fingerprint,'referenceSha256':profile['reference']['sha256'],'path':f'voices/{voice}/{key}.mp3','format':'mp3','sampleRate':24000}
+    base = {**item,'voiceId':voice,'fingerprint':fingerprint,'referenceSha256':profile['reference']['sha256'],'path':f'voices/{voice}/{key}.mp3','format':'mp3','sampleRate':24000,'encodingVersion':ENCODING_VERSION}
     raw.parent.mkdir(parents=True,exist_ok=True)
     attempt_offset=prior.get('attempt',0) if prior.get('fingerprint')==fingerprint else 0
     for attempt in range(retries+1):
@@ -547,7 +594,7 @@ def word_batch(profile, items, retries):
             mp3=OUT/'bundle'/'voices'/voice/f'{key}.mp3'
             gain=encode(target,mp3,sig)
             fingerprint=generation_fingerprint(profile,item)
-            record={**item,'voiceId':voice,'fingerprint':fingerprint,'referenceSha256':profile['reference']['sha256'],'path':f'voices/{voice}/{key}.mp3','format':'mp3','sampleRate':24000,'seed':seed,'attempt':1,'generationMode':'word-batch-v2-leadin','batchId':batch_id,'batchIndex':n-1,'batchClipStart':boundaries[n]/sr,'batchClipEnd':boundaries[n+1]/sr,'generationSeconds':seconds/len(items),'requestFields':fields,'duration':sig['duration'],'signal':sig,'qa':clip_qa,'qaStatus':'passed','qaVersion':QA_VERSION,'qaRulesSignature':qa_signature(),'asrWeightsSha256':MODEL_SHA,'rawSha256':sha(target.read_bytes()),'gainDb':gain,'sha256':sha(mp3.read_bytes()),'bytes':mp3.stat().st_size}
+            record={**item,'voiceId':voice,'fingerprint':fingerprint,'referenceSha256':profile['reference']['sha256'],'path':f'voices/{voice}/{key}.mp3','format':'mp3','sampleRate':24000,'encodingVersion':ENCODING_VERSION,'seed':seed,'attempt':1,'generationMode':'word-batch-v2-leadin','batchId':batch_id,'batchIndex':n-1,'batchClipStart':boundaries[n]/sr,'batchClipEnd':boundaries[n+1]/sr,'generationSeconds':seconds/len(items),'requestFields':fields,'duration':sig['duration'],'signal':sig,'qa':clip_qa,'qaStatus':'passed','qaVersion':QA_VERSION,'qaRulesSignature':qa_signature(),'asrWeightsSha256':MODEL_SHA,'rawSha256':sha(target.read_bytes()),'gainDb':gain,'sha256':sha(mp3.read_bytes()),'bytes':mp3.stat().st_size}
             atomic_json(OUT/'records'/voice/f'{key}.json',record)
             print('BATCH_DONE',voice,item['itemKeys'][0],sig['duration'],clip_qa['transcript'],flush=True)
             results.append(record)
@@ -568,12 +615,18 @@ def manifest(profiles, items):
         valid_current=item and profile and r.get('originalText')==item['originalText'] and r.get('spokenText')==item['spokenText'] and r.get('fingerprint')==generation_fingerprint(profile,item)
         if valid_current and required_pronunciation(item) not in r.get('requestFields',{}).get('instruction',''):valid_current=False
         if valid_current and r.get('qa',{}).get('contextCheck') and not context_check_valid(r,OUT/'raw'/profile['id']/f"{item['textKey']}.wav",profile):valid_current=False
-        if r.get('qaStatus')=='passed' and not r.get('auditProblems') and r.get('qaVersion')==QA_VERSION and r.get('qaRulesSignature')==signature and valid_current:
+        if r.get('qaStatus')=='passed' and not r.get('auditProblems') and r.get('encodingVersion')==ENCODING_VERSION and r.get('qaVersion')==QA_VERSION and r.get('qaRulesSignature')==signature and valid_current:
             assets.append({k:r[k] for k in ('textKey','originalText','spokenText','voiceId','path','sha256','duration','sampleRate','format','qaStatus','bytes')})
     previews=[]
     source=ROOT/'out/breeze-voices-20261110'
     original=json.loads((source/'manifest.json').read_text())['text']
     key=sha(original.encode())
+    preview_meta_path=OUT/'preview-encoding.json'
+    try:
+        previous_previews=json.loads(preview_meta_path.read_text())
+        if not isinstance(previous_previews,list):previous_previews=[]
+    except (OSError,ValueError):previous_previews=[]
+    preview_encodings=[]
     for p in profiles:
         path=f"previews/{p['id']}/{key}.mp3"
         target=OUT/'bundle'/path
@@ -581,8 +634,12 @@ def manifest(profiles, items):
         assert sha(raw.read_bytes())==p['rawSha256']
         qa=json.loads((source/f"qa-{p['id']}.json").read_text())
         assert qa['sha256']==p['rawSha256'] and words(qa['transcript'])==words(original)
-        if not target.exists():encode(raw,target,signal(raw))
+        previous=next((r for r in previous_previews if isinstance(r,dict) and r.get('voiceId')==p['id'] and r.get('path')==path),{})
+        cached=(target.is_file() and previous.get('encodingVersion')==ENCODING_VERSION and previous.get('rawSha256')==p['rawSha256'] and previous.get('sha256')==sha(target.read_bytes()) and type(previous.get('gainDb')) in (int,float) and math.isfinite(previous['gainDb']))
+        gain=previous['gainDb'] if cached else encode(raw,target,signal(raw))
+        preview_encodings.append({'voiceId':p['id'],'encodingVersion':ENCODING_VERSION,'path':path,'rawPath':str(raw),'rawSha256':p['rawSha256'],'gainDb':gain,'sha256':sha(target.read_bytes())})
         previews.append({'textKey':key,'originalText':original,'spokenText':original,'voiceId':p['id'],'path':path,'sha256':sha(target.read_bytes()),'duration':p['duration'],'sampleRate':24000,'format':'mp3','qaStatus':'passed','bytes':target.stat().st_size})
+    atomic_json(preview_meta_path,preview_encodings)
     data={'manifestVersion':1,'generatedAt':time.strftime('%Y-%m-%dT%H:%M:%SZ',time.gmtime()),'scope':'personal-use public practice content','voices':[{'id':p['id'],'name':p['name'],'referenceSha256':p['reference']['sha256']} for p in profiles],'expectedTexts':len(items),'expectedAssets':len(items)*len(profiles),'assets':assets,'previews':previews}
     atomic_json(OUT/'bundle'/'manifest.json',data)
     return data
@@ -619,6 +676,26 @@ def main():
         return
     audit=audit_records(profiles,items)
     print('STARTUP_AUDIT',audit['checked'],audit['passed'],len(audit['review']),flush=True)
+    migrated=0
+    # The first audit may temporarily invalidate contextual checks while their
+    # literal come/give anchors still use old encodings. Upgrade anchors/ordinary
+    # records, re-audit, then migrate dependent recordings without new TTS.
+    for upgrade_pass in range(2):
+        previous=migrated
+        for profile in profiles:
+            for item in items:
+                meta=OUT/'records'/profile['id']/f"{item['textKey']}.json"
+                if not meta.exists():continue
+                prior=json.loads(meta.read_text())
+                if prior.get('encodingVersion')==ENCODING_VERSION:continue
+                raw=OUT/'raw'/profile['id']/f"{item['textKey']}.wav";mp3=OUT/'bundle'/f"voices/{profile['id']}/{item['textKey']}.mp3"
+                upgraded=upgrade_encoding(profile,item,prior,raw,mp3,meta)
+                if upgraded.get('encodingVersion')==ENCODING_VERSION:
+                    migrated+=1
+                    if migrated%100==0:print('ENCODING_UPGRADE',migrated,flush=True)
+        if migrated==previous:break
+        audit=audit_records(profiles,items)
+        print('ENCODING_UPGRADE_COMPLETE',migrated,audit['passed'],len(audit['review']),flush=True)
     if args.mode=='all' and audit['review']:
         recheck_word_records(profiles,items)
         audit=audit_records(profiles,items)
@@ -639,7 +716,7 @@ def main():
                     audio=OUT/'bundle'/r.get('path','nonexistent')
                     raw=OUT/'raw'/p['id']/f"{item['textKey']}.wav"
                     expected_fingerprint=generation_fingerprint(p,item)
-                    if r.get('qaStatus')=='passed' and not r.get('auditProblems') and r.get('qaVersion')==QA_VERSION and r.get('fingerprint')==expected_fingerprint and audio.is_file() and raw.is_file() and sha(audio.read_bytes())==r.get('sha256') and sha(raw.read_bytes())==r.get('rawSha256'):
+                    if r.get('qaStatus')=='passed' and not r.get('auditProblems') and r.get('encodingVersion')==ENCODING_VERSION and r.get('qaVersion')==QA_VERSION and r.get('fingerprint')==expected_fingerprint and audio.is_file() and raw.is_file() and sha(audio.read_bytes())==r.get('sha256') and sha(raw.read_bytes())==r.get('rawSha256'):
                         completed+=1;continue
                     if item['kind']=='word':pending[p['id']].append(item)
                     else:tasks.append(('single',p,item))
