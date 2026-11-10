@@ -30,6 +30,7 @@ async function mockApp(page: Page, options: { anonymous?: boolean; mistakes?: bo
   await page.route("**/api/**", async (route) => {
     const request = route.request();
     const path = new URL(request.url()).pathname;
+    if (path === "/api/speech/catalog") return route.fulfill({ contentType: "application/json", body: JSON.stringify({ available: false, voices: [], entries: [] }) });
     if (path.startsWith("/api/content-resources/")) return json(route, JSON.parse(readFileSync(path.split("/").pop()!, "utf8")));
     const body = request.postDataJSON() as Record<string, unknown> | null;
     if (body) requests.push({ path, body });

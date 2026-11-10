@@ -28,6 +28,7 @@ async function json(route: Route, body: unknown, status = 200): Promise<void> {
 async function mockAdmin(page: Page): Promise<void> {
   await page.route("**/api/**", async (route) => {
     const path = new URL(route.request().url()).pathname;
+    if (path === "/api/speech/catalog") return route.fulfill({ contentType: "application/json", body: JSON.stringify({ available: false, voices: [], entries: [] }) });
     if (path.startsWith("/api/content-resources/")) return route.fallback();
     if (path === "/api/auth/session") return json(route, { user: admin, csrfToken: "md-csrf", capabilities: { emailAuthEnabled: false, selfRegistrationEnabled: false } });
     if (path === "/api/admin/users") return json(route, { users: [admin] });

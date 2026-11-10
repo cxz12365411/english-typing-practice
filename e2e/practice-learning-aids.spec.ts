@@ -53,6 +53,7 @@ async function mockApp(page: Page, items = [item(hey, 0), item(longest, 1), item
   await page.route("**/api/**", async route => {
     const request = route.request();
     const path = new URL(request.url()).pathname;
+    if (path === "/api/speech/catalog") return route.fulfill({ contentType: "application/json", body: JSON.stringify({ available: false, voices: [], entries: [] }) });
     if (path.startsWith("/api/content-resources/")) return route.fallback();
     const body = request.postDataJSON() as Record<string, unknown> | null;
     if (body) requests.push({ path, body });
@@ -492,4 +493,216 @@ test("rapid navigation and disabling automatic speech cancel old audio and queue
   expect((await speechState(page)).calls.at(-1)?.text).toBe(otherSentence.english);
   await page.getByRole("link", { name: "管理后台", exact: true }).click();
   expect((await speechState(page)).active).toBeNull();
+});
+
+// A real PCM WAV exercises Chromium's native media pipeline without depending on
+// workstation voices, generated private assets, or network services.
+function playbackFixture(): Buffer {
+  const frames = 24_000 * 5;
+  const body = Buffer.alloc(44 + frames * 2);
+  body.write("RIFF"); body.writeUInt32LE(body.length - 8, 4); body.write("WAVEfmt ", 8);
+  body.writeUInt32LE(16, 16); body.writeUInt16LE(1, 20); body.writeUInt16LE(1, 22);
+  body.writeUInt32LE(24_000, 24); body.writeUInt32LE(48_000, 28);
+  body.writeUInt16LE(2, 32); body.writeUInt16LE(16, 34); body.write("data", 36);
+  body.writeUInt32LE(frames * 2, 40);
+  for (let i = 0; i < frames; i++) body.writeInt16LE(Math.round(Math.sin(i / 24_000 * 440 * Math.PI * 2) * 16), 44 + i * 2);
+  return body;
+}
+
+async function recordedSpeech(page: Page, items: ContentItem[], options: { delayed?: Promise<void>; failAudio?: boolean } = {}) {
+  const voices = ["温柔陪练", "亲切学姐", "安静讲解", "自然教师", "清亮助手"].map((name, index) => {
+    const id = String(index + 1).padStart(2, "0");
+    return { id, name, previewUrl: `/api/speech/preview/${id}` };
+  });
+  const mediaRequests: string[] = [];
+  await page.addInitScript(() => {
+    const NativeAudio = window.Audio;
+    const players: HTMLAudioElement[] = [];
+    Object.defineProperty(window, "Audio", { configurable: true, value: function () {
+      const player = new NativeAudio();
+      players.push(player);
+      return player;
+    } });
+    (window as unknown as { __recordedPlayers: HTMLAudioElement[] }).__recordedPlayers = players;
+  });
+  await page.route("**/api/speech/**", async route => {
+    const path = new URL(route.request().url()).pathname;
+    if (path === "/api/speech/catalog") {
+      if (options.delayed) await options.delayed;
+      const entries = items.map((entry, index) => ({ itemId: entry.id, english: entry.english,
+        textKey: String(index + 1).repeat(64), voiceIds: voices.map(v => v.id) }));
+      return json(route, { available: true, voices, entries });
+    }
+    mediaRequests.push(route.request().url());
+    if (options.failAudio) return route.fulfill({ status: 404, body: "Unavailable" });
+    return route.fulfill({ status: 200, contentType: "audio/wav", body: playbackFixture() });
+  });
+  return mediaRequests;
+}
+
+async function mediaState(page: Page) {
+  return page.evaluate(() => (window as unknown as { __recordedPlayers: HTMLAudioElement[] }).__recordedPlayers.map(a => ({
+    src: a.getAttribute("src"), currentTime: a.currentTime, paused: a.paused,
+    playbackRate: a.playbackRate, preservesPitch: a.preservesPitch, readyState: a.readyState
+  })));
+}
+
+async function expectPlaying(page: Page, path: string) {
+  await expect.poll(async () => {
+    const [player] = await mediaState(page);
+    return Boolean(player && !player.paused && player.currentTime > 0 && player.src?.includes(path));
+  }).toBe(true);
+}
+
+test("five recorded voices play through native audio, retain rate and selection, and leave the answer intact", async ({ page }) => {
+  const original = item(hey, 0);
+  await mockApp(page, [original]);
+  const requests = await recordedSpeech(page, [original]);
+  await readyPractice(page);
+  await expect(page.locator("#voiceSelect option")).toHaveCount(5);
+  await expect(page.locator("#voiceSelect")).toHaveValue("01");
+  await page.locator("#answerInput").fill("Hey");
+  for (const id of ["01", "02", "03", "04", "05"]) {
+    await page.locator("#voiceSelect").selectOption(id);
+    await page.locator("#speakButton").click();
+    await expectPlaying(page, `/audio/${id}/`);
+    await expect(page.locator("#answerInput")).toHaveValue("Hey");
+  }
+  expect((await mediaState(page))).toHaveLength(1);
+  expect((await speechState(page)).calls).toHaveLength(0);
+  await page.locator("#speechRate").fill("1.15");
+  await page.locator("#speechRate").dispatchEvent("input");
+  expect((await mediaState(page))[0]).toMatchObject({ src: null, paused: true });
+  await page.reload();
+  await expect(page.locator("#voiceSelect")).toHaveValue("05");
+  await expect(page.locator("#speechRate")).toHaveValue("1.15");
+  await page.locator("#previewVoiceBtn").click();
+  await expectPlaying(page, "/preview/05");
+  expect((await mediaState(page))[0]).toMatchObject({ playbackRate: 1.15, preservesPitch: true });
+  expect(requests.some(url => url.includes("itemId=original-item-0"))).toBe(true);
+});
+
+test("recorded audio stops for fast navigation, auto off, and leaving practice", async ({ page }) => {
+  const items = [item(hey, 0), item(longest, 1), item(otherSentence, 2)];
+  await mockApp(page, items);
+  await recordedSpeech(page, items);
+  await readyPractice(page);
+  await expect(page.locator("#voiceSelect option")).toHaveCount(5);
+  await page.locator("#autoSpeak").check();
+  await expectPlaying(page, "/audio/01/");
+  await page.evaluate(() => {
+    const next = document.querySelector<HTMLButtonElement>("#nextButton")!;
+    next.click(); next.click();
+    const auto = document.querySelector<HTMLInputElement>("#autoSpeak")!;
+    auto.checked = false; auto.dispatchEvent(new Event("change", { bubbles: true }));
+  });
+  await page.waitForTimeout(300);
+  expect((await mediaState(page))[0]).toMatchObject({ src: null, paused: true });
+  await expect(page.locator("#targetWord")).toHaveText(otherSentence.english);
+  await page.locator("#speakButton").click();
+  await expectPlaying(page, "3".repeat(64));
+  await page.getByRole("link", { name: "管理后台", exact: true }).click();
+  expect((await mediaState(page))[0]).toMatchObject({ src: null, paused: true });
+});
+
+test("delayed catalog preserves typing and missing recording requires explicit Samantha use on mobile", async ({ page }) => {
+  await page.setViewportSize({ width: 375, height: 812 });
+  const original = item(hey, 0);
+  const gate = deferred();
+  await mockApp(page, [original]);
+  await recordedSpeech(page, [{ ...original, english: "Old wording" }], { delayed: gate.promise });
+  await readyPractice(page);
+  await page.locator("#answerInput").fill("Hey");
+  await expect(page.locator("#speechStatus")).toContainText("正在加载");
+  gate.resolve();
+  await expect(page.locator("#voiceSelect option")).toHaveCount(5);
+  await expect(page.locator("#answerInput")).toHaveValue("Hey");
+  await expect(page.locator("#speakButton")).toBeDisabled();
+  await expect(page.locator("#speechStatus")).toContainText("暂未生成");
+  expect((await speechState(page)).calls).toHaveLength(0);
+  await page.locator("#samanthaFallbackBtn").click();
+  expect((await speechState(page)).calls.at(-1)?.text).toBe(hey.english);
+  await expect(page.locator("#speechStatus")).toContainText("系统 Samantha");
+  await expect(page.locator("#voiceSelect")).toHaveValue("01");
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+  await page.screenshot({ path: "out/recorded-speech-mobile-375.png", fullPage: true });
+});
+
+test("a failed audio response leaves input and question intact without silently changing voice", async ({ page }) => {
+  const original = item(hey, 0);
+  await mockApp(page, [original]);
+  await recordedSpeech(page, [original], { failAudio: true });
+  await readyPractice(page);
+  await expect(page.locator("#voiceSelect option")).toHaveCount(5);
+  await page.locator("#answerInput").fill("Hey");
+  await page.locator("#speakButton").click();
+  await expect(page.locator("#speechStatus")).toHaveClass(/bad/);
+  await expect(page.locator("#samanthaFallbackBtn")).toBeVisible();
+  await expect(page.locator("#answerInput")).toHaveValue("Hey");
+  await expect(page.locator("#targetWord")).toHaveText(hey.english);
+  expect((await speechState(page)).calls).toHaveLength(0);
+  expect((await mediaState(page))[0]).toMatchObject({ src: null, paused: true });
+});
+
+test("recorded catalog reloads after content conflict and plays the updated item once", async ({ page }) => {
+  const original = item(hey, 0);
+  const items = [original];
+  await mockApp(page, items);
+  const media = await recordedSpeech(page, items);
+  let catalogs = 0;
+  page.on("request", request => { if (new URL(request.url()).pathname === "/api/speech/catalog") catalogs++; });
+  await page.route("**/api/practice/sessions/*/attempts", async route => {
+    items[0] = { ...item(otherSentence, 0), revision: original.revision + 1 };
+    return route.fulfill({ status: 409, contentType: "application/json", body: JSON.stringify({
+      error: { code: "CONTENT_CHANGED", message: "该题目版本已更新。" }
+    }) });
+  });
+  await readyPractice(page);
+  await expect(page.locator("#voiceSelect option")).toHaveCount(5);
+  await page.locator("#voiceSelect").selectOption("04");
+  await page.locator("#speechRate").fill("0.85");
+  await page.locator("#speechRate").dispatchEvent("input");
+  await page.locator("#autoSpeak").check();
+  await expectPlaying(page, "/audio/04/");
+  await page.locator("#answerInput").fill(original.english);
+  await expect(page.locator("#targetWord")).toHaveText(otherSentence.english);
+  await expect(page.locator("#syncMessage")).toContainText("题库已更新并重新加载");
+  await expect(page.locator("#speakButton")).toBeEnabled();
+  await expect(page.locator("#voiceSelect")).toHaveValue("04");
+  await expect(page.locator("#speechRate")).toHaveValue("0.85");
+  await expectPlaying(page, "/audio/04/");
+  await expect.poll(() => media.length).toBe(2);
+  await page.waitForTimeout(250);
+  expect(media).toHaveLength(2);
+  expect(catalogs).toBe(2);
+  expect((await speechState(page)).calls).toHaveLength(0);
+});
+
+test("online restores a failed catalog without clearing a draft or replaying current speech", async ({ page }) => {
+  const original = item(hey, 0);
+  const gate = deferred();
+  await page.addInitScript(() => localStorage.setItem("basicTypingSpeechSettings", JSON.stringify({ voiceId: "05", rate: 1.15 })));
+  await mockApp(page, [original]);
+  const media = await recordedSpeech(page, [original], { delayed: gate.promise });
+  let catalogs = 0;
+  await page.route("**/api/speech/catalog", async route => {
+    catalogs++;
+    if (catalogs === 1) return route.fulfill({ status: 503, body: "Temporary failure" });
+    return route.fallback();
+  });
+  await readyPractice(page);
+  await expect(page.locator("#voiceSelect")).toContainText("Samantha");
+  await page.locator("#answerInput").fill("My unfinished answer");
+  await page.locator("#autoSpeak").check();
+  expect((await speechState(page)).calls).toHaveLength(1);
+  await page.evaluate(() => { window.dispatchEvent(new Event("online")); window.dispatchEvent(new Event("online")); });
+  await expect.poll(() => catalogs).toBe(2);
+  gate.resolve();
+  await expect(page.locator("#voiceSelect option")).toHaveCount(5);
+  await expect(page.locator("#voiceSelect")).toHaveValue("05");
+  await expect(page.locator("#speechRate")).toHaveValue("1.15");
+  await expect(page.locator("#answerInput")).toHaveValue("My unfinished answer");
+  await page.waitForTimeout(250);
+  expect(media).toHaveLength(0);
+  expect((await speechState(page)).calls).toHaveLength(1);
 });

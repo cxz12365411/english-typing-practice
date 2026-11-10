@@ -45,6 +45,7 @@ async function mockBatchApp(page: Page) {
   await page.route("**/api/**", async (route) => {
     const request = route.request();
     const path = new URL(request.url()).pathname;
+    if (path === "/api/speech/catalog") return route.fulfill({ contentType: "application/json", body: JSON.stringify({ available: false, voices: [], entries: [] }) });
     if (path.startsWith("/api/content-resources/")) return route.fallback();
     paths.push(path);
     const body = request.postDataJSON() as Record<string, unknown> | null;

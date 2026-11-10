@@ -17,6 +17,7 @@ async function mockPractice(page: Page, mutate?: (items: any[]) => void) {
   let sessions = 0;
   await page.route("**/api/**", route => {
     const path = new URL(route.request().url()).pathname;
+    if (path === "/api/speech/catalog") return route.fulfill({ contentType: "application/json", body: JSON.stringify({ available: false, voices: [], entries: [] }) });
     if (path.startsWith("/api/content-resources/")) return route.fallback();
     let body: unknown;
     if (path === "/api/auth/session") body = { user: { id: "cet4-test-user", username: "writer", displayName: "写作测试", role: "user", status: "active", mustChangePassword: false }, csrfToken: "cet4-test-csrf", capabilities: {} };

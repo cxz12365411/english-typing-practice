@@ -18,6 +18,7 @@ async function mock(page: Page, options: { status?: string; enabled?: boolean; p
   const order = () => ({ id: "order-test-1", status: paid ? "paid" : pendingStatus, amountFen: 100, durationDays: 30, createdAt: new Date().toISOString(), expiresAt: new Date(Date.now() + 900_000).toISOString(), paidAt: paid ? new Date().toISOString() : null, creditedUntil: paid ? new Date(Date.now() + 30 * 86_400_000).toISOString() : null });
   await page.route("**/api/**", async route => {
     const path = new URL(route.request().url()).pathname;
+    if (path === "/api/speech/catalog") return route.fulfill({ contentType: "application/json", body: JSON.stringify({ available: false, voices: [], entries: [] }) });
     calls.push(path);
     const send = (body: unknown, statusCode = 200) => route.fulfill({ status: statusCode, contentType: "application/json", body: JSON.stringify(body) });
     if (path === "/api/auth/session") return send({ user: signedIn ? user : null, csrfToken: "csrf", capabilities });

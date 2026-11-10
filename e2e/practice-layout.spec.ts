@@ -19,6 +19,7 @@ async function mockPractice(page: Page) {
   let loggedOut = false;
   await page.route("**/api/**", route => {
     const path = new URL(route.request().url()).pathname;
+    if (path === "/api/speech/catalog") return route.fulfill({ contentType: "application/json", body: JSON.stringify({ available: false, voices: [], entries: [] }) });
     if (path.startsWith("/api/content-resources/")) return route.fallback();
     let body: unknown;
     if (path === "/api/auth/session") body = { user: loggedOut ? null : { id: "layout-test-user", username: "layout", displayName: "布局测试", role: "user", status: "active", mustChangePassword: false }, csrfToken: "layout-test-csrf", capabilities: {} };

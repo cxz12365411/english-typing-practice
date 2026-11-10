@@ -18,14 +18,19 @@ die() {
 }
 
 [[ "${EUID}" -eq 0 ]] || die "run this script as root on the Ubuntu target so native modules match production"
-[[ $# -eq 1 ]] || die "usage: stage-release.sh <release-id>"
+[[ $# -ge 1 && $# -le 2 ]] || die "usage: stage-release.sh <release-id> [speech-audio-bundle]"
 readonly release_id="$1"
+speech_audio_bundle="${2:-}"
+# Later code-only releases retain the current immutable audio package by default.
+if [[ -z "$speech_audio_bundle" ]] && [[ -e /opt/english-typing-practice/current/server/audio || -L /opt/english-typing-practice/current/server/audio ]]; then
+  speech_audio_bundle=/opt/english-typing-practice/current/server/audio
+fi
 [[ "$release_id" =~ ^[0-9a-f]{7,64}$ ]] || die "release id must be a 7-64 character lowercase hexadecimal Git commit"
 readonly incoming="${INCOMING_ROOT}/${release_id}"
 readonly staging="${INCOMING_ROOT}/.staging-${release_id}-$$"
 readonly build_dir="${BUILD_ROOT}/${release_id}-$$"
 
-for command_path in /usr/bin/node /usr/bin/npm /usr/bin/git /usr/bin/tar; do
+for command_path in /usr/bin/node /usr/bin/npm /usr/bin/git /usr/bin/tar /usr/bin/realpath /usr/bin/python3; do
   [[ -x "$command_path" ]] || die "required command is missing: ${command_path}"
 done
 readonly RUNUSER="$(command -v runuser || true)"
@@ -42,6 +47,15 @@ readonly RUNUSER="$(command -v runuser || true)"
 readonly actual_commit="$(/usr/bin/git -C "$SOURCE_ROOT" rev-parse HEAD)"
 [[ "$actual_commit" == "$release_id" ]] || die "source HEAD ${actual_commit} does not match requested release ${release_id}"
 [[ -z "$(/usr/bin/git -C "$SOURCE_ROOT" status --porcelain --untracked-files=normal)" ]] || die "source checkout is dirty; commit or remove changes before staging"
+
+if [[ -n "$speech_audio_bundle" ]]; then
+  [[ "$speech_audio_bundle" == /* ]] || die "speech audio bundle must use an absolute path"
+  [[ -d "$speech_audio_bundle" && ! -L "$speech_audio_bundle" ]] || die "speech audio bundle must be a real directory"
+  # Pin the selected version before a concurrent deployment can switch current.
+  speech_audio_bundle="$(/usr/bin/realpath -e -- "$speech_audio_bundle")"
+  /usr/bin/python3 /usr/local/libexec/english-typing-practice/verify-speech-audio.py "$speech_audio_bundle" || die "invalid speech audio bundle"
+fi
+readonly speech_audio_bundle
 
 cleanup() {
   if [[ -d "$staging" && ! -L "$staging" ]]; then
@@ -75,6 +89,10 @@ done
 /usr/bin/cp -a -- "$build_dir/server/dist" "$staging/server/dist"
 /usr/bin/cp -a -- "$build_dir/node_modules" "$staging/server/node_modules"
 /usr/bin/install -m 0600 -o root -g root "$build_dir/server/package.json" "$staging/server/package.json"
+if [[ -n "$speech_audio_bundle" ]]; then
+  /usr/bin/cp -a -- "$speech_audio_bundle" "$staging/server/audio"
+  /usr/bin/python3 /usr/local/libexec/english-typing-practice/verify-speech-audio.py "$staging/server/audio" || die "staged speech audio verification failed"
+fi
 /usr/bin/cp -a -- "$build_dir/web/dist" "$staging/web/dist"
 /usr/bin/install -m 0600 -o root -g root "$build_dir/basic-english-850.md" "$staging/basic-english-850.md"
 /usr/bin/install -m 0600 -o root -g root "$build_dir/daily-english-high-frequency-sentences.md" "$staging/daily-english-high-frequency-sentences.md"

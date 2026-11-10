@@ -36,6 +36,7 @@ export interface AppConfig {
   membershipEnabled: boolean;
   payment: PaymentConfig;
   contentSourceDir?: string;
+  speechAudioDir?: string;
 }
 
 function parseEnvironment(value: string | undefined): AppEnvironment {
@@ -191,6 +192,9 @@ export function loadConfig(overrides: Partial<AppConfig> = {}): AppConfig {
     emailRegistrationIpDailyLimit,
     membershipEnabled: overrides.membershipEnabled ?? booleanSetting(process.env.MEMBERSHIP_ENABLED, false, "MEMBERSHIP_ENABLED"),
     payment: overrides.payment ?? loadPaymentConfig(process.env, environment),
+    ...(overrides.speechAudioDir || process.env.SPEECH_AUDIO_DIR
+      ? { speechAudioDir: overrides.speechAudioDir ?? process.env.SPEECH_AUDIO_DIR! }
+      : {}),
     ...(overrides.contentSourceDir || process.env.CONTENT_SOURCE_DIR
       ? { contentSourceDir: path.resolve(overrides.contentSourceDir ?? process.env.CONTENT_SOURCE_DIR!) }
       : {})

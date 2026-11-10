@@ -16,6 +16,7 @@ import { registerMembershipRoutes } from "./routes-membership.js";
 import { registerPaymentRoutes } from "./routes-payments.js";
 import { ALIPAY_NOTIFY_PATH, createPaymentProvider, type PaymentProvider } from "./payment-provider.js";
 import { registerContentResourceRoutes } from "./routes-content-resources.js";
+import { registerSpeechRoutes } from "./routes-speech.js";
 
 export interface BuildAppOptions {
   config?: Partial<AppConfig>;
@@ -164,6 +165,10 @@ export async function buildApp(options: BuildAppOptions = {}): Promise<FastifyIn
   await registerContentResourceRoutes(app, db, {
     membershipEnabled: config.membershipEnabled,
     ...(config.contentSourceDir ? { contentSourceDir: config.contentSourceDir } : {})
+  });
+  await registerSpeechRoutes(app, db, {
+    membershipEnabled: config.membershipEnabled,
+    ...(config.speechAudioDir ? { speechAudioDir: config.speechAudioDir } : {})
   });
   await registerAdminRoutes(app, db);
   await registerMarkdownImportRoutes(app, db);

@@ -61,6 +61,7 @@ for source_file in \
   "${SCRIPT_DIR}/prune-deployments.sh" \
   "${SCRIPT_DIR}/rewrite-caddy.py" \
   "${SCRIPT_DIR}/check-payment-restore.py" \
+  "${SCRIPT_DIR}/verify-speech-audio.py" \
   "${SCRIPT_DIR}/stage-release.sh" \
   "${SCRIPT_DIR}/deploy-release.sh" \
   "${SCRIPT_DIR}/rollback-release.sh" \
@@ -148,6 +149,7 @@ for script_name in backup-sqlite.sh restore-sqlite.sh activate-caddy-site.sh res
 done
 install_managed "${SCRIPT_DIR}/rewrite-caddy.py" "${LIBEXEC_DIR}/rewrite-caddy.py" 0755
 install_managed "${SCRIPT_DIR}/check-payment-restore.py" "${LIBEXEC_DIR}/check-payment-restore.py" 0755
+install_managed "${SCRIPT_DIR}/verify-speech-audio.py" "${LIBEXEC_DIR}/verify-speech-audio.py" 0755
 install_managed "${DEPLOY_DIR}/caddy/english-typing-practice.caddy" "${SHARE_DIR}/caddy-site.caddy" 0644
 install_managed "${DEPLOY_DIR}/README.md" "${SHARE_DIR}/README.md" 0644
 

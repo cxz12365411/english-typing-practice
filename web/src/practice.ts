@@ -557,6 +557,8 @@ async function refreshContentAfterConflict(): Promise<void> {
       const note = document.querySelector<HTMLElement>("#batchAvailabilityNote");
       if (note) note.textContent = `只练这份文件中的 ${state.items.length} 道已发布题目${state.unavailableCount ? `，另有 ${state.unavailableCount} 道已不可练习` : ""}。`;
     }
+    await speechController?.reloadCatalog({ invalidate: true });
+    if (!isActive(activeState)) return;
     state.contentRefreshRequired = false;
     await rebuildPool();
     if (!isActive(activeState)) return;
@@ -966,6 +968,7 @@ export async function renderPractice(context: PageContext): Promise<void> {
       speakButton: mustElement<HTMLButtonElement>("#speakButton"),
       isActive: () => isActive(activeState) && !activeState.membershipBlocked,
       getText: () => currentItem()?.english ?? null,
+      getItem: () => currentItem(),
       autoEnabled: () => Boolean(state?.autoSpeak && state.session)
     });
     bindPracticeEvents();

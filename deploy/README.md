@@ -32,6 +32,40 @@ these assets.
 
 ## First deployment
 
+### Prerecorded personal-use speech
+
+Five optional synthetic voices are served through authenticated `/api/speech` routes.
+The audio package is separate from Git and the public Web root. Its `manifest.json`
+uses exact original-English SHA-256 keys; every published text must have reviewed
+MP3 files for voices `01` through `05`, plus one preview per voice. The deployment
+validator checks coverage, file hashes, permitted paths, and rejects links or extra
+files. Original WAV references and generation/QA logs remain in the local output
+archive; only the checked MP3 package is staged.
+
+To introduce or update a package, securely transfer it to a root-owned directory
+on the existing host, then run:
+
+```bash
+sudo python3 /usr/local/libexec/english-typing-practice/verify-speech-audio.py /var/tmp/english-speech-bundle
+sudo /usr/local/libexec/english-typing-practice/stage-release.sh <exact-commit> /var/tmp/english-speech-bundle
+sudo /usr/local/libexec/english-typing-practice/deploy-release.sh <exact-commit>
+```
+
+The package becomes `server/audio` inside the same immutable release as the API.
+Normal code-only staging carries forward the current package. The existing atomic
+release switch and rollback therefore select matching code and audio without changing
+the production environment or database. Only `englishapp` may read these files;
+Caddy cannot serve them directly. A missing package keeps the existing Samantha
+implementation available. Modified, removed, or private practice texts with no matching
+audio show an explicit unavailable message; they never play another voice silently.
+`SPEECH_AUDIO_DIR` is an optional absolute path for local testing; production normally
+uses the release-relative default.
+
+These Breeze-generated assets are intended for the user's stated personal use.
+The installed BreezeBlue weight/output license remains separately applicable;
+this integration does not enable billing or grant commercial-use rights. Review
+the applicable output license before changing the intended use to a paid service.
+
 The host must be Ubuntu with systemd, Caddy, SQLite CLI, Python 3, curl, OpenSSL,
 Git, and Node.js **22** installed at the standard `/usr/bin` paths. Build native Node
 modules on the Ubuntu target, not on Windows.

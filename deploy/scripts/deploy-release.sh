@@ -43,7 +43,7 @@ for command_path in /usr/bin/node /usr/bin/sqlite3 /usr/bin/curl /usr/bin/flock 
 done
 readonly RUNUSER="$(command -v runuser || true)"
 [[ -n "$RUNUSER" && -x "$RUNUSER" ]] || die "runuser is required (normally /usr/sbin/runuser)"
-for helper in backup-sqlite.sh rollback-release.sh activate-caddy-site.sh robot-regression.sh prune-deployments.sh acceptance-test.sh check-email-config.sh check-payment-restore.py; do
+for helper in backup-sqlite.sh rollback-release.sh activate-caddy-site.sh robot-regression.sh prune-deployments.sh acceptance-test.sh check-email-config.sh check-payment-restore.py verify-speech-audio.py; do
   [[ -x "${LIBEXEC_DIR}/${helper}" ]] || die "deployment helper is missing: ${LIBEXEC_DIR}/${helper}"
 done
 
@@ -81,6 +81,13 @@ guest_secret_value="$(/usr/bin/sed -n 's/^GUEST_TOKEN_SECRET=//p' "$ENV_FILE")"
 [[ "${#guest_secret_value}" -ge 32 && "$guest_secret_value" != '__GENERATED_BY_PROVISION_HOST__' ]] ||
   die "GUEST_TOKEN_SECRET must be a generated secret of at least 32 characters"
 "${LIBEXEC_DIR}/check-email-config.sh" --config-only
+if /usr/bin/grep -Eq '^SPEECH_AUDIO_DIR=.' "$ENV_FILE"; then
+  die "production SPEECH_AUDIO_DIR must be unset or empty so audio follows atomic release switches and rollback"
+fi
+
+if [[ -e "${incoming}/server/audio" || -L "${incoming}/server/audio" ]]; then
+  /usr/bin/python3 "${LIBEXEC_DIR}/verify-speech-audio.py" "${incoming}/server/audio" || die "invalid incoming speech audio"
+fi
 
 for required_path in \
   server/dist/index.js \
@@ -171,6 +178,9 @@ trap 'exit 143' TERM
 /usr/bin/cp -a -- "${incoming}/server/dist" "$staging_dir/server/dist"
 /usr/bin/cp -a -- "${incoming}/server/node_modules" "$staging_dir/server/node_modules"
 /usr/bin/install -m 0640 -o root -g englishapp "${incoming}/server/package.json" "$staging_dir/server/package.json"
+if [[ -d "${incoming}/server/audio" ]]; then
+  /usr/bin/cp -a -- "${incoming}/server/audio" "$staging_dir/server/audio"
+fi
 /usr/bin/cp -a -- "${incoming}/web/dist" "$staging_dir/web/dist"
 /usr/bin/install -m 0640 -o root -g englishapp "${incoming}/basic-english-850.md" "$staging_dir/basic-english-850.md"
 /usr/bin/install -m 0640 -o root -g englishapp "${incoming}/daily-english-high-frequency-sentences.md" "$staging_dir/daily-english-high-frequency-sentences.md"
@@ -203,6 +213,12 @@ done < <(/usr/bin/find "$staging_dir" -type l -print0)
 
 # Verify effective identities, not just numeric modes, before the release can become current.
 "$RUNUSER" --user englishapp -- /usr/bin/test -r "${release_dir}/server/dist/index.js" || die "API account cannot read server release"
+if [[ -d "${release_dir}/server/audio" ]]; then
+  "$RUNUSER" --user englishapp -- /usr/bin/python3 "${LIBEXEC_DIR}/verify-speech-audio.py" "${release_dir}/server/audio" || die "API account cannot validate audio release"
+  if "$RUNUSER" --user caddy -- /usr/bin/test -r "${release_dir}/server/audio/manifest.json"; then
+    die "Caddy unexpectedly reads protected speech audio"
+  fi
+fi
 "$RUNUSER" --user englishapp -- /usr/bin/test -r "${release_dir}/cet4-writing.json" || die "API account cannot read writing content"
 "$RUNUSER" --user englishapp -- /usr/bin/test -r "${release_dir}/cet6-writing.json" || die "API account cannot read writing content"
 "$RUNUSER" --user englishapp -- /usr/bin/test -r "${release_dir}/sentence-alignments.json" || die "API account cannot read alignment content"

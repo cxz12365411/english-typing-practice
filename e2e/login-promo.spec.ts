@@ -25,6 +25,7 @@ async function mockLogin(page: Page, emailEnabled = false) {
   await page.route("**/api/**", async route => {
     const request = route.request();
     const path = new URL(request.url()).pathname;
+    if (path === "/api/speech/catalog") return route.fulfill({ contentType: "application/json", body: JSON.stringify({ available: false, voices: [], entries: [] }) });
     if (path.startsWith("/api/content-resources/")) return route.fallback();
     const body = request.postDataJSON();
     if (request.method() === "POST") requests.push({ path, body });
