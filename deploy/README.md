@@ -536,3 +536,15 @@ records, authenticated five-voice playback and the robot-site baseline. Users
 must sign in again at the new host; accounts and cloud records are unchanged,
 while local voice/layout preferences and PWA installation remain origin-specific.
 GitHub Pages remains disabled.
+
+
+### Controlled live payment acceptance
+
+Before enabling expiry enforcement, set `MEMBERSHIP_ENABLED=false`,
+`PAYMENT_MODE=live`, and `PAYMENT_PREVIEW_USER_ID` to the exact ID of the designated
+ordinary test account. Only this account sees the real checkout; all accounts
+retain free practice. Admin and legacy-free exemptions still prevent purchases.
+The preview ID is server configuration, never a browser-supplied entitlement.
+After checking the real signed notification/query and exactly-once 30-day credit,
+remove `PAYMENT_PREVIEW_USER_ID` and set `MEMBERSHIP_ENABLED=true`. Preserve all
+live orders and use the database-preserving rollback procedure above.

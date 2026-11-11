@@ -42,15 +42,15 @@ function cookie(headers: Record<string, unknown>): string {
   const value = headers["set-cookie"];
   return String(Array.isArray(value) ? value[0] : value).split(";")[0]!;
 }
-async function fixture(payments: FakePayments | null = new FakePayments()) {
+async function fixture(payments: FakePayments | null = new FakePayments(), preview = false) {
   const db = openDatabase({ databasePath: ":memory:" });
   const app = await buildApp({ database: db, seed: false, logger: false,
     ...(payments ? { paymentProvider: payments } : {}),
-    config: { environment: "test", databasePath: ":memory:", appOrigin: ORIGIN, membershipEnabled: true, payment: { mode: "disabled" } }
+    config: { environment: "test", databasePath: ":memory:", appOrigin: ORIGIN, membershipEnabled: !preview, paymentPreviewUserId: preview ? "preview-user" : undefined, payment: { mode: "disabled" } }
   });
   const passwordHash = await hashPassword(PASSWORD);
   async function client(name = randomUUID(), role = "user") {
-    const id = randomUUID(), now = Date.now();
+    const id = preview && name === "student" ? "preview-user" : randomUUID(), now = Date.now();
     db.prepare(`INSERT INTO users(id,username,display_name,password_hash,role,active,must_change_password,created_at,updated_at)
       VALUES(?,?,?,?,?,1,0,?,?)`).run(id, name, "Test", passwordHash, role, now, now);
     const guest = await app.inject({ method: "GET", url: "/api/auth/session" });
@@ -279,4 +279,28 @@ test("payment configuration and money parsing fail closed", () => {
   assert.throws(() => loadPaymentConfig({ PAYMENT_MODE: "live" }, "test"));
   for (const value of ["1e0", "1.001", " 1.00", "-1", 1, null]) assert.equal(amountToFen(value), null);
   assert.equal(amountToFen("1.00"), 100); assert.equal(amountToFen("1"), 100);
+});
+
+
+test("payment preview is limited to one ordinary account without locking practice", async () => {
+  const f = await fixture(new FakePayments(), true);
+  try {
+    f.db.prepare("UPDATE user_memberships SET trial_started_at=0, trial_ends_at=1 WHERE user_id=?").run(f.user.id);
+    const member = (await f.app.inject({method:"GET",url:"/api/membership",headers:f.user.headers})).json();
+    assert.equal(member.enabled,true);
+    assert.equal(member.paymentEnabled,true);
+    assert.equal(member.access.canPractice,true);
+    const order = await f.create();
+    assert.equal(order.statusCode,201);
+    assert.ok(order.json().paymentUrl);
+    const other = await f.client("not-preview");
+    const ordinary = (await f.app.inject({method:"GET",url:"/api/membership",headers:other.headers})).json();
+    assert.equal(ordinary.enabled,false);
+    assert.equal(ordinary.paymentEnabled,false);
+    assert.equal(ordinary.access.canPractice,true);
+    assert.equal((await f.app.inject({method:"POST",url:"/api/payments/orders",headers:other.headers,payload:{}})).statusCode,503);
+    assert.equal((await f.app.inject({method:"GET",url:"/api/payments/orders/"+order.json().order.id,headers:other.headers})).statusCode,404);
+    f.db.prepare("UPDATE user_memberships SET access_kind='legacy_free' WHERE user_id=?").run(f.user.id);
+    assert.equal((await f.create()).json().error.code,"MEMBERSHIP_NOT_REQUIRED");
+  } finally { await f.close(); }
 });

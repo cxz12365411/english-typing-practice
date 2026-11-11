@@ -159,9 +159,10 @@ export async function buildApp(options: BuildAppOptions = {}): Promise<FastifyIn
   await registerMembershipRoutes(app, db, {
     membershipEnabled: config.membershipEnabled,
     paymentEnabled: paymentProvider.mode !== "disabled",
+    paymentPreviewUserId: config.paymentPreviewUserId,
     paymentMode: paymentProvider.mode
   });
-  await registerPaymentRoutes(app, db, paymentProvider, { membershipEnabled: config.membershipEnabled });
+  await registerPaymentRoutes(app, db, paymentProvider, { membershipEnabled: config.membershipEnabled, paymentPreviewUserId: config.paymentPreviewUserId });
   await registerContentResourceRoutes(app, db, {
     membershipEnabled: config.membershipEnabled,
     ...(config.contentSourceDir ? { contentSourceDir: config.contentSourceDir } : {})

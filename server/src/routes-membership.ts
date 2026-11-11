@@ -6,6 +6,7 @@ import { objectBody, stringField } from "./validation.js";
 
 export interface MembershipRouteOptions {
   membershipEnabled: boolean;
+  paymentPreviewUserId?: string | undefined;
   paymentEnabled: boolean;
   paymentMode: "disabled" | "sandbox" | "live" | "test";
 }
@@ -26,11 +27,15 @@ export async function registerMembershipRoutes(
   app.get("/api/membership", async (request) => {
     const user = requireUser(request);
     const now = Date.now();
+    const enabled = options.membershipEnabled || user.id === options.paymentPreviewUserId;
+    const access = getMembershipAccess(db, user, enabled, now);
+    // Controlled payment acceptance must not lock practice while the site is free.
+    if (!options.membershipEnabled) access.canPractice = true;
     return {
-      enabled: options.membershipEnabled,
-      access: getMembershipAccess(db, user, options.membershipEnabled, now),
+      enabled,
+      access,
       plan: MEMBERSHIP_PLAN,
-      paymentEnabled: options.membershipEnabled && options.paymentEnabled,
+      paymentEnabled: enabled && options.paymentEnabled,
       paymentMode: options.paymentMode,
       serverTime: new Date(now).toISOString()
     };

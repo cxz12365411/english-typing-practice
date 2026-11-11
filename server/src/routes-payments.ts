@@ -56,12 +56,12 @@ export function applyVerifiedPayment(db: SqliteDatabase, provider: PaymentProvid
 
 export async function registerPaymentRoutes(
   app: FastifyInstance, db: SqliteDatabase, provider: PaymentProvider,
-  options: { membershipEnabled: boolean }
+  options: { membershipEnabled: boolean; paymentPreviewUserId?: string | undefined }
 ): Promise<void> {
   const readOrder = (id: string) => db.prepare("SELECT * FROM payment_orders WHERE id = ?").get(id) as OrderRow | undefined;
   const response = (order: OrderRow) => ({
     order: publicOrder(order), paymentMode: provider.mode,
-    paymentUrl: options.membershipEnabled && currentProvider(order, provider) && provider.mode !== "disabled"
+    paymentUrl: (options.membershipEnabled || order.user_id === options.paymentPreviewUserId) && currentProvider(order, provider) && provider.mode !== "disabled"
       && order.status === "pending" && order.expires_at > Date.now()
       ? provider.paymentUrl({ id: order.id, amountFen: order.amount_fen, expiresAt: order.expires_at }) : null,
     retryAfterSeconds: QUERY_COOLDOWN / 1000
@@ -69,7 +69,7 @@ export async function registerPaymentRoutes(
 
   app.post("/api/payments/orders", async (request, reply) => {
     const actor = requireUser(request);
-    if (!options.membershipEnabled || provider.mode === "disabled") throw new ApiError(503, "PAYMENTS_DISABLED", "Payments are not enabled");
+    if ((!options.membershipEnabled && actor.id !== options.paymentPreviewUserId) || provider.mode === "disabled") throw new ApiError(503, "PAYMENTS_DISABLED", "Payments are not enabled");
     const body = request.body as Record<string, unknown> | undefined;
     if (body !== undefined && (body === null || Array.isArray(body) || typeof body !== "object"
       || Object.keys(body).some(key => key !== "planId") || (body.planId !== undefined && body.planId !== "monthly"))) {

@@ -34,6 +34,7 @@ export interface AppConfig {
   emailRegistrationDailySendLimit: number;
   emailRegistrationIpDailyLimit: number;
   membershipEnabled: boolean;
+  paymentPreviewUserId?: string | undefined;
   payment: PaymentConfig;
   contentSourceDir?: string;
   speechAudioDir?: string;
@@ -191,6 +192,7 @@ export function loadConfig(overrides: Partial<AppConfig> = {}): AppConfig {
     emailRegistrationDailySendLimit,
     emailRegistrationIpDailyLimit,
     membershipEnabled: overrides.membershipEnabled ?? booleanSetting(process.env.MEMBERSHIP_ENABLED, false, "MEMBERSHIP_ENABLED"),
+    paymentPreviewUserId: overrides.paymentPreviewUserId ?? process.env.PAYMENT_PREVIEW_USER_ID?.trim(),
     payment: overrides.payment ?? loadPaymentConfig(process.env, environment),
     ...(overrides.speechAudioDir || process.env.SPEECH_AUDIO_DIR
       ? { speechAudioDir: overrides.speechAudioDir ?? process.env.SPEECH_AUDIO_DIR! }
