@@ -80,7 +80,6 @@ function enabledAuthMarkup(capabilities: AuthCapabilities): string {
         <label class="field"><span>邮箱验证码</span><input class="input code-input" name="code" inputmode="numeric" autocomplete="one-time-code" minlength="6" maxlength="6" pattern="[0-9]{6}" title="请输入 6 位数字验证码" required></label>
         <div class="message error" id="emailLoginMessage" role="alert" hidden></div>
         <button class="btn primary" type="submit">登录</button>
-        <p class="helper">验证码只用于本次操作，请勿转发给其他人。已有账号如果尚未绑定邮箱，请先切换到“账号密码”登录，再到“账号安全与邮箱”完成绑定。</p>
       </form>
     </section>
 
