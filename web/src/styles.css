@@ -135,6 +135,10 @@ a {
 .login-home .auth-card .helper { margin: 2px 0 0; font-size: 12px; }
 .login-home .auth-card .message { padding: 10px 12px; font-size: 12px; }
 .login-home .auth-capability-note { margin-top: 14px; }
+.login-support { margin-top: 22px; padding-top: 20px; border-top: 1px solid #e5e7e2; text-align: center; }
+.login-support h2 { margin: 0 0 12px; font-size: 15px; }
+.login-support img { display: block; width: 168px; max-width: 100%; height: auto; margin: 0 auto; }
+.login-support p { margin: 10px 0 0; color: #65726a; font-size: 12px; }
 .login-home .auth-card .input, .login-home .auth-card .btn { min-height: 44px; }
 .login-home .auth-tabs { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 4px; margin: 0 0 16px; padding-bottom: 8px; overflow: visible; }
 .login-home .auth-tab { min-width: 0; padding: 7px 4px; font-size: 12px; }

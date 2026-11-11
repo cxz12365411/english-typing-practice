@@ -134,6 +134,11 @@ function loginMarkup(capabilities: AuthCapabilities): string {
           ${passwordLoginForm()}
           <div class="message info auth-capability-note">邮箱验证码功能正在配置中，当前请使用账号密码登录。</div>
         `}
+        <div class="login-support">
+          <h2>客服微信</h2>
+          <img src="/customer-service-wechat.jpg" width="648" height="647" alt="客服微信二维码" />
+          <p>微信扫一扫，联系客服</p>
+        </div>
       </section>
     </main>
     ${siteFooterMarkup()}
