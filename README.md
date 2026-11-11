@@ -5,7 +5,15 @@ administrator console, content publishing, and an installable PWA shell.
 
 ## Live website
 
-Use the [Aliyun account site](https://english.47.120.37.63.sslip.io/login).
+Use the [Aliyun account site](https://cxzenglish.cn/login).
+The canonical origin is `https://cxzenglish.cn`; `www.cxzenglish.cn` and both
+previous `english.47.120.37.63.sslip.io` / `english-47-120-37-63.sslip.io` addresses
+redirect to it while preserving the path and query string. Accounts and learning
+records remain in the same database. The new domain requires signing in again;
+browser-local preferences and installed PWAs do not move automatically.
+The account site displays the approved filing number
+[粤ICP备2026178427号-1](https://beian.miit.gov.cn/) in its shared footer.
+
 At the owner's request, all GitHub Pages website entrances were disabled on
 2026-10-27. GitHub retains the source and history; standalone HTML files remain
 available for local development and regression checks. Do not deploy

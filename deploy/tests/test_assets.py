@@ -93,12 +93,12 @@ english-47-120-37-63.sslip.io {
         self.assertIn("\tlog\n", caddy)
         self.assertNotIn("output file", caddy)
 
-    def test_dotted_canonical_remains_consistent_across_deployment_assets(self) -> None:
-        canonical = "english.47.120.37.63.sslip.io"
-        legacy = "english-47-120-37-63.sslip.io"
+    def test_registered_canonical_remains_consistent_across_deployment_assets(self) -> None:
+        canonical = "cxzenglish.cn"
+        aliases = "www.cxzenglish.cn, english.47.120.37.63.sslip.io, english-47-120-37-63.sslip.io"
         caddy = (DEPLOY / "caddy" / "english-typing-practice.caddy").read_text(encoding="utf-8")
         self.assertTrue(caddy.startswith(canonical + " {\n"))
-        self.assertIn(legacy + " {\n\tredir https://" + canonical + "{uri} 308", caddy)
+        self.assertIn(aliases + " {\n\tredir https://" + canonical + "{uri} 308", caddy)
         self.assertIn("APP_ORIGIN=https://" + canonical, (DEPLOY / "env.example").read_text())
         self.assertIn("require_env_value APP_ORIGIN https://" + canonical, (DEPLOY / "scripts" / "deploy-release.sh").read_text())
         acceptance = (DEPLOY / "scripts" / "acceptance-test.sh").read_text()

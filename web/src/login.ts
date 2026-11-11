@@ -7,7 +7,7 @@ import {
   validateVerificationCode
 } from "./email";
 import type { AuthCapabilities, EmailCodePurpose, SessionResponse } from "./types";
-import { mustElement, setBusy } from "./ui";
+import { mustElement, setBusy, siteFooterMarkup } from "./ui";
 import { getErrorMessage, validatePassword } from "./utils";
 import "../../login-promo.js";
 import "../../login-promo.css";
@@ -116,6 +116,7 @@ function enabledAuthMarkup(capabilities: AuthCapabilities): string {
 
 function loginMarkup(capabilities: AuthCapabilities): string {
   return `
+    <div class="login-page">
     <main class="login-home">
       <section class="login-story" aria-label="英语打字练习功能演示">
         <div class="login-story-heading">
@@ -135,6 +136,8 @@ function loginMarkup(capabilities: AuthCapabilities): string {
         `}
       </section>
     </main>
+    ${siteFooterMarkup()}
+    </div>
     <div class="toast-region" id="toastRegion" role="status" aria-live="polite"></div>
   `;
 }

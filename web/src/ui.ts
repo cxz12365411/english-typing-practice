@@ -3,6 +3,14 @@ import { escapeHtml } from "./utils";
 
 export type ToastKind = "success" | "error" | "info";
 
+export function siteFooterMarkup(): string {
+  return `
+    <footer class="site-footer" aria-label="网站备案信息">
+      <a href="https://beian.miit.gov.cn/" target="_blank" rel="noopener noreferrer">粤ICP备2026178427号-1</a>
+    </footer>
+  `;
+}
+
 export function shellMarkup(user: User, activeRoute: "/practice" | "/admin" | "/membership", content: string): string {
   const isAdmin = user.role === "admin";
   return `
@@ -26,6 +34,7 @@ export function shellMarkup(user: User, activeRoute: "/practice" | "/admin" | "/
         </div>
       </header>
       ${content}
+      ${siteFooterMarkup()}
     </div>
     <div class="toast-region" id="toastRegion" role="status" aria-live="polite"></div>
   `;

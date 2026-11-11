@@ -1,4 +1,4 @@
-english.47.120.37.63.sslip.io {
+cxzenglish.cn {
 	encode zstd gzip
 
 	# Older public learning-data URLs are retired. Current data is served through
@@ -45,6 +45,6 @@ english.47.120.37.63.sslip.io {
 	log
 }
 
-english-47-120-37-63.sslip.io {
-	redir https://english.47.120.37.63.sslip.io{uri} 308
+www.cxzenglish.cn, english.47.120.37.63.sslip.io, english-47-120-37-63.sslip.io {
+	redir https://cxzenglish.cn{uri} 308
 }

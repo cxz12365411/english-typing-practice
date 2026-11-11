@@ -12,7 +12,7 @@ SQLite data. It is intentionally tied to the following production layout:
 - environment: `/etc/english-typing-practice/env`
 - backups: `/var/backups/english-typing-practice`
 - API listener: `127.0.0.1:8091`
-- public origin: `https://english.47.120.37.63.sslip.io`
+- public origin: `https://cxzenglish.cn`
 
 English-site access logs are written to the existing Caddy systemd journal rather
 than a separate file, so configuration validation and runtime use the same permissions.
@@ -501,3 +501,38 @@ Users must sign in again because session cookies are host-only. Cloud learning
 records remain in the existing database; browser-local layout/voice preferences and
 PWA installation belong to their original origin and are not migrated automatically.
 Keep GitHub Pages disabled. Source-only preparation is not proof of production activation.
+
+## 2026-11-11 registered domain cutover
+
+The canonical origin is `https://cxzenglish.cn`. The `www.cxzenglish.cn`, dotted
+sslip and hyphenated sslip aliases redirect to it with HTTP 308 while preserving
+the path and query. This supersedes the 2026-10-29 canonical address above.
+The account pages display the approved website filing number
+`粤ICP备2026178427号-1` with a link to the official MIIT lookup.
+
+Do not provision the new canonical helpers into an old-origin production
+environment before the guarded domain cutover. Prepare and test the new exact
+commit first; while the current release remains active, acquire the English
+deployment lock and the existing shared Caddy lock, back up the five configuration
+files, and temporarily serve both registered hosts alongside the old primary
+host. Verify trusted HTTPS on both new hosts before changing the single
+`APP_ORIGIN` line. Preserve all other environment bytes, file ownership/modes,
+SMTP settings, signing secrets, the disabled payment mode, and disabled membership
+enforcement. Atomically install matching origin checks in the installed deploy
+and acceptance helpers plus the final active/persistent Caddy templates.
+Restart only the English API and reload Caddy after native configuration
+validation. Keep the main Caddyfile and other sites byte-for-byte unchanged.
+
+Then provision, stage and deploy the new exact source commit normally, carrying
+forward the current five-voice audio package. The normal release creates its own
+database backup and atomic code/audio switch; the separate domain migration
+never replaces the database or active release symlink. A domain rollback restores
+only its saved configuration after confirming no external edits. Do not use the
+database-restoring release rollback for a configuration-only domain failure.
+
+Verify trusted TLS, all alias paths/queries, Origin/CSRF rejection, email
+registration capabilities, the filing footer, existing-account login, learning
+records, authenticated five-voice playback and the robot-site baseline. Users
+must sign in again at the new host; accounts and cloud records are unchanged,
+while local voice/layout preferences and PWA installation remain origin-specific.
+GitHub Pages remains disabled.
