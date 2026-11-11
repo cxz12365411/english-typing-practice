@@ -141,6 +141,11 @@ a {
 .login-home .verification-row { grid-template-columns: minmax(0, 1fr); }
 .login-home .verification-row .btn { width: 100%; }
 @media (min-width: 941px) {
+  .login-home { align-content: center; align-items: start; row-gap: 28px; }
+  .login-story { display: contents; }
+  .login-story-heading { grid-column: 1; grid-row: 1; margin-bottom: 0; }
+  .login-home #loginPromo { grid-column: 1; grid-row: 2; }
+  .login-home .auth-card { grid-column: 2; grid-row: 2; }
   .login-home .practice-promo .promo-view { min-height: 430px; }
   .login-home .practice-promo .promo-headline,
   .login-home .practice-promo .promo-finish-title { font-size: clamp(40px, 7.6cqw, 72px); }
