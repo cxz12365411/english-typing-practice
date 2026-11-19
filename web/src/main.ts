@@ -4,6 +4,7 @@ import { renderAdmin, disposeAdmin } from "./admin";
 import { ApiError, api } from "./api";
 import { clearVerificationCountdowns } from "./email";
 import { disposeLoginScreen, renderLoginScreen } from "./login";
+import { disposeGuestTrial, renderGuestTrial } from "./guest-trial";
 import { normaliseAppRoute } from "./routes";
 import { confirmDiscardPendingAttempt, disposePractice, renderPractice } from "./practice";
 import type { AuthCapabilities, PageContext, SessionResponse, User } from "./types";
@@ -24,6 +25,7 @@ let pendingReturnRoute: string | null = null;
 
 function disposePage(): void {
   disposeLoginScreen();
+  disposeGuestTrial();
   clearVerificationCountdowns();
   disposePractice();
   disposeAdmin();
@@ -157,8 +159,9 @@ function renderLogin(): void {
     pendingReturnRoute = normaliseAppRoute(`${location.pathname}${location.search}`, location.origin, "/login");
   }
   if (location.pathname !== "/login") history.replaceState({}, "", "/login");
+  renderedRouteUrl = `${location.pathname}${location.search}`;
   document.title = "登录 · 英语打字练习";
-  renderLoginScreen(app, authCapabilities, { onAuthenticated: acceptAuthenticatedSession, handleAuthError });
+  renderLoginScreen(app, authCapabilities, { onAuthenticated: acceptAuthenticatedSession, handleAuthError, navigate });
 }
 
 function forcedPasswordMarkup(user: User): string {
@@ -268,6 +271,13 @@ async function logout(button: HTMLButtonElement): Promise<void> {
 async function renderRoute(): Promise<void> {
   const sequence = ++renderSequence;
   if (!currentUser) {
+    if (location.pathname === "/trial") {
+      disposePage();
+      renderedRouteUrl = "/trial";
+      document.title = "访客试用 · 英语打字练习";
+      renderGuestTrial(app, authCapabilities, navigate);
+      return;
+    }
     renderLogin();
     return;
   }
@@ -285,6 +295,10 @@ async function renderRoute(): Promise<void> {
   renderedRouteUrl = canonical;
   if (route === "/login") {
     navigate(currentUser.role === "admin" ? "/admin" : "/practice", true);
+    return;
+  }
+  if (canonical === "/trial") {
+    navigate("/practice", true);
     return;
   }
   if (route === "/admin" && currentUser.role !== "admin") {

@@ -1,8 +1,9 @@
-/** Keep only supported same-origin routes and the practice batch parameter. */
+/** Keep only supported same-origin routes and their recognized parameters. */
 export function normaliseAppRoute(input: string, origin: string, fallback: "/login" | "/practice"): string {
   let url: URL;
   try { url = new URL(input, origin); } catch { return fallback; }
-  if (url.origin !== origin || !["/login", "/admin", "/practice", "/membership"].includes(url.pathname)) return fallback;
+  if (url.origin !== origin || !["/login", "/trial", "/admin", "/practice", "/membership"].includes(url.pathname)) return fallback;
+  if (url.pathname === "/login") return url.searchParams.get("mode") === "register" ? "/login?mode=register" : "/login";
   if (url.pathname === "/membership") {
     const orders = url.searchParams.getAll("order");
     return orders.length === 1 && /^[a-zA-Z0-9_-]{1,100}$/.test(orders[0]!)

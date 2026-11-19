@@ -1389,3 +1389,37 @@ a {
 .membership-page .button-row { flex-wrap: wrap; }
 .membership-page .account-email strong { overflow-wrap: anywhere; min-width: 0; }
 @media (max-width: 600px) { .membership-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); } .membership-page .panel-body { padding: 18px; } .membership-page .btn { white-space: normal; } }
+
+.login-trial-entry {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px 14px;
+  margin-top: 18px;
+  color: var(--muted);
+  font-size: 14px;
+}
+.login-trial-entry .btn { min-height: 44px; padding-inline: 22px; }
+.login-trial-entry a, .guest-trial a.btn { text-decoration: none; }
+
+.guest-trial { width: min(960px, 100%); margin: 0 auto; padding: 36px 20px; }
+.guest-trial-header,
+.guest-trial-meta { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; }
+.guest-trial-header { margin-bottom: 20px; }
+.guest-trial-header .auth-brand { margin: 0; }
+.guest-trial-card {
+  min-width: 0;
+  padding: clamp(16px, 4vw, 34px);
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  background: var(--panel);
+}
+.guest-trial-meta { color: var(--muted); font-size: 14px; margin-bottom: 14px; }
+#guestTrialTimer { color: var(--green-dark); font-size: 18px; font-variant-numeric: tabular-nums; margin-left: 4px; }
+.guest-trial .prompt { margin-bottom: 22px; }
+.guest-trial-feedback { min-height: 1.5em; margin: 0; }
+.guest-trial-feedback[data-result="correct"] { color: #19704a; }
+.guest-trial-feedback[data-result="incorrect"] { color: #aa461a; }
+.guest-trial-end { padding-block: 42px; text-align: center; }
+.guest-trial-end h2 { margin: 0; }
+.guest-trial-end p { margin: 12px 0 22px; color: var(--muted); }

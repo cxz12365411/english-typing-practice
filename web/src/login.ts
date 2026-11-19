@@ -9,6 +9,7 @@ import {
 import type { AuthCapabilities, EmailCodePurpose, SessionResponse } from "./types";
 import { mustElement, setBusy, siteFooterMarkup } from "./ui";
 import { getErrorMessage, validatePassword } from "./utils";
+import { guestTrialEntryLabel } from "./guest-trial";
 import "../../login-promo.js";
 import "../../login-promo.css";
 
@@ -28,6 +29,7 @@ type AuthMode = "email-login" | "register" | "reset-password" | "password-login"
 interface LoginCallbacks {
   onAuthenticated: (response: SessionResponse) => void;
   handleAuthError: (error: unknown) => boolean;
+  navigate: (path: string) => void;
 }
 
 function setMessage(element: HTMLElement, text: string, kind: "error" | "success" | "info" = "error"): void {
@@ -121,6 +123,10 @@ function loginMarkup(capabilities: AuthCapabilities): string {
         <div class="login-story-heading">
           <h2>每一次敲击，<br>都多一份理解。</h2>
           <p>用中文连起词义，用谐音找到记忆线索。</p>
+          <div class="login-trial-entry">
+            <a class="btn primary" id="guestTrialLink" href="/trial">${guestTrialEntryLabel()}</a>
+            <span>无需登录，免费体验 10 分钟</span>
+          </div>
         </div>
         <div id="loginPromo"><p>中文箭头联想 · 中文谐音助记 · 逐句打字练习</p></div>
       </section>
@@ -391,6 +397,11 @@ export function renderLoginScreen(
 ): void {
   disposeLoginScreen();
   app.innerHTML = loginMarkup(capabilities);
+  mustElement<HTMLAnchorElement>("#guestTrialLink").addEventListener("click", (event) => {
+    if (event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) return;
+    event.preventDefault();
+    callbacks.navigate("/trial");
+  });
   loginPromo = window.PracticePromo?.create(mustElement("#loginPromo")) ?? null;
   bindPasswordLogin(callbacks);
   if (!capabilities.emailAuthEnabled) {
@@ -401,5 +412,6 @@ export function renderLoginScreen(
   bindEmailLogin(callbacks);
   bindRegistration(callbacks);
   bindPasswordReset(callbacks);
-  switchAuthMode(capabilities.selfRegistrationEnabled ? "email-login" : "password-login");
+  const initialMode = new URLSearchParams(location.search).get("mode") === "register" ? "register" : "email-login";
+  switchAuthMode(capabilities.selfRegistrationEnabled ? initialMode : "password-login");
 }
