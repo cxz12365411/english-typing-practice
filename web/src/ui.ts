@@ -25,6 +25,7 @@ export function shellMarkup(user: User, activeRoute: "/practice" | "/admin" | "/
             <a class="nav-link${activeRoute === "/practice" ? " active" : ""}" href="/practice" data-route="/practice">练习</a>
             <a class="nav-link${activeRoute === "/membership" ? " active" : ""}" href="/membership" data-route="/membership">会员与记录</a>
             ${isAdmin ? `<a class="nav-link${activeRoute === "/admin" ? " active" : ""}" href="/admin" data-route="/admin">管理后台</a>` : ""}
+            <button class="nav-link support-trigger" id="supportButton" type="button" aria-haspopup="dialog" aria-controls="supportDialog">联系客服</button>
           </nav>
           <div class="user-chip">
             <strong title="${escapeHtml(user.username)}">${escapeHtml(user.displayName || user.username)}</strong>
@@ -35,6 +36,14 @@ export function shellMarkup(user: User, activeRoute: "/practice" | "/admin" | "/
       </header>
       ${content}
       ${siteFooterMarkup()}
+      <dialog class="support-dialog" id="supportDialog" aria-labelledby="supportTitle" aria-describedby="supportHint">
+        <h2 id="supportTitle">客服微信</h2>
+        <p id="supportHint">微信扫一扫，联系客服</p>
+        <img src="/customer-service-wechat.jpg" width="648" height="647" alt="客服微信二维码" loading="lazy">
+        <form method="dialog">
+          <button class="btn" type="submit" autofocus>关闭</button>
+        </form>
+      </dialog>
     </div>
     <div class="toast-region" id="toastRegion" role="status" aria-live="polite"></div>
   `;

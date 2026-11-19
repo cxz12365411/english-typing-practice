@@ -135,10 +135,10 @@ a {
 .login-home .auth-card .helper { margin: 2px 0 0; font-size: 12px; }
 .login-home .auth-card .message { padding: 10px 12px; font-size: 12px; }
 .login-home .auth-capability-note { margin-top: 14px; }
-.login-support { margin-top: 22px; padding-top: 20px; border-top: 1px solid #e5e7e2; text-align: center; }
-.login-support h2 { margin: 0 0 12px; font-size: 15px; }
-.login-support img { display: block; width: 168px; max-width: 100%; height: auto; margin: 0 auto; }
-.login-support p { margin: 10px 0 0; color: #65726a; font-size: 12px; }
+.login-trial-entry { margin-top: 22px; padding-top: 20px; border-top: 1px solid #e5e7e2; text-align: center; }
+.login-trial-entry .btn { width: 100%; color: var(--green-dark); border-color: #bdd8c8; background: var(--green-soft); }
+.login-trial-entry .btn:hover { background: #d8eddf; }
+.login-trial-entry p { margin: 9px 0 0; color: var(--muted); font-size: 12px; }
 .login-home .auth-card .input, .login-home .auth-card .btn { min-height: 44px; }
 .login-home .auth-tabs { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 4px; margin: 0 0 16px; padding-bottom: 8px; overflow: visible; }
 .login-home .auth-tab { min-width: 0; padding: 7px 4px; font-size: 12px; }
@@ -316,6 +316,29 @@ a {
   color: var(--green);
   background: var(--green-soft);
 }
+
+.support-trigger {
+  font-family: inherit;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+.support-dialog {
+  width: min(340px, calc(100% - 32px));
+  padding: 22px 24px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  color: var(--ink);
+  background: var(--panel);
+  box-shadow: var(--shadow);
+  text-align: center;
+}
+.support-dialog::backdrop { background: rgb(23 33 26 / 48%); }
+.support-dialog h2 { margin: 0; font-size: 20px; }
+.support-dialog p { margin: 8px 0 12px; color: var(--muted); font-size: 14px; }
+.support-dialog img { display: block; width: min(224px, 100%); height: auto; margin: 0 auto; }
+.support-dialog form { margin-top: 16px; }
 
 .user-chip {
   border-left: 1px solid var(--line);
@@ -1390,17 +1413,7 @@ a {
 .membership-page .account-email strong { overflow-wrap: anywhere; min-width: 0; }
 @media (max-width: 600px) { .membership-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); } .membership-page .panel-body { padding: 18px; } .membership-page .btn { white-space: normal; } }
 
-.login-trial-entry {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 10px 14px;
-  margin-top: 18px;
-  color: var(--muted);
-  font-size: 14px;
-}
-.login-trial-entry .btn { min-height: 44px; padding-inline: 22px; }
-.login-trial-entry a, .guest-trial a.btn { text-decoration: none; }
+.guest-trial a.btn { text-decoration: none; }
 
 .guest-trial { width: min(960px, 100%); margin: 0 auto; padding: 36px 20px; }
 .guest-trial-header,

@@ -123,10 +123,6 @@ function loginMarkup(capabilities: AuthCapabilities): string {
         <div class="login-story-heading">
           <h2>每一次敲击，<br>都多一份理解。</h2>
           <p>用中文连起词义，用谐音找到记忆线索。</p>
-          <div class="login-trial-entry">
-            <a class="btn primary" id="guestTrialLink" href="/trial">${guestTrialEntryLabel()}</a>
-            <span>无需登录，免费体验 10 分钟</span>
-          </div>
         </div>
         <div id="loginPromo"><p>中文箭头联想 · 中文谐音助记 · 逐句打字练习</p></div>
       </section>
@@ -139,10 +135,9 @@ function loginMarkup(capabilities: AuthCapabilities): string {
           ${passwordLoginForm()}
           <div class="message info auth-capability-note">邮箱验证码功能正在配置中，当前请使用账号密码登录。</div>
         `}
-        <div class="login-support">
-          <h2>客服微信</h2>
-          <img src="/customer-service-wechat.jpg" width="648" height="647" alt="客服微信二维码" />
-          <p>微信扫一扫，联系客服</p>
+        <div class="login-trial-entry">
+          <a class="btn" id="guestTrialLink" href="/trial" aria-describedby="guestTrialHint">${guestTrialEntryLabel()}</a>
+          <p id="guestTrialHint">无需登录，免费体验 10 分钟</p>
         </div>
       </section>
     </main>

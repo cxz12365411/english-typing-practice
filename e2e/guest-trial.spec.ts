@@ -14,7 +14,9 @@ test("guest can type with alignment, retains the deadline, and reaches email reg
   });
 
   await page.goto("/login");
-  await page.getByRole("link", { name: "立即试用" }).click();
+  await expect(page.getByRole("img", { name: "客服微信二维码" })).toHaveCount(0);
+  await expect(page.locator(".login-story").getByRole("link", { name: "立即试用" })).toHaveCount(0);
+  await page.locator(".auth-card").getByRole("link", { name: "立即试用" }).click();
   await expect(page).toHaveURL(/\/trial$/);
   await expect(page.getByRole("timer")).toHaveText(/^(10:00|09:5[5-9])$/);
 

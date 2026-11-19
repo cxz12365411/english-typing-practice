@@ -61,6 +61,10 @@ function renderShell(content: string, activeRoute: "/practice" | "/admin" | "/me
   if (!currentUser) return;
   app.innerHTML = shellMarkup(currentUser, activeRoute, content);
   bindRouteLinks();
+  const supportDialog = mustElement<HTMLDialogElement>("#supportDialog", app);
+  mustElement<HTMLButtonElement>("#supportButton", app).addEventListener("click", () => {
+    supportDialog.showModal();
+  });
   document.querySelector<HTMLButtonElement>("#logoutButton")?.addEventListener("click", (event) => {
     void logout(event.currentTarget as HTMLButtonElement);
   });
