@@ -4,6 +4,8 @@ import type { SqliteDatabase } from "./database.js";
 
 const STREET_PHOTOGRAPHY_UPDATE = "content_update:street-photography-v1";
 const STREET_PHOTOGRAPHY_EXPANSION = "content_update:street-photography-v2";
+export const TRAVEL_SHOPPING_UPDATE = "content_update:travel-shopping-v1";
+const TRAVEL_SHOPPING_SLUG = "sentences-23";
 const STREET_CATEGORIES = [
   { name: "句型：街头摄影：开场与征求同意", size: 4 },
   { name: "句型：街头摄影：拍摄时引导动作", size: 5 },
@@ -244,4 +246,45 @@ export function applyContentUpdates(
     }
     return result;
   }).immediate();
+}
+
+/** The same patch adds the category to new and existing databases. */
+export function applyTravelShoppingUpdate(
+  db: SqliteDatabase,
+  readSource: () => ParsedContent,
+  bumpVersion: () => string
+): ContentUpdateResult {
+  return db.transaction(() => applyContentUpdate(db, {
+    marker: TRAVEL_SHOPPING_UPDATE,
+    allowNewCategories: true,
+    categoryCount: 1,
+    itemCount: 24,
+    sourceName: "daily-english-high-frequency-sentences.md",
+    conflictLabel: "Travel shopping",
+    select(parsed) {
+      const categories = parsed.categories.filter((category) => category.slug === TRAVEL_SHOPPING_SLUG);
+      const category = categories[0];
+      const items = parsed.items.filter((item) => item.categorySlug === TRAVEL_SHOPPING_SLUG);
+      if (categories.length !== 1 || category?.name !== "句型：旅游购物与砍价" ||
+          category.kind !== "sentence" || category.sortOrder !== 23 || items.length !== 24) {
+        throw new Error("Travel shopping source integrity check failed: expected the dedicated category and 24 sentences");
+      }
+      const keys = new Set(items.map((item) => item.key));
+      for (const [index, item] of items.entries()) {
+        const expectedKey = `sentence-${String(271 + index).padStart(4, "0")}`;
+        if (item.key !== expectedKey || item.kind !== "sentence" ||
+            item.sortOrder !== index + 1 || !item.english.trim() ||
+            !item.meaning.trim() || !item.pronunciation.trim()) {
+          throw new Error(`Travel shopping source integrity check failed for ${expectedKey}`);
+        }
+      }
+      const existing = db.prepare(`SELECT items.item_key FROM items
+        JOIN categories ON categories.id = items.category_id WHERE categories.slug = ?`)
+        .all(TRAVEL_SHOPPING_SLUG) as Array<{ item_key: string }>;
+      if (existing.some((item) => !keys.has(item.item_key))) {
+        throw new Error(`Travel shopping update conflict: category ${TRAVEL_SHOPPING_SLUG} contains unrelated items`);
+      }
+      return { categories, items };
+    }
+  }, readSource, bumpVersion)).immediate();
 }

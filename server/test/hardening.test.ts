@@ -118,11 +118,11 @@ test("migration history is checksummed, rejects future schemas, and the initial 
   const db = openDatabase({ databasePath: ":memory:" });
   try {
     const first = migrateAndSeed(db, SOURCE);
-    assert.equal(first.itemsInserted, 1120 + WRITING_COUNT);
+    assert.equal(first.itemsInserted, 1144 + WRITING_COUNT);
     const second = migrateAndSeed(db, "Z:\\path-that-does-not-exist");
     assert.equal(second.itemsInserted, 0);
     assert.equal(second.words, 850);
-    assert.equal(second.sentences, 270 + WRITING_COUNT);
+    assert.equal(second.sentences, 294 + WRITING_COUNT);
     db.prepare("UPDATE schema_migrations SET checksum = 'tampered' WHERE version = 2").run();
     assert.throws(() => migrateDatabase(db), /checksum mismatch/i);
   } finally {

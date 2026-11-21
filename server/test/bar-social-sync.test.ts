@@ -80,17 +80,15 @@ test("bar source additions preserve all original 238 identities, text, pronuncia
 test("canonical 32 bar phrases exactly match the approved plan and the four-group Markdown import", () => {
   const parsed = corpus();
   const extra = parseMarkdownImport(readFileSync(resolve(SOURCE, EXTRA_FILE), "utf8"));
-  const added = parsed.items.filter((item) => Number(item.key.slice(9)) >= 239);
+  const added = parsed.items.filter((item) => Number(item.key.slice(9)) >= 239 && Number(item.key.slice(9)) <= 270);
   assert.deepEqual(extra.errors, []);
   assert.deepEqual(extra.warnings, []);
   assert.equal(extra.groups.length, 4);
   assert.equal(extra.rows.length, 32);
-  assert.equal(parsed.items.length, 270);
-  assert.equal(parsed.categories.length, 22);
   assert.deepEqual(added.map((item) => item.english), EXPECTED_ENGLISH);
   assert.deepEqual(added.map((item) => item.key),
     Array.from({ length: 32 }, (_, index) => `sentence-${String(index + 239).padStart(4, "0")}`));
-  assert.deepEqual(parsed.categories.slice(18).map((category) => category.name), EXPECTED_CATEGORIES);
+  assert.deepEqual(parsed.categories.slice(18, 22).map((category) => category.name), EXPECTED_CATEGORIES);
   for (const [index, group] of extra.groups.entries()) {
     const category = parsed.categories[index + 18]!;
     const sourceRows = extra.rows.filter((row) => row.groupId === group.groupId);

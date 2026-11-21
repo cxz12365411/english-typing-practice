@@ -125,8 +125,8 @@ update it, and a typo keeps the highlight at the first incorrect word. Long
 diagrams scroll horizontally to keep the current word visible without moving the
 page or interrupting the answer.
 
-All 850 words link to their existing complete definitions. All 478 sentences (270
-original sentences, 130 CET-4 and 78 CET-6 practice sentences) have
+All 850 words link to their existing complete definitions. All 502 sentences (294
+conversation sentences, 130 CET-4 and 78 CET-6 practice sentences) have
 reviewed semantic groups: contractions, hyphenated words, numbers, and `____` are
 tokens; punctuation and spaces remain unchanged. Articles, auxiliaries, idioms,
 and omitted words belong to their full expression, with explanatory notes where

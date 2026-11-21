@@ -64,7 +64,6 @@ test("canonical 32 new street phrases exactly match the published Markdown impor
     const number = Number(item.key.slice(9));
     return number >= 207 && number <= 238;
   });
-  assert.equal(parsed.items.length, 270);
   assert.deepEqual(added.map((item) => item.key),
     Array.from({ length: 32 }, (_, index) => `sentence-${String(index + 207).padStart(4, "0")}`));
 

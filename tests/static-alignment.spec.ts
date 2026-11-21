@@ -105,7 +105,7 @@ async function geometryErrors(page: Page) {
   });
 }
 
-test("original 270 plus CET4 and CET6 sentence alignments cover the sources and every token and Chinese fragment", () => {
+test("daily English, CET4 and CET6 alignments cover the sources and every token and Chinese fragment", () => {
   const data = JSON.parse(readFileSync("sentence-alignments.json", "utf8")) as AlignmentData;
   const source = readFileSync("daily-english-high-frequency-sentences.md", "utf8").split(/\r?\n/)
     .filter(line => line.startsWith("|") && line.includes("<br>"))
@@ -114,12 +114,12 @@ test("original 270 plus CET4 and CET6 sentence alignments cover the sources and 
       return { english: cells[0].split("<br>")[0], meaning: cells[1] };
     });
   expect(data.version).toBe(1);
-  expect(source).toHaveLength(270);
+  expect(source).toHaveLength(294);
   const writing = require("../cet4-writing.js").parse(JSON.parse(readFileSync("cet4-writing.json", "utf8")));
-  expect(data.entries).toHaveLength(270 + writing.items.length + require("../cet4-writing.js").parse(JSON.parse(readFileSync("cet6-writing.json", "utf8"))).items.length);
+  expect(data.entries).toHaveLength(source.length + writing.items.length + require("../cet4-writing.js").parse(JSON.parse(readFileSync("cet6-writing.json", "utf8"))).items.length);
   const expectedKeys = source.map(entry => api.key(entry.english, entry.meaning)).sort();
-  expect(data.entries.slice(0, 270).map(entry => api.key(entry.english, entry.meaning)).sort()).toEqual(expectedKeys);
-  expect(new Set(expectedKeys).size).toBe(270);
+  expect(data.entries.slice(0, source.length).map(entry => api.key(entry.english, entry.meaning)).sort()).toEqual(expectedKeys);
+  expect(new Set(expectedKeys).size).toBe(source.length);
   for (const entry of data.entries) {
     expect(api.validateEntry(entry), entry.english).toBe(true);
     expect(entry.zhParts.join(""), entry.english).toBe(entry.meaning);
@@ -128,6 +128,23 @@ test("original 270 plus CET4 and CET6 sentence alignments cover the sources and 
   }
   expect(api.tokenize("I'll try black-and-white at 10:30 with ____ and I’m ready.").map(token => token.text))
     .toEqual(["I'll", "try", "black-and-white", "at", "10", "30", "with", "____", "and", "I’m", "ready"]);
+});
+
+test("the travel shopping category loads from the public source with phrase arrows and typing practice", async ({ page }) => {
+  await page.goto("/index.html");
+  const answer = page.locator("#answerInput");
+  await expect(answer).toBeEnabled();
+  await page.locator("#categorySelect").selectOption("句型：旅游购物与砍价");
+  await expect(page.locator("#positionText")).toHaveText("1 / 24");
+  await expect(page.locator("#targetWord")).toHaveText("How much is this one?");
+  await expect(page.locator("#meaningText")).toHaveText("这个多少钱？");
+  await expect(page.locator("#soundText")).toContainText("豪 马奇");
+  await page.locator('.alignment-token[data-en-index="0"]').click();
+  await expect(page.locator(".alignment-token.is-highlighted")).toHaveText(["How", "much", "is"]);
+  await expect(page.locator(".alignment-zh.is-highlighted")).toHaveText("多少钱");
+  await answer.fill("How much is this one?");
+  await expect(page.locator("#doneStat")).toHaveText("1");
+  await expect(page.locator("#targetWord")).toHaveText("How much are these?");
 });
 
 test("all 850 words retain their complete meaning and render exactly one arrow", async ({ page }) => {

@@ -30,6 +30,7 @@ const barCounts = [
   ["句型：酒吧社交：闲聊与邀请", 8],
   ["句型：酒吧社交：交换联系方式与礼貌结束", 8]
 ] as const;
+const travelShoppingCategory = "句型：旅游购物与砍价";
 
 function parserSource(html: string): string {
   // Run the actual standalone parsers, not a test copy. The slice ends before
@@ -65,9 +66,9 @@ for (const entrypoint of ["index.html", "typing-practice.html"]) {
   const source = parserSource(html);
   const parsed = parseStandalone(source, wordMarkdown, sentenceMarkdown);
 
-  test(`${entrypoint} actual parsers load 850 words and 270 complete sentences`, () => {
+  test(`${entrypoint} actual parsers load 850 words and 294 complete sentences`, () => {
     assert.equal(parsed.words.length, 850);
-    assert.equal(parsed.sentences.length, 270);
+    assert.equal(parsed.sentences.length, 294);
     assert.deepEqual(parsed.words, canonicalWords.items.map(staticShape));
     assert.deepEqual(parsed.sentences, canonicalSentences.items.map(staticShape));
     for (const item of [...parsed.words, ...parsed.sentences]) {
@@ -75,7 +76,7 @@ for (const entrypoint of ["index.html", "typing-practice.html"]) {
       assert.ok(item.meaning.trim(), `${item.word}: meaning is required`);
       assert.ok(item.sound.trim(), `${item.word}: pronunciation is required`);
     }
-    for (const [category, count] of [...streetCounts, ...barCounts]) {
+    for (const [category, count] of [...streetCounts, ...barCounts, [travelShoppingCategory, 24] as const]) {
       assert.equal(parsed.sentences.filter((item) => item.category === category).length, count, category);
     }
   });
@@ -94,7 +95,10 @@ for (const entrypoint of ["index.html", "typing-practice.html"]) {
   });
 
   test(`${entrypoint} includes all 32 new bar phrases and pronunciations in their four public categories`, () => {
-    const additions = canonicalSentences.items.filter((item) => Number(item.key.slice("sentence-".length)) >= 239);
+    const additions = canonicalSentences.items.filter((item) => {
+      const number = Number(item.key.slice("sentence-".length));
+      return number >= 239 && number <= 270;
+    });
     assert.equal(additions.length, 32);
     for (const addition of additions) {
       const matching = parsed.sentences.filter((item) => item.word === addition.english &&

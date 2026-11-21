@@ -5,7 +5,7 @@ import { createHash, randomUUID } from "node:crypto";
 import Database from "better-sqlite3";
 import type { AppConfig } from "./config.js";
 import { parseSentenceMarkdown, parseWordMarkdown, type ParsedContent } from "./content-parser.js";
-import { applyContentUpdates } from "./content-updates.js";
+import { applyContentUpdates, applyTravelShoppingUpdate } from "./content-updates.js";
 import { applyCet6WritingUpdate } from "./cet6-writing.js";
 import { applyCet4WritingUpdate } from "./cet4-writing.js";
 
@@ -436,7 +436,9 @@ export function locateContentSource(explicit?: string): string {
 
 function readSeedContent(sourceDir: string): { parsed: ParsedContent; checksum: string } {
   const wordsSource = readFileSync(resolve(sourceDir, "basic-english-850.md"), "utf8");
-  const sentencesSource = readFileSync(resolve(sourceDir, "daily-english-high-frequency-sentences.md"), "utf8");
+  // Later public categories are applied as one-shot updates, even on new databases.
+  const sentencesSource = readFileSync(resolve(sourceDir, "daily-english-high-frequency-sentences.md"), "utf8")
+    .split(/^##[ \t]+23\.[ \t]+/m, 1)[0]!;
   const words = parseWordMarkdown(wordsSource);
   const sentences = parseSentenceMarkdown(sentencesSource);
   if (words.items.length !== 850 || sentences.items.length !== 270) {
@@ -573,10 +575,15 @@ export function migrateAndSeed(db: SqliteDatabase, explicitSourceDir?: string): 
       () => JSON.parse(readFileSync(resolve(locateContentSource(explicitSourceDir), "cet6-writing.json"), "utf8")),
       () => bumpContentVersion(db)
     );
+    const travelShopping = applyTravelShoppingUpdate(
+      db,
+      () => parseSentenceMarkdown(readFileSync(resolve(locateContentSource(explicitSourceDir), "daily-english-high-frequency-sentences.md"), "utf8")),
+      () => bumpContentVersion(db)
+    );
     const counts = contentCounts(db);
     return {
-      categoriesInserted: seeded.categoriesInserted + updated.categoriesInserted + writing.categoriesInserted + advancedWriting.categoriesInserted,
-      itemsInserted: seeded.itemsInserted + updated.itemsInserted + writing.itemsInserted + advancedWriting.itemsInserted,
+      categoriesInserted: seeded.categoriesInserted + updated.categoriesInserted + writing.categoriesInserted + advancedWriting.categoriesInserted + travelShopping.categoriesInserted,
+      itemsInserted: seeded.itemsInserted + updated.itemsInserted + writing.itemsInserted + advancedWriting.itemsInserted + travelShopping.itemsInserted,
       words: counts.words,
       sentences: counts.sentences
     };

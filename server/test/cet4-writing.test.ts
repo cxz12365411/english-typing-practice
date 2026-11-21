@@ -107,15 +107,15 @@ test("fresh installation atomically adds CET4 content, revisions, version and au
   const directory = sourceDirectory();
   const db = openDatabase({ databasePath: ":memory:" });
   try {
-    assert.deepEqual(migrateAndSeed(db, directory), { categoriesInserted: 50, itemsInserted: 1278, words: 850, sentences: 428 });
-    assert.equal(count(db, "item_revisions"), 1278);
+    assert.deepEqual(migrateAndSeed(db, directory), { categoriesInserted: 51, itemsInserted: 1302, words: 850, sentences: 452 });
+    assert.equal(count(db, "item_revisions"), 1302);
     assert.equal(count(db, "items WHERE item_key LIKE 'cet4-%' AND status = 'published'"), 80);
-    assert.deepEqual(db.prepare("SELECT value FROM app_meta WHERE key = 'content_version'").get(), { value: "3" });
+    assert.deepEqual(db.prepare("SELECT value FROM app_meta WHERE key = 'content_version'").get(), { value: "4" });
     const audit = db.prepare("SELECT metadata_json FROM audit_log WHERE target_id = ?").get(CET4_WRITING_UPDATE) as { metadata_json: string };
     assert.deepEqual(JSON.parse(audit.metadata_json), { source: "cet4-writing.json", categories: 14, items: 80, categoriesInserted: 14, itemsInserted: 80 });
     const before = snapshot(db);
     rmSync(directory, { recursive: true });
-    assert.deepEqual(migrateAndSeed(db, directory), { categoriesInserted: 0, itemsInserted: 0, words: 850, sentences: 428 });
+    assert.deepEqual(migrateAndSeed(db, directory), { categoriesInserted: 0, itemsInserted: 0, words: 850, sentences: 452 });
     assert.equal(snapshot(db), before);
   } finally { db.close(); rmSync(directory, { recursive: true, force: true }); }
 });
@@ -135,9 +135,11 @@ test("CET4 upgrade preserves original content, administrator changes, users and 
     const oldCategories = db.prepare("SELECT * FROM categories ORDER BY slug").all();
     const tables = ["users", "practice_sessions", "attempts", "progress"];
     const history = tables.map((table) => db.prepare(`SELECT * FROM ${table}`).all());
-    assert.deepEqual(migrateAndSeed(db, directory), { categoriesInserted: 24, itemsInserted: 158, words: 850, sentences: 428 });
-    assert.deepEqual(db.prepare("SELECT * FROM items WHERE item_key NOT LIKE 'cet4-%' AND item_key NOT LIKE 'cet6-%' ORDER BY item_key").all(), oldItems);
-    assert.deepEqual(db.prepare("SELECT * FROM categories WHERE slug NOT LIKE 'cet4-%' AND slug NOT LIKE 'cet6-%' ORDER BY slug").all(), oldCategories);
+    assert.deepEqual(migrateAndSeed(db, directory), { categoriesInserted: 25, itemsInserted: 182, words: 850, sentences: 452 });
+    assert.deepEqual(db.prepare(`SELECT * FROM items WHERE item_key NOT LIKE 'cet4-%' AND item_key NOT LIKE 'cet6-%'
+      AND item_key NOT BETWEEN 'sentence-0271' AND 'sentence-0294' ORDER BY item_key`).all(), oldItems);
+    assert.deepEqual(db.prepare(`SELECT * FROM categories WHERE slug NOT LIKE 'cet4-%' AND slug NOT LIKE 'cet6-%'
+      AND slug <> 'sentences-23' ORDER BY slug`).all(), oldCategories);
     assert.deepEqual(tables.map((table) => db.prepare(`SELECT * FROM ${table}`).all()), history);
     db.prepare("UPDATE items SET english = 'Later administrator change.', status = 'archived', archived_at = ?, revision = 2 WHERE item_key = 'cet4-e01-s01'").run(now);
     db.prepare("UPDATE categories SET name = '管理员分类', status = 'draft' WHERE slug = 'cet4-essay-01'").run();

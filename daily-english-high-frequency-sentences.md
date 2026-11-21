@@ -387,3 +387,33 @@
 | No problem. Enjoy your night!<br>中文谐音：诺 普拉布勒姆。因乔伊 尤尔 奈特！ | 没问题，祝你今晚玩得开心！ | sentence-0268 |
 | I'll let you get back to your friends.<br>中文谐音：艾尔 莱特 优 盖特 拜克 特 尤尔 弗瑞恩兹。 | 我就不打扰你和朋友聚会了。 | sentence-0269 |
 | Get home safe!<br>中文谐音：盖特 霍姆 塞夫！ | 回家路上注意安全！ | sentence-0270 |
+
+
+## 23. 旅游购物与砍价
+
+| English / 中文谐音 | 中文 | Stable ID |
+|---|---|---|
+| How much is this one?<br>中文谐音：豪 马奇 伊兹 迪斯 万？ | 这个多少钱？ | sentence-0271 |
+| How much are these?<br>中文谐音：豪 马奇 阿尔 迪兹？ | 这些多少钱？ | sentence-0272 |
+| Is that the price for one or for both?<br>中文谐音：伊兹 戴特 德 普赖斯 佛 万 奥尔 佛 博思？ | 这是单件价，还是两件一起的价格？ | sentence-0273 |
+| I'm just looking, thanks.<br>中文谐音：艾姆 贾斯特 卢金，桑克斯。 | 我就随便看看，谢谢。 | sentence-0274 |
+| I'm looking for a small souvenir.<br>中文谐音：艾姆 卢金 佛 额 斯莫尔 苏弗尼尔。 | 我想找一个小纪念品。 | sentence-0275 |
+| Do you have this in a different color?<br>中文谐音：杜 优 海夫 迪斯 因 额 迪弗仁特 卡勒尔？ | 这款还有别的颜色吗？ | sentence-0276 |
+| Can I try this on?<br>中文谐音：肯 艾 特赖 迪斯 昂？ | 我可以试穿这件吗？ | sentence-0277 |
+| Do you have a bigger size?<br>中文谐音：杜 优 海夫 额 比格尔 赛兹？ | 还有大一号的吗？ | sentence-0278 |
+| Is the price negotiable?<br>中文谐音：伊兹 德 普赖斯 尼沟谢伯尔？ | 这个价钱能商量吗？ | sentence-0279 |
+| That's a little more than I wanted to spend.<br>中文谐音：戴茨 额 利特尔 莫尔 岱恩 艾 旺提德 特 斯彭德。 | 这比我原本想花的多一点。 | sentence-0280 |
+| Could you give me a better price?<br>中文谐音：库德 优 吉夫 米 额 贝特尔 普赖斯？ | 能给我个更优惠的价吗？ | sentence-0281 |
+| Would you take twenty for it?<br>中文谐音：伍德 优 特诶克 特温提 佛 伊特？ | 二十可以卖给我吗？ | sentence-0282 |
+| Could you do thirty for both?<br>中文谐音：库德 优 杜 瑟蒂 佛 博思？ | 两件一起三十，可以吗？ | sentence-0283 |
+| Is there a discount if I buy two?<br>中文谐音：伊兹 戴尔 额 迪斯考恩特 伊夫 艾 拜 图？ | 买两件的话，有折扣吗？ | sentence-0284 |
+| Sorry, the price is fixed.<br>中文谐音：萨瑞，德 普赖斯 伊兹 菲克斯特。 | 不好意思，这是固定价。 | sentence-0285 |
+| I can give you ten percent off.<br>中文谐音：艾 肯 吉夫 优 滕 珀森特 奥夫。 | 我可以给你打九折。 | sentence-0286 |
+| The lowest I can go is twenty-five.<br>中文谐音：德 洛厄斯特 艾 肯 够 伊兹 特温提 法夫。 | 我最低只能给到二十五。 | sentence-0287 |
+| Could we meet in the middle?<br>中文谐音：库德 威 米特 因 德 米德尔？ | 我们能各让一步吗？ | sentence-0288 |
+| That's still a little over my budget.<br>中文谐音：戴茨 斯提尔 额 利特尔 欧弗 买 巴吉特。 | 这还是有点超出我的预算。 | sentence-0289 |
+| Thanks, I'll think about it.<br>中文谐音：桑克斯，艾尔 辛克 额鲍特 伊特。 | 谢谢，我再考虑一下。 | sentence-0290 |
+| Deal. I'll take it.<br>中文谐音：迪尔。艾尔 特诶克 伊特。 | 成交，我买了。 | sentence-0291 |
+| Can I pay by card?<br>中文谐音：肯 艾 佩 拜 卡尔德？ | 我可以刷卡吗？ | sentence-0292 |
+| Cash only, please.<br>中文谐音：凯什 欧恩利，普利兹。 | 只收现金，谢谢。 | sentence-0293 |
+| Could I get a receipt, please?<br>中文谐音：库德 艾 盖特 额 瑞西特，普利兹？ | 麻烦给我一张小票，可以吗？ | sentence-0294 |

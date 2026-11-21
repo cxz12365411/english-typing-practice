@@ -162,7 +162,7 @@ async function geometryErrors(page: Page): Promise<string[]> {
   });
 }
 
-test("account practice loads the real 270 alignments and highlights the screenshot's shared phrase", async ({ page }) => {
+test("account practice loads all sentence alignments and highlights the screenshot's shared phrase", async ({ page }) => {
   await mockApp(page);
   const dataResponse = page.waitForResponse(response => response.request().resourceType() === "fetch" && dataUrl.test(response.url()));
   await readyPractice(page);
@@ -178,7 +178,7 @@ test("account practice loads the real 270 alignments and highlights the screensh
     expect(new URL(response.url()).pathname).toBe("/api/content-resources/sentence-alignments.json");
   }
   const writing = require("../cet4-writing.js").parse(JSON.parse(readFileSync("cet4-writing.json", "utf8")));
-  expect(alignmentData.entries).toHaveLength(270 + writing.items.length + require("../cet4-writing.js").parse(JSON.parse(readFileSync("cet6-writing.json", "utf8"))).items.length);
+  expect(alignmentData.entries).toHaveLength(294 + writing.items.length + require("../cet4-writing.js").parse(JSON.parse(readFileSync("cet6-writing.json", "utf8"))).items.length);
   await expect(page.locator("#targetWord")).toHaveText(hey.english);
   await expect(page.locator("#meaningText")).toHaveText(hey.meaning);
   await expect(page.locator(".alignment-token")).toHaveCount(5);
