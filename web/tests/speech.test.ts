@@ -285,6 +285,26 @@ describe("recorded practice speech", () => {
     expect(restored.audios[0].calls[0]).toEqual({ src: "/api/speech/preview/05", rate: 1.15, preservesPitch: true });
   });
 
+  it("offers reselection without changing a saved voice 06 when a five-voice catalog is restored", async () => {
+    const saved = { voiceId: "06", rate: 1.2 };
+    const env = await setup([samantha], saved, true, catalog);
+    expect(env.elements.voiceSelect.options.map(o => o.value)).toEqual(["", "01", "02", "03", "04", "05"]);
+    expect(env.elements.voiceSelect.value).toBe("");
+    expect(env.elements.speechStatus.textContent).toContain("请重新选择");
+    expect(env.elements.speakButton.disabled).toBe(true);
+    expect(env.elements.previewVoiceBtn.disabled).toBe(true);
+    env.controller.speakCurrent();
+    env.elements.previewVoiceBtn.dispatchEvent(new Event("click"));
+    expect(env.audios[0].calls).toHaveLength(0);
+    expect(env.synth.calls).toHaveLength(0);
+    expect(JSON.parse(env.storage.get("basicTypingSpeechSettings")!)).toEqual(saved);
+    env.elements.voiceSelect.value = "03";
+    env.elements.voiceSelect.dispatchEvent(new Event("change"));
+    env.controller.speakCurrent();
+    expect(env.audios[0].calls[0].src).toContain("/audio/03/");
+    expect(JSON.parse(env.storage.get("basicTypingSpeechSettings")!)).toEqual({ ...saved, voiceId: "03" });
+  });
+
   it("switches and saves voice without changing input and stops before changing rate", async () => {
     const env = await setup([samantha], undefined, true, catalog);
     const player = env.audios[0];

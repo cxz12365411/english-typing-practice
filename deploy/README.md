@@ -34,10 +34,11 @@ these assets.
 
 ### Prerecorded personal-use speech
 
-Five optional synthetic voices are served through authenticated `/api/speech` routes.
+Prerecorded synthetic voices are served through authenticated `/api/speech` routes.
 The audio package is separate from Git and the public Web root. Its `manifest.json`
-uses exact original-English SHA-256 keys; every published text must have reviewed
-MP3 files for voices `01` through `05`, plus one preview per voice. The deployment
+uses exact original-English SHA-256 keys. Each bundle declares voices `01` through
+`05` in order and can add `06`. Every bundled text must have a reviewed MP3 for
+each declared voice, and each voice must have a preview. The deployment
 validator checks coverage, file hashes, permitted paths, and rejects links or extra
 files. Original WAV references and generation/QA logs remain in the local output
 archive; only the checked MP3 package is staged.
@@ -61,7 +62,7 @@ audio show an explicit unavailable message; they never play another voice silent
 `SPEECH_AUDIO_DIR` is an optional absolute path for local testing; production normally
 uses the release-relative default.
 
-These Breeze-generated assets are intended for the user's stated personal use.
+The original Breeze-generated recordings are intended for the user's stated personal use.
 The installed BreezeBlue weight/output license remains separately applicable;
 this integration does not enable billing or grant commercial-use rights. Review
 the applicable output license before changing the intended use to a paid service.

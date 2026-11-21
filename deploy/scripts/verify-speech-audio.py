@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Validate a complete immutable five-voice bundle before staging or activation."""
+"""Validate an immutable speech bundle before staging or activation."""
 import hashlib
 import json
 import math
@@ -7,7 +7,7 @@ import re
 import sys
 from pathlib import Path
 
-VOICE_IDS = ("01", "02", "03", "04", "05")
+VOICE_IDS = ("01", "02", "03", "04", "05", "06")
 MAX_MANIFEST_BYTES = 32 * 1024 * 1024
 
 
@@ -27,19 +27,20 @@ def verify(directory):
     manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
     if not isinstance(manifest, dict) or type(manifest.get("manifestVersion")) is not int or manifest.get("manifestVersion") != 1:
         raise ValueError("unsupported audio manifest version")
-    voice_ids = set(VOICE_IDS)
     voices = manifest.get("voices", [])
-    if not isinstance(voices, list) or len(voices) != 5:
-        raise ValueError("bundle must contain exactly voices 01-05 in order")
+    if not isinstance(voices, list) or len(voices) not in (5, 6):
+        raise ValueError("bundle must contain voices 01-05 with optional voice 06")
+    voice_count = len(voices)
+    voice_ids = set(VOICE_IDS[:voice_count])
     for expected, voice in zip(VOICE_IDS, voices):
         if not isinstance(voice, dict) or voice.get("id") != expected:
-            raise ValueError("bundle must contain exactly voices 01-05 in order")
+            raise ValueError("voices must be in order from 01")
         name = voice.get("name")
         if not isinstance(name, str) or not name.strip() or js_length(name) > 80 or re.search(r"[\x00-\x1f\x7f]", name):
             raise ValueError("invalid voice name")
     expected_texts = manifest.get("expectedTexts")
     expected_assets = manifest.get("expectedAssets")
-    if type(expected_texts) is not int or not 0 < expected_texts <= 20_000 or type(expected_assets) is not int or expected_assets != expected_texts * 5:
+    if type(expected_texts) is not int or not 0 < expected_texts <= 20_000 or type(expected_assets) is not int or expected_assets != expected_texts * voice_count:
         raise ValueError("invalid declared speech coverage")
     allowed_files = {"manifest.json"}
     coverage = {}
@@ -49,8 +50,8 @@ def verify(directory):
         entries = manifest.get(group)
         if not isinstance(entries, list) or not entries or len(entries) > 100_000:
             raise ValueError("missing audio entries: " + group)
-        if group == "previews" and len(entries) != 5:
-            raise ValueError("exactly five voice previews are required")
+        if group == "previews" and len(entries) != voice_count:
+            raise ValueError("one preview per voice is required")
         for entry in entries:
             if not isinstance(entry, dict):
                 raise ValueError("invalid audio entry")
@@ -100,7 +101,7 @@ def verify(directory):
             else:
                 previews.add(voice)
     if previews != voice_ids or any(ids != voice_ids for ids in coverage.values()):
-        raise ValueError("every text and preview must have all five voices")
+        raise ValueError("every text and preview must cover all declared voices")
     if len(coverage) != expected_texts or len(manifest["assets"]) != expected_assets:
         raise ValueError("incomplete declared speech coverage")
     # No hidden executable, secret, extra metadata, device, or links enter the release.
@@ -109,7 +110,7 @@ def verify(directory):
             raise ValueError("non-regular bundle content")
         if candidate.is_file() and candidate.relative_to(root).as_posix() not in allowed_files:
             raise ValueError("unlisted bundle file: " + candidate.relative_to(root).as_posix())
-    return {"voices": 5, "texts": len(coverage), "assets": len(manifest["assets"]),
+    return {"voices": voice_count, "texts": len(coverage), "assets": len(manifest["assets"]),
             "previews": len(previews), "bytes": total_bytes,
             "manifestSha256": hashlib.sha256(manifest_path.read_bytes()).hexdigest()}
 

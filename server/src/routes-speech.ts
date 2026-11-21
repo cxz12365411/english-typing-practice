@@ -9,7 +9,8 @@ import { revalidateAuthenticatedActor, type UserRow } from "./auth.js";
 import { ApiError } from "./errors.js";
 import { requirePracticeAccess } from "./membership.js";
 
-const VOICE_IDS = ["01", "02", "03", "04", "05"] as const;
+const VOICE_IDS = ["01", "02", "03", "04", "05", "06"] as const;
+const MIN_VOICES = VOICE_IDS.length - 1;
 const HASH = /^[a-f0-9]{64}$/;
 const MAX_AUDIO_BYTES = 16 * 1024 * 1024;
 const MAX_MANIFEST_BYTES = 32 * 1024 * 1024;
@@ -44,11 +45,11 @@ function record(value: unknown): value is Record<string, unknown> {
   return value !== null && typeof value === "object" && !Array.isArray(value);
 }
 
-function validateAsset(value: unknown, prefix: "voices" | "previews"): Asset {
+function validateAsset(value: unknown, prefix: "voices" | "previews", voiceIds: ReadonlySet<string>): Asset {
   if (!record(value) || typeof value.textKey !== "string" || !HASH.test(value.textKey)
     || typeof value.originalText !== "string" || !value.originalText.length || value.originalText.length > 20_000
     || digest(value.originalText) !== value.textKey || typeof value.spokenText !== "string" || !value.spokenText.length
-    || typeof value.voiceId !== "string" || !VOICE_IDS.includes(value.voiceId as typeof VOICE_IDS[number])
+    || typeof value.voiceId !== "string" || !voiceIds.has(value.voiceId)
     || value.path !== `${prefix}/${value.voiceId}/${value.textKey}.mp3`
     || typeof value.sha256 !== "string" || !HASH.test(value.sha256)
     || typeof value.duration !== "number" || !Number.isFinite(value.duration) || value.duration <= 0 || value.duration > 300
@@ -74,9 +75,9 @@ function loadLibrary(directory: string): AudioLibrary {
   }
   const manifest: unknown = JSON.parse(readFileSync(resolvedManifest, "utf8"));
   if (!record(manifest) || manifest.manifestVersion !== 1 || !Array.isArray(manifest.voices)
-    || manifest.voices.length !== VOICE_IDS.length || !Array.isArray(manifest.assets)
+    || manifest.voices.length < MIN_VOICES || manifest.voices.length > VOICE_IDS.length || !Array.isArray(manifest.assets)
     || manifest.assets.length > 100_000 || !Array.isArray(manifest.previews)
-    || manifest.previews.length !== VOICE_IDS.length) throw new Error("Invalid speech manifest");
+    || manifest.previews.length !== manifest.voices.length) throw new Error("Invalid speech manifest");
   const voices: Voice[] = manifest.voices.map((voice: unknown, index: number) => {
     if (!record(voice) || voice.id !== VOICE_IDS[index] || typeof voice.name !== "string"
       || !voice.name.trim() || voice.name.length > 80 || /[\x00-\x1f\x7f]/.test(voice.name)) {
@@ -84,12 +85,13 @@ function loadLibrary(directory: string): AudioLibrary {
     }
     return { id: voice.id as string, name: voice.name };
   });
+  const voiceIds = new Set(voices.map(voice => voice.id));
   const assets = new Map<string, Map<string, Asset>>();
   const previews = new Map<string, Asset>();
   const seen = new Set<string>();
   for (const [prefix, rows] of [["voices", manifest.assets], ["previews", manifest.previews]] as const) {
     for (const row of rows) {
-      const asset = validateAsset(row, prefix);
+      const asset = validateAsset(row, prefix, voiceIds);
       const key = `${prefix}/${asset.voiceId}/${asset.textKey}`;
       if (seen.has(key)) throw new Error("Duplicate speech audio asset");
       seen.add(key);
@@ -110,7 +112,7 @@ function loadLibrary(directory: string): AudioLibrary {
       }
     }
   }
-  if (previews.size !== VOICE_IDS.length || !assets.size) throw new Error("Incomplete speech audio bundle");
+  if (previews.size !== voices.length || !assets.size) throw new Error("Incomplete speech audio bundle");
   return { root, voices, assets, previews };
 }
 

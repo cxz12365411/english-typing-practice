@@ -22,8 +22,10 @@ function cookie(headers: Record<string, unknown>): string {
   return String(Array.isArray(raw) ? raw[0] : raw).split(";")[0]!;
 }
 
-function bundle(root: string) {
-  const voices = ["01", "02", "03", "04", "05"].map((id) => ({ id, name: `Voice ${id}` }));
+function bundle(root: string, sixVoices = false) {
+  const ids = ["01", "02", "03", "04", "05"];
+  if (sixVoices) ids.push("06");
+  const voices = ids.map((id) => ({ id, name: `Voice ${id}` }));
   function asset(voiceId: string, prefix: "voices" | "previews", originalText: string) {
     const key = digest(originalText);
     const relative = `${prefix}/${voiceId}/${key}.mp3`;
@@ -46,9 +48,10 @@ async function fixture(t: TestContext, options: {
   missing?: boolean;
   relative?: boolean;
   role?: "user" | "admin";
+  sixVoices?: boolean;
 } = {}) {
   const root = mkdtempSync(path.join(tmpdir(), "speech-test-"));
-  const manifest = bundle(root);
+  const manifest = bundle(root, options.sixVoices);
   options.mutate?.(root, manifest);
   const db = openDatabase({ databasePath: ":memory:" });
   const app = await buildApp({ database: db, seed: false, logger: false, config: {
@@ -127,6 +130,25 @@ test("audio provides exact full, HEAD, suffix, bounded and open-ended byte range
   const preview = await app.inject({ url: "/api/speech/preview/05", headers });
   assert.equal(preview.statusCode, 200);
   assert.deepEqual(preview.rawPayload, readFileSync(path.join(root, manifest.previews[4]!.path)));
+});
+
+test("a six-voice bundle exposes the authenticated preview and the exact recording for voice 06", async (t) => {
+  const { app, root, manifest, headers } = await fixture(t, { sixVoices: true });
+  const catalog = await app.inject({ url: "/api/speech/catalog", headers });
+  const ids = ["01", "02", "03", "04", "05", "06"];
+  assert.equal(catalog.statusCode, 200);
+  assert.deepEqual(catalog.json().voices.map((v: { id: string }) => v.id), ids);
+  assert.deepEqual(catalog.json().entries[0].voiceIds, ids);
+  const routes = [
+    ["/api/speech/preview/06", manifest.previews.at(-1)!],
+    [url.replace("/01/", "/06/"), manifest.assets.at(-1)!]
+  ] as const;
+  for (const [route, asset] of routes) {
+    assert.equal((await app.inject({ url: route })).statusCode, 401);
+    const response = await app.inject({ url: route, headers });
+    assert.equal(response.statusCode, 200);
+    assert.deepEqual(response.rawPayload, readFileSync(path.join(root, asset.path)));
+  }
 });
 
 test("old URLs stop working immediately after text changes or item/category unpublishing", async (t) => {

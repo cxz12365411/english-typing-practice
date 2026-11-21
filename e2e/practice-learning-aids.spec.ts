@@ -509,8 +509,12 @@ function playbackFixture(): Buffer {
   return body;
 }
 
-async function recordedSpeech(page: Page, items: ContentItem[], options: { delayed?: Promise<void>; failAudio?: boolean } = {}) {
-  const voices = ["温柔陪练", "亲切学姐", "安静讲解", "自然教师", "清亮助手"].map((name, index) => {
+async function recordedSpeech(page: Page, items: ContentItem[], options: {
+  delayed?: Promise<void>; failAudio?: boolean; sixthVoice?: string
+} = {}) {
+  const names = ["温柔陪练", "亲切学姐", "安静讲解", "自然教师", "清亮助手"];
+  if (options.sixthVoice) names.push(options.sixthVoice);
+  const voices = names.map((name, index) => {
     const id = String(index + 1).padStart(2, "0");
     return { id, name, previewUrl: `/api/speech/preview/${id}` };
   });
@@ -554,15 +558,16 @@ async function expectPlaying(page: Page, path: string) {
   }).toBe(true);
 }
 
-test("five recorded voices play through native audio, retain rate and selection, and leave the answer intact", async ({ page }) => {
+test("all six recorded voices play through native audio, retain rate and selection, and leave the answer intact", async ({ page }) => {
   const original = item(hey, 0);
   await mockApp(page, [original]);
-  const requests = await recordedSpeech(page, [original]);
+  const requests = await recordedSpeech(page, [original], { sixthVoice: "自然旁白" });
   await readyPractice(page);
-  await expect(page.locator("#voiceSelect option")).toHaveCount(5);
+  await expect(page.locator("#voiceSelect option")).toHaveCount(6);
+  await expect(page.locator('#voiceSelect option[value="06"]')).toHaveText("06 · 自然旁白");
   await expect(page.locator("#voiceSelect")).toHaveValue("01");
   await page.locator("#answerInput").fill("Hey");
-  for (const id of ["01", "02", "03", "04", "05"]) {
+  for (const id of ["01", "02", "03", "04", "05", "06"]) {
     await page.locator("#voiceSelect").selectOption(id);
     await page.locator("#speakButton").click();
     await expectPlaying(page, `/audio/${id}/`);
@@ -574,10 +579,10 @@ test("five recorded voices play through native audio, retain rate and selection,
   await page.locator("#speechRate").dispatchEvent("input");
   expect((await mediaState(page))[0]).toMatchObject({ src: null, paused: true });
   await page.reload();
-  await expect(page.locator("#voiceSelect")).toHaveValue("05");
+  await expect(page.locator("#voiceSelect")).toHaveValue("06");
   await expect(page.locator("#speechRate")).toHaveValue("1.15");
   await page.locator("#previewVoiceBtn").click();
-  await expectPlaying(page, "/preview/05");
+  await expectPlaying(page, "/preview/06");
   expect((await mediaState(page))[0]).toMatchObject({ playbackRate: 1.15, preservesPitch: true });
   expect(requests.some(url => url.includes("itemId=original-item-0"))).toBe(true);
 });

@@ -1,5 +1,6 @@
 const settingsKey = "basicTypingSpeechSettings";
-const voiceIds = ["01", "02", "03", "04", "05"];
+const voiceIds = ["01", "02", "03", "04", "05", "06"];
+const minimumVoices = voiceIds.length - 1;
 
 interface SpeechItem { id: string; english: string }
 interface SpeechControllerOptions {
@@ -69,11 +70,15 @@ function voiceRank(voice: SpeechSynthesisVoice): number {
 function parseCatalog(value: unknown): SpeechCatalog | null {
   const data = value as { available?: unknown; voices?: RecordedVoice[]; entries?: RecordedEntry[] } | null;
   if (data?.available !== true || !Array.isArray(data.voices) || !Array.isArray(data.entries)) return null;
-  if (data.voices.length !== voiceIds.length || !voiceIds.every(id => data.voices!.filter(v => v?.id === id).length === 1)) return null;
-  if (data.voices.some(v => typeof v.name !== "string" || !v.name || (v.previewUrl !== null && v.previewUrl !== `/api/speech/preview/${v.id}`))) return null;
+  if (data.voices.length < minimumVoices || data.voices.length > voiceIds.length
+    || data.voices.some(v => !v || typeof v.id !== "string" || typeof v.name !== "string" || !v.name
+      || (v.previewUrl !== null && v.previewUrl !== `/api/speech/preview/${v.id}`))) return null;
+  const voices = [...data.voices].sort((a, b) => a.id.localeCompare(b.id));
+  if (voices.some((v, i) => v.id !== voiceIds[i])) return null;
+  const availableIds = new Set(voices.map(v => v.id));
   if (data.entries.some(e => !e || typeof e.itemId !== "string" || typeof e.english !== "string"
-    || typeof e.textKey !== "string" || !/^[a-f0-9]{64}$/.test(e.textKey) || !Array.isArray(e.voiceIds) || e.voiceIds.some(id => !voiceIds.includes(id)))) return null;
-  return { voices: [...data.voices].sort((a, b) => a.id.localeCompare(b.id)), entries: data.entries };
+    || typeof e.textKey !== "string" || !/^[a-f0-9]{64}$/.test(e.textKey) || !Array.isArray(e.voiceIds) || e.voiceIds.some(id => !availableIds.has(id)))) return null;
+  return { voices, entries: data.entries };
 }
 
 export function createSpeechController(options: SpeechControllerOptions): SpeechController {
@@ -123,9 +128,13 @@ export function createSpeechController(options: SpeechControllerOptions): Speech
   }
   function idleStatus(): string {
     if (loading) return "正在加载声音…";
-    if (catalog && audio) return currentEntry()
-      ? `当前音色：${voiceId} · ${recordedVoice()?.name}`
-      : "此题暂未生成所选声音，可继续练习，或单独使用系统 Samantha 朗读。";
+    if (catalog && audio) {
+      const selected = recordedVoice();
+      if (!selected) return "已保存的音色暂不可用，请重新选择。";
+      return currentEntry()
+        ? `当前音色：${voiceId} · ${selected.name}`
+        : "此题暂未生成所选声音，可继续练习，或单独使用系统 Samantha 朗读。";
+    }
     if (!synth) return "当前浏览器不支持系统朗读，仍可继续打字练习。";
     if (!samantha) return "录音资源暂不可用；当前设备也未提供 Samantha，仍可继续打字练习。";
     return `录音资源暂不可用，当前使用系统 ${samantha.name}（${samantha.lang}）`;
@@ -138,15 +147,21 @@ export function createSpeechController(options: SpeechControllerOptions): Speech
     if (destroyed) return;
     samantha = synth?.getVoices().filter(v => /^en(?:[-_]|$)/i.test(v.lang) && /\bSamantha\b/i.test(v.name))
       .sort((a, b) => voiceRank(a) - voiceRank(b) || a.name.localeCompare(b.name))[0] || null;
+    const selected = recordedVoice();
     const entries = loading ? [["", "正在加载声音…"]] : catalog && audio
       ? catalog.voices.map(v => [v.id, `${v.id} · ${v.name}`])
       : [["", samantha ? `自动推荐 · ${samantha.name}` : "Samantha · 当前设备不可用"]];
+    if (!loading && catalog && audio && !selected) entries.unshift(["", "请选择音色"]);
     const identity = JSON.stringify(entries);
     if (identity !== renderedOptions) {
-      voiceSelect.replaceChildren(...entries.map(([value, label]) => new Option(label, value)));
+      voiceSelect.replaceChildren(...entries.map(([value, label]) => {
+        const option = new Option(label, value);
+        option.disabled = !value;
+        return option;
+      }));
       renderedOptions = identity;
     }
-    voiceSelect.value = catalog && audio && !loading ? voiceId : "";
+    voiceSelect.value = catalog && audio && !loading ? selected?.id ?? "" : "";
     voiceSelect.disabled = loading || !(catalog && audio);
     rateInput.disabled = !supported;
     options.speakButton.disabled = !active() || loading || !options.getText() || (catalog && audio ? !currentEntry() : !samantha);
@@ -154,7 +169,7 @@ export function createSpeechController(options: SpeechControllerOptions): Speech
     fallbackButton.hidden = !catalog || !audio || (!failedAudio && Boolean(currentEntry()));
     fallbackButton.disabled = !active() || !samantha || !options.getText();
     help.textContent = catalog && audio
-      ? "五种录音声音；缺少对应录音时不会自动换声。声音和语速保存在本机。"
+      ? `${catalog.voices.length} 种录音音色。缺少对应录音时不会自动换声。声音和语速保存在本机。`
       : "录音资源恢复前使用系统 Samantha；不切换为其他系统声音。";
     if (!utterance && !playingAudio && !failedAudio) setStatus(idleStatus());
   }
@@ -261,7 +276,7 @@ export function createSpeechController(options: SpeechControllerOptions): Speech
   };
   const fallback = (): void => { const text = options.getText(); if (text) speakSystem(text); };
   const changeVoice = (): void => {
-    if (!active() || !catalog || !voiceIds.includes(voiceSelect.value)) return;
+    if (!active() || !catalog?.voices.some(voice => voice.id === voiceSelect.value)) return;
     const next = voiceSelect.value;
     stop();
     voiceId = next;

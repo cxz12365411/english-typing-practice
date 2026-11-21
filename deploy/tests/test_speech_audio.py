@@ -21,18 +21,21 @@ class SpeechAudioBundleTests(unittest.TestCase):
         self.manifest = {"manifestVersion": 1, "expectedTexts": 1, "expectedAssets": 5,
                          "voices": [], "assets": [], "previews": []}
         for voice in ("01", "02", "03", "04", "05"):
-            self.manifest["voices"].append({"id": voice, "name": voice})
-            for group, prefix, text in (("assets", "voices", "Hello."), ("previews", "previews", "A preview.")):
-                key = hashlib.sha256(text.encode()).hexdigest()
-                relative = f"{prefix}/{voice}/{key}.mp3"
-                audio = b"ID3\x00fixture-" + voice.encode()
-                target = self.root / relative
-                target.parent.mkdir(parents=True, exist_ok=True)
-                target.write_bytes(audio)
-                self.manifest[group].append({"voiceId": voice, "textKey": key, "originalText": text, "spokenText": text,
-                    "path": relative, "sha256": hashlib.sha256(audio).hexdigest(), "duration": 1.0,
-                    "sampleRate": 24000, "format": "mp3", "qaStatus": "passed"})
+            self.add_voice(voice)
         self.save()
+
+    def add_voice(self, voice):
+        self.manifest["voices"].append({"id": voice, "name": voice})
+        for group, prefix, text in (("assets", "voices", "Hello."), ("previews", "previews", "A preview.")):
+            key = hashlib.sha256(text.encode()).hexdigest()
+            relative = f"{prefix}/{voice}/{key}.mp3"
+            audio = b"ID3\x00fixture-" + voice.encode()
+            target = self.root / relative
+            target.parent.mkdir(parents=True, exist_ok=True)
+            target.write_bytes(audio)
+            self.manifest[group].append({"voiceId": voice, "textKey": key, "originalText": text, "spokenText": text,
+                "path": relative, "sha256": hashlib.sha256(audio).hexdigest(), "duration": 1.0,
+                "sampleRate": 24000, "format": "mp3", "qaStatus": "passed"})
 
     def tearDown(self):
         self.tmp.cleanup()
@@ -43,6 +46,19 @@ class SpeechAudioBundleTests(unittest.TestCase):
     def test_accepts_complete_checked_package(self):
         result = validator.verify(self.root)
         self.assertEqual((result["texts"], result["assets"], result["previews"]), (1, 5, 5))
+
+    def test_requires_a_complete_sixth_voice_when_declared(self):
+        self.add_voice("06")
+        self.manifest["expectedAssets"] = 6
+        self.save()
+        result = validator.verify(self.root)
+        self.assertEqual((result["voices"], result["assets"], result["previews"]), (6, 6, 6))
+
+        removed = self.manifest["assets"].pop()
+        (self.root / removed["path"]).unlink()
+        self.save()
+        with self.assertRaisesRegex(ValueError, "all declared voices"):
+            validator.verify(self.root)
 
     def test_tampering_cannot_be_staged(self):
         (self.root / self.manifest["assets"][0]["path"]).write_bytes(b"tampered")
@@ -65,7 +81,7 @@ class SpeechAudioBundleTests(unittest.TestCase):
         removed = self.manifest["assets"].pop()
         (self.root / removed["path"]).unlink()
         self.save()
-        with self.assertRaisesRegex(ValueError, "all five"):
+        with self.assertRaisesRegex(ValueError, "all declared voices"):
             validator.verify(self.root)
 
     def test_unreviewed_cannot_be_staged(self):
