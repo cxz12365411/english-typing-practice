@@ -6,6 +6,7 @@ import { parseSentenceMarkdown } from "../src/content-parser.js";
 import { applyTravelShoppingUpdate, TRAVEL_SHOPPING_UPDATE } from "../src/content-updates.js";
 import { bumpContentVersion, migrateAndSeed, migrateDatabase, openDatabase } from "../src/database.js";
 import { GAOKAO_WRITING_UPDATE } from "../src/gaokao-writing.js";
+import { GRADUATE_WRITING_UPDATE } from "../src/graduate-writing.js";
 
 const SOURCE = resolve(import.meta.dirname, "../..");
 const SOURCE_FILE = resolve(SOURCE, "daily-english-high-frequency-sentences.md");
@@ -13,7 +14,8 @@ const SOURCE_FILE = resolve(SOURCE, "daily-english-high-frequency-sentences.md")
 function previousCorpus() {
   const db = openDatabase({ databasePath: ":memory:" });
   migrateDatabase(db);
-  db.prepare("INSERT INTO app_meta(key, value) VALUES (?, '1'), (?, '1')").run(TRAVEL_SHOPPING_UPDATE, GAOKAO_WRITING_UPDATE);
+  db.prepare("INSERT INTO app_meta(key, value) VALUES (?, '1'), (?, '1'), (?, '1')")
+    .run(TRAVEL_SHOPPING_UPDATE, GAOKAO_WRITING_UPDATE, GRADUATE_WRITING_UPDATE);
   migrateAndSeed(db, SOURCE);
   db.prepare("DELETE FROM app_meta WHERE key = ?").run(TRAVEL_SHOPPING_UPDATE);
   return db;

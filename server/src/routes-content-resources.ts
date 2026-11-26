@@ -5,8 +5,11 @@ import { locateContentSource, type SqliteDatabase } from "./database.js";
 import { requirePracticeAccess } from "./membership.js";
 import { ApiError } from "./errors.js";
 import { GAOKAO_WRITING_SOURCE } from "./gaokao-writing.js";
+import { GRADUATE_WRITING_SOURCE } from "./graduate-writing.js";
 
-const RESOURCE_NAMES = ["sentence-alignments.json", "cet4-writing.json", "cet6-writing.json", GAOKAO_WRITING_SOURCE] as const;
+const RESOURCE_NAMES = [
+  "sentence-alignments.json", "cet4-writing.json", "cet6-writing.json", GAOKAO_WRITING_SOURCE, GRADUATE_WRITING_SOURCE
+] as const;
 
 /** Same canonical sources as the static practice, delivered only to authorized learners. */
 export async function registerContentResourceRoutes(

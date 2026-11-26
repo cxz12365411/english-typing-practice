@@ -13,7 +13,7 @@ class DeploymentAssetTests(unittest.TestCase):
     def test_writing_source_survives_staging_and_release_permissions(self) -> None:
         stage = (DEPLOY / "scripts" / "stage-release.sh").read_text(encoding="utf-8")
         deploy = (DEPLOY / "scripts" / "deploy-release.sh").read_text(encoding="utf-8")
-        for name in ("cet4-writing.json", "cet6-writing.json", "gaokao-writing.json"):
+        for name in ("cet4-writing.json", "cet6-writing.json", "gaokao-writing.json", "graduate-writing.json"):
             self.assertIn(f'"$build_dir/{name}" "$staging/{name}"', stage)
             self.assertIn(f"  {name} \\\n", deploy)
             self.assertIn(f'-m 0640 -o root -g englishapp "${{incoming}}/{name}" "$staging_dir/{name}"', deploy)

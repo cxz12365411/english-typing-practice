@@ -12,12 +12,14 @@ import { BoundedWorkPool, hashPassword, tokenHash } from "../src/security.js";
 import { parseCet6WritingContent } from "../src/cet6-writing.js";
 import { parseCet4WritingContent } from "../src/cet4-writing.js";
 import { GAOKAO_WRITING_SOURCE, parseGaokaoWritingContent } from "../src/gaokao-writing.js";
+import { GRADUATE_WRITING_SOURCE, parseGraduateWritingContent } from "../src/graduate-writing.js";
 
 const ORIGIN = "https://english.test";
 const SOURCE = resolve(import.meta.dirname, "../..");
 const WRITING_COUNT = parseCet4WritingContent(JSON.parse(readFileSync(resolve(SOURCE, "cet4-writing.json"), "utf8"))).items.length +
   parseCet6WritingContent(JSON.parse(readFileSync(resolve(SOURCE, "cet6-writing.json"), "utf8"))).items.length +
-  parseGaokaoWritingContent(JSON.parse(readFileSync(resolve(SOURCE, GAOKAO_WRITING_SOURCE), "utf8"))).items.length;
+  parseGaokaoWritingContent(JSON.parse(readFileSync(resolve(SOURCE, GAOKAO_WRITING_SOURCE), "utf8"))).items.length +
+  parseGraduateWritingContent(JSON.parse(readFileSync(resolve(SOURCE, GRADUATE_WRITING_SOURCE), "utf8"))).items.length;
 
 interface Client {
   cookie: string;

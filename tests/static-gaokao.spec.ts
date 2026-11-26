@@ -29,8 +29,10 @@ for (const entry of ["/index.html", "/typing-practice.html"]) {
     await expect(page.locator("#answerInput")).toBeEnabled();
     const categories = page.locator("#categorySelect");
     const labels = await categories.locator("option").allTextContents();
-    expect(labels.slice(-10)).toEqual(writing.parse(data).categories.map((category: { name: string }) => category.name));
-    expect(labels.at(-11)).toMatch(/^六级句型：/);
+    const startIndex = labels.findIndex(label => label.startsWith("高考应用文："));
+    expect(labels.slice(startIndex, startIndex + 10)).toEqual(writing.parse(data).categories.map((category: { name: string }) => category.name));
+    expect(labels[startIndex - 1]).toMatch(/^六级句型：/);
+    expect(labels[startIndex + 10]).toMatch(/^考研英语一·小作文：/);
 
     await categories.selectOption(`高考应用文：${application.title}`);
     await expect(page.locator("#positionText")).toHaveText("1 / 6");

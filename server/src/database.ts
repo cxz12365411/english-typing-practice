@@ -9,6 +9,7 @@ import { applyContentUpdates, applyTravelShoppingUpdate } from "./content-update
 import { applyCet6WritingUpdate } from "./cet6-writing.js";
 import { applyCet4WritingUpdate } from "./cet4-writing.js";
 import { applyGaokaoWritingUpdate, GAOKAO_WRITING_SOURCE } from "./gaokao-writing.js";
+import { applyGraduateWritingUpdate, GRADUATE_WRITING_SOURCE } from "./graduate-writing.js";
 
 export type SqliteDatabase = Database.Database;
 
@@ -586,12 +587,18 @@ export function migrateAndSeed(db: SqliteDatabase, explicitSourceDir?: string): 
       () => JSON.parse(readFileSync(resolve(locateContentSource(explicitSourceDir), GAOKAO_WRITING_SOURCE), "utf8")),
       () => bumpContentVersion(db)
     );
+    const graduateWriting = applyGraduateWritingUpdate(
+      db,
+      () => JSON.parse(readFileSync(resolve(locateContentSource(explicitSourceDir), GRADUATE_WRITING_SOURCE), "utf8")),
+      () => bumpContentVersion(db)
+    );
     const counts = contentCounts(db);
     return {
       categoriesInserted: seeded.categoriesInserted + updated.categoriesInserted + writing.categoriesInserted +
-        advancedWriting.categoriesInserted + travelShopping.categoriesInserted + gaokaoWriting.categoriesInserted,
+        advancedWriting.categoriesInserted + travelShopping.categoriesInserted + gaokaoWriting.categoriesInserted +
+        graduateWriting.categoriesInserted,
       itemsInserted: seeded.itemsInserted + updated.itemsInserted + writing.itemsInserted + advancedWriting.itemsInserted +
-        travelShopping.itemsInserted + gaokaoWriting.itemsInserted,
+        travelShopping.itemsInserted + gaokaoWriting.itemsInserted + graduateWriting.itemsInserted,
       words: counts.words,
       sentences: counts.sentences
     };

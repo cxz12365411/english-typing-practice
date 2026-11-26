@@ -167,10 +167,12 @@ assert_status "$status" 401 "anonymous admin access"
 # Compatibility releases do not expose the membership routes yet.
 protected_routes=(/api/membership /api/payments/orders /api/content-resources/sentence-alignments.json /api/content-resources/cet4-writing.json /api/content-resources/cet6-writing.json)
 retired_resources=(/sentence-alignments.json /cet4-writing.json /cet6-writing.json /assets/sentence-alignments-retired123.json /assets/cet4-writing-retired123.json)
-if [[ -f "${CURRENT_SERVER}/../gaokao-writing.json" ]]; then
-  protected_routes+=(/api/content-resources/gaokao-writing.json)
-  retired_resources+=(/gaokao-writing.json /assets/gaokao-writing-retired123.json)
-fi
+for source in gaokao-writing graduate-writing; do
+  if [[ -f "${CURRENT_SERVER}/../${source}.json" ]]; then
+    protected_routes+=("/api/content-resources/${source}.json")
+    retired_resources+=("/${source}.json" "/assets/${source}-retired123.json")
+  fi
+done
 if [[ -f "${CURRENT_SERVER}/dist/membership.js" ]]; then
   for route in "${protected_routes[@]}"; do
     status="$(curl_status "${BASE_URL}${route}" "${temp_dir}/protected.body" "${temp_dir}/protected.headers")"

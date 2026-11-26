@@ -99,6 +99,7 @@ fi
 /usr/bin/install -m 0600 -o root -g root "$build_dir/cet4-writing.json" "$staging/cet4-writing.json"
 /usr/bin/install -m 0600 -o root -g root "$build_dir/cet6-writing.json" "$staging/cet6-writing.json"
 /usr/bin/install -m 0600 -o root -g root "$build_dir/gaokao-writing.json" "$staging/gaokao-writing.json"
+/usr/bin/install -m 0600 -o root -g root "$build_dir/graduate-writing.json" "$staging/graduate-writing.json"
 /usr/bin/install -m 0600 -o root -g root "$build_dir/sentence-alignments.json" "$staging/sentence-alignments.json"
 
 for workspace_link in english-typing-practice-server english-typing-practice-web; do

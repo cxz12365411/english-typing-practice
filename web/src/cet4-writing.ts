@@ -3,7 +3,7 @@ import "../../cet4-writing.css";
 import type { ContentCategory, ContentItem } from "./types";
 import { mustElement } from "./ui";
 
-const writingDataUrls = ["cet4-writing.json", "cet6-writing.json", "gaokao-writing.json"]
+const writingDataUrls = ["cet4-writing.json", "cet6-writing.json", "gaokao-writing.json", "graduate-writing.json"]
   .map(name => `/api/content-resources/${name}`);
 
 interface WritingItem {

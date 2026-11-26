@@ -1234,7 +1234,8 @@
         const writingResources = [
           { url: "cet4-writing.json", label: "四级作文" },
           { url: "cet6-writing.json", label: "六级作文" },
-          { url: "gaokao-writing.json", label: "高考作文" }
+          { url: "gaokao-writing.json", label: "高考作文" },
+          { url: "graduate-writing.json", label: "考研作文" }
         ];
         const [wordResponse, sentenceResponse, writingData] = await Promise.all([
           fetch("basic-english-850.md", { cache: "no-store" }),

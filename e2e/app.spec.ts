@@ -3,7 +3,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { expect, test, type Page } from "@playwright/test";
 
-const writingSources = ["cet4-writing.json", "cet6-writing.json", "gaokao-writing.json"];
+const writingSources = ["cet4-writing.json", "cet6-writing.json", "gaokao-writing.json", "graduate-writing.json"];
 const writingCorpus = writingSources.map((file) => require("../cet4-writing.js").parse(JSON.parse(readFileSync(file, "utf8"))));
 const totalSentences = 294 + writingCorpus.reduce((sum, content) => sum + content.items.length, 0);
 const categoryOptions = 1 + 4 + 23 + writingCorpus.reduce((sum, content) => sum + content.categories.length, 0);

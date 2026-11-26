@@ -114,7 +114,7 @@ modify login fields, practice answers, or learning records.
 
 The account practice page and both standalone pages share `alignment.js`,
 `alignment.css`, and `sentence-alignments.json`. The account build bundles the
-renderer and styles and publishes the data with a content-hashed asset URL.
+renderer and styles and loads the data through the authenticated content API.
 **对应箭头** is enabled by default and saved in the
 current browser. Hover, click, or Tab to an English word to highlight its semantic
 group and explanation; Escape clears the selection. On narrow screens, scroll
@@ -125,8 +125,8 @@ update it, and a typo keeps the highlight at the first incorrect word. Long
 diagrams scroll horizontally to keep the current word visible without moving the
 page or interrupting the answer.
 
-All 850 words link to their existing complete definitions. All 578 sentences (294
-conversation sentences, 130 CET-4, 78 CET-6 and 76 Gaokao practice sentences) have
+All 850 words link to their existing complete definitions. All 638 sentences (294
+conversation sentences, 130 CET-4, 78 CET-6, 76 Gaokao and 60 graduate practice sentences) have
 reviewed semantic groups: contractions, hyphenated words, numbers, and `____` are
 tokens; punctuation and spaces remain unchanged. Articles, auxiliaries, idioms,
 and omitted words belong to their full expression, with explanatory notes where
@@ -283,3 +283,15 @@ the six published voices.
 The `content_update:gaokao-writing-v1` update adds ten categories under stable
 `gaokao-*` keys. The account site serves the source through the authorized
 `/api/content-resources/gaokao-writing.json` route.
+
+## Graduate entrance exam writing practice
+
+`graduate-writing.json` contains eight original essays. English I and English II
+each have two short applications and two long essays. English I long prompts
+describe original two-panel scenes. English II long prompts include table data
+created for the exercises. Learners can read the materials while the model essay
+is hidden. Only the 60 bilingual body sentences enter typing practice.
+
+The `content_update:graduate-writing-v1` transaction preserves prior content and
+progress and publishes the categories under stable `grad-*` keys. The authorized
+`/api/content-resources/graduate-writing.json` endpoint serves the writing source.

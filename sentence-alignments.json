@@ -32848,6 +32848,3123 @@
           ]
         }
       ]
+    },
+    {
+      "english": "On behalf of the student union, I would like to invite you to speak at our career roundtable for graduating students.",
+      "meaning": "我谨代表学生会，邀请您担任毕业生职业圆桌的分享嘉宾。",
+      "zhParts": [
+        "我谨代表学生会",
+        "，",
+        "邀请您",
+        "担任毕业生职业圆桌的分享嘉宾",
+        "。"
+      ],
+      "groups": [
+        {
+          "en": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5
+          ],
+          "zh": [
+            0
+          ]
+        },
+        {
+          "en": [
+            6,
+            7,
+            8,
+            9,
+            10,
+            11
+          ],
+          "zh": [
+            2
+          ]
+        },
+        {
+          "en": [
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20
+          ],
+          "zh": [
+            3
+          ]
+        }
+      ]
+    },
+    {
+      "english": "The event will take place next Friday evening in the main hall of the student center.",
+      "meaning": "活动将于下周五晚在学生活动中心的大厅举行。",
+      "zhParts": [
+        "活动将于",
+        "下周五晚",
+        "在学生活动中心的大厅举行",
+        "。"
+      ],
+      "groups": [
+        {
+          "en": [
+            0,
+            1,
+            2,
+            3,
+            4
+          ],
+          "zh": [
+            0
+          ]
+        },
+        {
+          "en": [
+            5,
+            6,
+            7
+          ],
+          "zh": [
+            1
+          ]
+        },
+        {
+          "en": [
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15
+          ],
+          "zh": [
+            2
+          ]
+        }
+      ]
+    },
+    {
+      "english": "We would especially value your advice on moving from university into the workplace.",
+      "meaning": "我们特别希望听听您对如何从校园过渡到职场的建议。",
+      "zhParts": [
+        "我们特别希望听听",
+        "您对如何从校园过渡到职场的建议",
+        "。"
+      ],
+      "groups": [
+        {
+          "en": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "zh": [
+            0
+          ]
+        },
+        {
+          "en": [
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12
+          ],
+          "zh": [
+            1
+          ]
+        }
+      ]
+    },
+    {
+      "english": "If possible, please tell us about a difficult decision you faced in your first year at work.",
+      "meaning": "如果方便，请讲讲您在工作的第一年遇到的一次艰难抉择。",
+      "zhParts": [
+        "如果方便",
+        "，",
+        "请讲讲",
+        "您在工作的第一年",
+        "遇到的一次艰难抉择",
+        "。"
+      ],
+      "groups": [
+        {
+          "en": [
+            0,
+            1
+          ],
+          "zh": [
+            0
+          ]
+        },
+        {
+          "en": [
+            2,
+            3,
+            4,
+            5
+          ],
+          "zh": [
+            2
+          ]
+        },
+        {
+          "en": [
+            6,
+            7,
+            8,
+            9,
+            10
+          ],
+          "zh": [
+            4
+          ]
+        },
+        {
+          "en": [
+            11,
+            12,
+            13,
+            14,
+            15,
+            16
+          ],
+          "zh": [
+            3
+          ]
+        }
+      ]
+    },
+    {
+      "english": "Each guest will speak for ten minutes before taking questions from the audience about their own career choices.",
+      "meaning": "每位嘉宾将分享十分钟，随后回答听众关于职业选择的提问。",
+      "zhParts": [
+        "每位嘉宾将分享",
+        "十分钟",
+        "，",
+        "随后回答听众",
+        "关于职业选择的提问",
+        "。"
+      ],
+      "groups": [
+        {
+          "en": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "zh": [
+            0
+          ]
+        },
+        {
+          "en": [
+            4,
+            5,
+            6
+          ],
+          "zh": [
+            1
+          ]
+        },
+        {
+          "en": [
+            7,
+            8,
+            9,
+            10,
+            11,
+            12
+          ],
+          "zh": [
+            3
+          ]
+        },
+        {
+          "en": [
+            13,
+            14,
+            15,
+            16,
+            17
+          ],
+          "zh": [
+            4
+          ]
+        }
+      ]
+    },
+    {
+      "english": "Could you let me know by Monday whether you are available?",
+      "meaning": "您能否在周一前告知我是否有空出席？",
+      "zhParts": [
+        "您能否",
+        "在周一前",
+        "告知我",
+        "是否有空出席",
+        "？"
+      ],
+      "groups": [
+        {
+          "en": [
+            0,
+            1
+          ],
+          "zh": [
+            0
+          ]
+        },
+        {
+          "en": [
+            2,
+            3,
+            4
+          ],
+          "zh": [
+            2
+          ]
+        },
+        {
+          "en": [
+            5,
+            6
+          ],
+          "zh": [
+            1
+          ]
+        },
+        {
+          "en": [
+            7,
+            8,
+            9,
+            10
+          ],
+          "zh": [
+            3
+          ]
+        }
+      ]
+    },
+    {
+      "english": "I am writing to suggest a way to make quiet study seats easier to find during the busiest weeks of the examination period.",
+      "meaning": "我写信是想提一个建议，帮助同学们在备考最紧张的几周更容易找到安静的自习座位。",
+      "zhParts": [
+        "我写信是想提一个建议",
+        "，",
+        "帮助同学们在备考最紧张的几周更容易找到安静的自习座位",
+        "。"
+      ],
+      "groups": [
+        {
+          "en": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6
+          ],
+          "zh": [
+            0
+          ]
+        },
+        {
+          "en": [
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21,
+            22
+          ],
+          "zh": [
+            2
+          ]
+        }
+      ]
+    },
+    {
+      "english": "Many students walk between floors several times before a seat becomes available.",
+      "meaning": "许多同学要在几个楼层之间来回找上好几趟，才能等到空位。",
+      "zhParts": [
+        "许多同学",
+        "要在几个楼层之间来回找上好几趟",
+        "，",
+        "才能等到空位",
+        "。"
+      ],
+      "groups": [
+        {
+          "en": [
+            0,
+            1
+          ],
+          "zh": [
+            0
+          ]
+        },
+        {
+          "en": [
+            2,
+            3,
+            4,
+            5,
+            6
+          ],
+          "zh": [
+            1
+          ]
+        },
+        {
+          "en": [
+            7,
+            8,
+            9,
+            10,
+            11
+          ],
+          "zh": [
+            3
+          ]
+        }
+      ]
+    },
+    {
+      "english": "The library could set aside a small group of seats for two-hour reservations through its website.",
+      "meaning": "图书馆可以划出一小部分座位，让同学们在网站上预约两小时的使用时段。",
+      "zhParts": [
+        "图书馆可以划出",
+        "一小部分座位",
+        "，",
+        "让同学们在网站上预约两小时的使用时段",
+        "。"
+      ],
+      "groups": [
+        {
+          "en": [
+            0,
+            1,
+            2,
+            3,
+            4
+          ],
+          "zh": [
+            0
+          ]
+        },
+        {
+          "en": [
+            5,
+            6,
+            7,
+            8,
+            9
+          ],
+          "zh": [
+            1
+          ]
+        },
+        {
+          "en": [
+            10,
+            11,
+            12,
+            13,
+            14,
+            15
+          ],
+          "zh": [
+            3
+          ]
+        }
+      ]
+    },
+    {
+      "english": "If a reader does not arrive within fifteen minutes, the seat could be released automatically.",
+      "meaning": "如果预约者十五分钟内未到，座位可以自动释放。",
+      "zhParts": [
+        "如果预约者",
+        "十五分钟内未到",
+        "，",
+        "座位可以自动释放",
+        "。"
+      ],
+      "groups": [
+        {
+          "en": [
+            0,
+            1,
+            2
+          ],
+          "zh": [
+            0
+          ]
+        },
+        {
+          "en": [
+            3,
+            4,
+            5,
+            6,
+            7,
+            8
+          ],
+          "zh": [
+            1
+          ]
+        },
+        {
+          "en": [
+            9,
+            10,
+            11,
+            12,
+            13,
+            14
+          ],
+          "zh": [
+            3
+          ]
+        }
+      ]
+    },
+    {
+      "english": "Other seats would remain open to readers who prefer to walk in.",
+      "meaning": "其他座位仍供直接到馆的读者使用。",
+      "zhParts": [
+        "其他座位",
+        "仍供",
+        "直接到馆的读者使用",
+        "。"
+      ],
+      "groups": [
+        {
+          "en": [
+            0,
+            1
+          ],
+          "zh": [
+            0
+          ]
+        },
+        {
+          "en": [
+            2,
+            3,
+            4,
+            5
+          ],
+          "zh": [
+            1
+          ]
+        },
+        {
+          "en": [
+            6,
+            7,
+            8,
+            9,
+            10,
+            11
+          ],
+          "zh": [
+            2
+          ]
+        }
+      ]
+    },
+    {
+      "english": "A short trial would show whether this system reduces waiting without making access less fair.",
+      "meaning": "短期试行可以检验这个办法能否缩短等待时间，同时保持座位分配的公平性。",
+      "zhParts": [
+        "短期试行可以检验",
+        "这个办法能否缩短等待时间",
+        "，",
+        "同时保持座位分配的公平性",
+        "。"
+      ],
+      "groups": [
+        {
+          "en": [
+            0,
+            1,
+            2,
+            3,
+            4
+          ],
+          "zh": [
+            0
+          ]
+        },
+        {
+          "en": [
+            5,
+            6,
+            7,
+            8,
+            9
+          ],
+          "zh": [
+            1
+          ]
+        },
+        {
+          "en": [
+            10,
+            11,
+            12,
+            13,
+            14
+          ],
+          "zh": [
+            3
+          ]
+        }
+      ]
+    },
+    {
+      "english": "The first panel shows three students staring at a broken lamp in a shared workshop while they wait for detailed instructions.",
+      "meaning": "第一幅图中，三个学生在共用工作间里盯着一盏坏台灯，等待详细的操作说明。",
+      "zhParts": [
+        "第一幅图中",
+        "，",
+        "三个学生在共用工作间里盯着一盏坏台灯",
+        "，",
+        "等待详细的操作说明",
+        "。"
+      ],
+      "groups": [
+        {
+          "en": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "zh": [
+            0
+          ]
+        },
+        {
+          "en": [
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14
+          ],
+          "zh": [
+            2
+          ]
+        },
+        {
+          "en": [
+            15,
+            16,
+            17,
+            18,
+            19,
+            20
+          ],
+          "zh": [
+            4
+          ]
+        }
+      ]
+    },
+    {
+      "english": "In the second panel, another group has already taken the lamp apart and is comparing its damaged switch with a spare one.",
+      "meaning": "第二幅图中，另一组学生已经拆开台灯，正在把损坏的开关与备用开关进行对比。",
+      "zhParts": [
+        "第二幅图中",
+        "，",
+        "另一组学生已经拆开台灯",
+        "，",
+        "正在把损坏的开关与备用开关进行对比",
+        "。"
+      ],
+      "groups": [
+        {
+          "en": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "zh": [
+            0
+          ]
+        },
+        {
+          "en": [
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11
+          ],
+          "zh": [
+            2
+          ]
+        },
+        {
+          "en": [
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21
+          ],
+          "zh": [
+            4
+          ]
+        }
+      ]
+    },
+    {
+      "english": "Both groups face the same problem, but only the second group has turned uncertainty into a task it can work on.",
+      "meaning": "两组面对的是同一个问题，第二组却把不确定的情况变成了自己可以着手解决的具体任务。",
+      "zhParts": [
+        "两组面对的是同一个问题",
+        "，",
+        "第二组却把",
+        "不确定的情况变成了自己可以着手解决的具体任务",
+        "。"
+      ],
+      "groups": [
+        {
+          "en": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5
+          ],
+          "zh": [
+            0
+          ]
+        },
+        {
+          "en": [
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12
+          ],
+          "zh": [
+            2
+          ]
+        },
+        {
+          "en": [
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20
+          ],
+          "zh": [
+            3
+          ]
+        }
+      ]
+    },
+    {
+      "english": "The contrast suggests that taking a modest first step often teaches us more than waiting for a perfect plan.",
+      "meaning": "这种对比说明，先迈出力所能及的一步，往往比等待完美方案更能让我们有所收获。",
+      "zhParts": [
+        "这种对比说明",
+        "，",
+        "先迈出力所能及的一步",
+        "，",
+        "往往比等待完美方案更能让我们有所收获",
+        "。"
+      ],
+      "groups": [
+        {
+          "en": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "zh": [
+            0
+          ]
+        },
+        {
+          "en": [
+            4,
+            5,
+            6,
+            7,
+            8
+          ],
+          "zh": [
+            2
+          ]
+        },
+        {
+          "en": [
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18
+          ],
+          "zh": [
+            4
+          ]
+        }
+      ]
+    },
+    {
+      "english": "A simple test reveals practical difficulties that would remain invisible in long discussions about what might go wrong.",
+      "meaning": "一个简单的测试就能暴露一些实际难题，而反复讨论哪里可能出错，很难发现它们。",
+      "zhParts": [
+        "一个简单的测试",
+        "就能暴露一些实际难题",
+        "，",
+        "而反复讨论哪里可能出错，很难发现它们",
+        "。"
+      ],
+      "groups": [
+        {
+          "en": [
+            0,
+            1,
+            2
+          ],
+          "zh": [
+            0
+          ]
+        },
+        {
+          "en": [
+            3,
+            4,
+            5
+          ],
+          "zh": [
+            1
+          ]
+        },
+        {
+          "en": [
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17
+          ],
+          "zh": [
+            3
+          ]
+        }
+      ]
+    },
+    {
+      "english": "It also gives teammates something concrete to examine, so their suggestions become more specific and useful.",
+      "meaning": "简单的测试也给了队友一个可以仔细查看的对象，使他们提出的建议更具体、更实用。",
+      "zhParts": [
+        "简单的测试也给了队友",
+        "一个可以仔细查看的对象",
+        "，",
+        "使他们提出的建议更具体、更实用",
+        "。"
+      ],
+      "groups": [
+        {
+          "en": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "zh": [
+            0
+          ]
+        },
+        {
+          "en": [
+            4,
+            5,
+            6,
+            7
+          ],
+          "zh": [
+            1
+          ]
+        },
+        {
+          "en": [
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15
+          ],
+          "zh": [
+            3
+          ]
+        }
+      ]
+    },
+    {
+      "english": "At university, groups planning a new service could start by testing one feature with a few users.",
+      "meaning": "在大学里，策划新服务的小组可以先邀请少数用户试用其中一项功能。",
+      "zhParts": [
+        "在大学里",
+        "，",
+        "策划新服务的小组",
+        "可以先邀请少数用户试用其中一项功能",
+        "。"
+      ],
+      "groups": [
+        {
+          "en": [
+            0,
+            1
+          ],
+          "zh": [
+            0
+          ]
+        },
+        {
+          "en": [
+            2,
+            3,
+            4,
+            5,
+            6
+          ],
+          "zh": [
+            2
+          ]
+        },
+        {
+          "en": [
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16
+          ],
+          "zh": [
+            3
+          ]
+        }
+      ]
+    },
+    {
+      "english": "A trial that costs little and can be reversed makes it easier to learn from mistakes.",
+      "meaning": "小规模试验成本低，也容易撤回，让人更容易从失误中学习。",
+      "zhParts": [
+        "小规模试验成本低",
+        "，",
+        "也容易撤回",
+        "，",
+        "让人更容易从失误中学习",
+        "。"
+      ],
+      "groups": [
+        {
+          "en": [
+            0,
+            1,
+            2,
+            3,
+            4
+          ],
+          "zh": [
+            0
+          ]
+        },
+        {
+          "en": [
+            5,
+            6,
+            7,
+            8
+          ],
+          "zh": [
+            2
+          ]
+        },
+        {
+          "en": [
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15
+          ],
+          "zh": [
+            4
+          ]
+        }
+      ]
+    },
+    {
+      "english": "By repeating this process, students can develop the judgment needed to tackle harder problems independently.",
+      "meaning": "反复练习这个过程，学生就能培养判断力，逐渐学会独立解决更难的问题。",
+      "zhParts": [
+        "反复练习这个过程",
+        "，",
+        "学生就能培养判断力",
+        "，",
+        "逐渐学会独立解决更难的问题",
+        "。"
+      ],
+      "groups": [
+        {
+          "en": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "zh": [
+            0
+          ]
+        },
+        {
+          "en": [
+            4,
+            5,
+            6,
+            7,
+            8
+          ],
+          "zh": [
+            2
+          ]
+        },
+        {
+          "en": [
+            9,
+            10,
+            11,
+            12,
+            13,
+            14
+          ],
+          "zh": [
+            4
+          ]
+        }
+      ]
+    },
+    {
+      "english": "In the first panel, a student saves a stream of articles on her phone while a growing pile of unread bookmarks covers the screen.",
+      "meaning": "第一幅图中，一名学生不断在手机上收藏文章，屏幕上待读的书签越积越多。",
+      "zhParts": [
+        "第一幅图中",
+        "，",
+        "一名学生不断在手机上收藏文章",
+        "，",
+        "屏幕上待读的书签越积越多",
+        "。"
+      ],
+      "groups": [
+        {
+          "en": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "zh": [
+            0
+          ]
+        },
+        {
+          "en": [
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13
+          ],
+          "zh": [
+            2
+          ]
+        },
+        {
+          "en": [
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21,
+            22,
+            23
+          ],
+          "zh": [
+            4
+          ]
+        }
+      ]
+    },
+    {
+      "english": "The second panel shows another student reading one article at a desk and writing a question beside a passage that puzzles him.",
+      "meaning": "第二幅图中，另一名学生坐在桌前阅读一篇文章，并在一段让他不解的文字旁写下问题。",
+      "zhParts": [
+        "第二幅图中",
+        "，",
+        "另一名学生坐在桌前阅读一篇文章",
+        "，",
+        "并在一段让他不解的文字旁写下问题",
+        "。"
+      ],
+      "groups": [
+        {
+          "en": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "zh": [
+            0
+          ]
+        },
+        {
+          "en": [
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11
+          ],
+          "zh": [
+            2
+          ]
+        },
+        {
+          "en": [
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21
+          ],
+          "zh": [
+            4
+          ]
+        }
+      ]
+    },
+    {
+      "english": "The first student has gathered plenty of material, whereas the second has begun to make sense of what he reads.",
+      "meaning": "第一名学生积累了大量材料，而第二名学生已经开始理解自己读到的内容。",
+      "zhParts": [
+        "第一名学生",
+        "积累了大量材料",
+        "，",
+        "而第二名学生",
+        "已经开始理解自己读到的内容",
+        "。"
+      ],
+      "groups": [
+        {
+          "en": [
+            0,
+            1,
+            2
+          ],
+          "zh": [
+            0
+          ]
+        },
+        {
+          "en": [
+            3,
+            4,
+            5,
+            6,
+            7
+          ],
+          "zh": [
+            1
+          ]
+        },
+        {
+          "en": [
+            8,
+            9,
+            10
+          ],
+          "zh": [
+            3
+          ]
+        },
+        {
+          "en": [
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19
+          ],
+          "zh": [
+            4
+          ]
+        }
+      ]
+    },
+    {
+      "english": "Collecting links can be useful when we need to organize sources, but the habit alone does little to improve understanding.",
+      "meaning": "需要整理资料时，收藏链接确实有用，但光是收藏，很难加深理解。",
+      "zhParts": [
+        "需要整理资料时",
+        "，",
+        "收藏链接确实有用",
+        "，",
+        "但光是收藏",
+        "，",
+        "很难加深理解",
+        "。"
+      ],
+      "groups": [
+        {
+          "en": [
+            0,
+            1,
+            2,
+            3,
+            4
+          ],
+          "zh": [
+            2
+          ]
+        },
+        {
+          "en": [
+            5,
+            6,
+            7,
+            8,
+            9,
+            10
+          ],
+          "zh": [
+            0
+          ]
+        },
+        {
+          "en": [
+            11,
+            12,
+            13,
+            14
+          ],
+          "zh": [
+            4
+          ]
+        },
+        {
+          "en": [
+            15,
+            16,
+            17,
+            18,
+            19
+          ],
+          "zh": [
+            6
+          ]
+        }
+      ]
+    },
+    {
+      "english": "Careful readers follow an argument, examine its evidence and consider how it fits with what they already know.",
+      "meaning": "细心的读者会顺着论证思路往下看，考察证据，并思考它与已有知识的关系。",
+      "zhParts": [
+        "细心的读者",
+        "会顺着论证思路往下看",
+        "，",
+        "考察证据",
+        "，",
+        "并思考它与已有知识的关系",
+        "。"
+      ],
+      "groups": [
+        {
+          "en": [
+            0,
+            1
+          ],
+          "zh": [
+            0
+          ]
+        },
+        {
+          "en": [
+            2,
+            3,
+            4
+          ],
+          "zh": [
+            1
+          ]
+        },
+        {
+          "en": [
+            5,
+            6,
+            7
+          ],
+          "zh": [
+            3
+          ]
+        },
+        {
+          "en": [
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17
+          ],
+          "zh": [
+            5
+          ]
+        }
+      ]
+    },
+    {
+      "english": "These steps help them recognize a weak claim even when it has been shared widely.",
+      "meaning": "这些步骤能帮助读者识别站不住脚的说法，即使这种说法已经广泛传播。",
+      "zhParts": [
+        "这些步骤能帮助读者",
+        "识别站不住脚的说法",
+        "，",
+        "即使这种说法已经广泛传播",
+        "。"
+      ],
+      "groups": [
+        {
+          "en": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "zh": [
+            0
+          ]
+        },
+        {
+          "en": [
+            4,
+            5,
+            6,
+            7
+          ],
+          "zh": [
+            1
+          ]
+        },
+        {
+          "en": [
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14
+          ],
+          "zh": [
+            3
+          ]
+        }
+      ]
+    },
+    {
+      "english": "One practical habit is to put the article aside and summarize its main point from memory.",
+      "meaning": "一个实用的做法是先把文章放到一边，再凭记忆概括它的主要观点。",
+      "zhParts": [
+        "一个实用的做法是",
+        "先把文章放到一边",
+        "，",
+        "再凭记忆概括它的主要观点",
+        "。"
+      ],
+      "groups": [
+        {
+          "en": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "zh": [
+            0
+          ]
+        },
+        {
+          "en": [
+            4,
+            5,
+            6,
+            7,
+            8
+          ],
+          "zh": [
+            1
+          ]
+        },
+        {
+          "en": [
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15
+          ],
+          "zh": [
+            3
+          ]
+        }
+      ]
+    },
+    {
+      "english": "Readers can then compare their summaries with a classmate and return to the text whenever their interpretations differ.",
+      "meaning": "读者接着可以和同学对照各自的概括，理解有分歧时就回到原文核对。",
+      "zhParts": [
+        "读者接着可以",
+        "和同学对照各自的概括",
+        "，",
+        "理解有分歧时",
+        "就回到原文核对",
+        "。"
+      ],
+      "groups": [
+        {
+          "en": [
+            0,
+            1,
+            2
+          ],
+          "zh": [
+            0
+          ]
+        },
+        {
+          "en": [
+            3,
+            4,
+            5,
+            6,
+            7,
+            8
+          ],
+          "zh": [
+            1
+          ]
+        },
+        {
+          "en": [
+            9,
+            10,
+            11,
+            12,
+            13
+          ],
+          "zh": [
+            4
+          ]
+        },
+        {
+          "en": [
+            14,
+            15,
+            16,
+            17
+          ],
+          "zh": [
+            3
+          ]
+        }
+      ]
+    },
+    {
+      "english": "A few deliberate minutes of this kind can make regular reading a valuable exercise in independent thinking.",
+      "meaning": "每天抽出几分钟有意识地这样练，可以让日常阅读成为训练独立思考的好机会。",
+      "zhParts": [
+        "每天抽出几分钟有意识地这样练",
+        "，",
+        "可以让日常阅读",
+        "成为训练独立思考的好机会",
+        "。"
+      ],
+      "groups": [
+        {
+          "en": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6
+          ],
+          "zh": [
+            0
+          ]
+        },
+        {
+          "en": [
+            7,
+            8,
+            9,
+            10
+          ],
+          "zh": [
+            2
+          ]
+        },
+        {
+          "en": [
+            11,
+            12,
+            13,
+            14,
+            15,
+            16
+          ],
+          "zh": [
+            3
+          ]
+        }
+      ]
+    },
+    {
+      "english": "The university library is looking for student volunteers to help repair books that are still useful but too damaged to lend.",
+      "meaning": "校图书馆正在招募学生志愿者，协助修复仍有价值但因破损无法外借的图书。",
+      "zhParts": [
+        "校图书馆",
+        "正在招募学生志愿者",
+        "，",
+        "协助修复",
+        "仍有价值但因破损无法外借的图书",
+        "。"
+      ],
+      "groups": [
+        {
+          "en": [
+            0,
+            1,
+            2
+          ],
+          "zh": [
+            0
+          ]
+        },
+        {
+          "en": [
+            3,
+            4,
+            5,
+            6,
+            7
+          ],
+          "zh": [
+            1
+          ]
+        },
+        {
+          "en": [
+            8,
+            9,
+            10,
+            11
+          ],
+          "zh": [
+            3
+          ]
+        },
+        {
+          "en": [
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20
+          ],
+          "zh": [
+            4
+          ]
+        }
+      ]
+    },
+    {
+      "english": "The project starts next Saturday morning in the seminar room on the ground floor and runs until noon.",
+      "meaning": "活动下周六上午在图书馆一楼的研讨室启动，持续至中午。",
+      "zhParts": [
+        "活动下周六上午在图书馆一楼的研讨室启动",
+        "，",
+        "持续至中午",
+        "。"
+      ],
+      "groups": [
+        {
+          "en": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13
+          ],
+          "zh": [
+            0
+          ]
+        },
+        {
+          "en": [
+            14,
+            15,
+            16,
+            17
+          ],
+          "zh": [
+            2
+          ]
+        }
+      ]
+    },
+    {
+      "english": "Under the guidance of library staff, volunteers will sort the damaged books and mend loose pages.",
+      "meaning": "在图书馆工作人员的指导下，志愿者将给破损图书分类，并修补松脱的书页。",
+      "zhParts": [
+        "在图书馆工作人员的指导下",
+        "，",
+        "志愿者将给破损图书分类",
+        "，",
+        "并修补松脱的书页",
+        "。"
+      ],
+      "groups": [
+        {
+          "en": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5
+          ],
+          "zh": [
+            0
+          ]
+        },
+        {
+          "en": [
+            6,
+            7,
+            8,
+            9,
+            10,
+            11
+          ],
+          "zh": [
+            2
+          ]
+        },
+        {
+          "en": [
+            12,
+            13,
+            14,
+            15
+          ],
+          "zh": [
+            4
+          ]
+        }
+      ]
+    },
+    {
+      "english": "No previous experience is required, as basic training and all necessary materials will be provided.",
+      "meaning": "无需相关经验，图书馆会提供基础培训及所需的全部材料。",
+      "zhParts": [
+        "无需相关经验",
+        "，",
+        "图书馆会提供基础培训及所需的全部材料",
+        "。"
+      ],
+      "groups": [
+        {
+          "en": [
+            0,
+            1,
+            2,
+            3,
+            4
+          ],
+          "zh": [
+            0
+          ]
+        },
+        {
+          "en": [
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14
+          ],
+          "zh": [
+            2
+          ]
+        }
+      ]
+    },
+    {
+      "english": "To apply, send your name and Saturday availability to the library office by Wednesday.",
+      "meaning": "如需报名，请于周三前把姓名及周六可参加的时段发给图书馆办公室。",
+      "zhParts": [
+        "如需报名",
+        "，",
+        "请于周三前",
+        "把姓名及周六可参加的时段发给",
+        "图书馆办公室",
+        "。"
+      ],
+      "groups": [
+        {
+          "en": [
+            0,
+            1
+          ],
+          "zh": [
+            0
+          ]
+        },
+        {
+          "en": [
+            2,
+            3,
+            4,
+            5,
+            6,
+            7
+          ],
+          "zh": [
+            3
+          ]
+        },
+        {
+          "en": [
+            8,
+            9,
+            10,
+            11
+          ],
+          "zh": [
+            4
+          ]
+        },
+        {
+          "en": [
+            12,
+            13
+          ],
+          "zh": [
+            2
+          ]
+        }
+      ]
+    },
+    {
+      "english": "Successful applicants will receive a confirmation message with further details.",
+      "meaning": "入选的同学将收到确认消息及活动细节。",
+      "zhParts": [
+        "入选的同学",
+        "将收到确认消息",
+        "及活动细节",
+        "。"
+      ],
+      "groups": [
+        {
+          "en": [
+            0,
+            1
+          ],
+          "zh": [
+            0
+          ]
+        },
+        {
+          "en": [
+            2,
+            3,
+            4,
+            5,
+            6
+          ],
+          "zh": [
+            1
+          ]
+        },
+        {
+          "en": [
+            7,
+            8,
+            9
+          ],
+          "zh": [
+            2
+          ]
+        }
+      ]
+    },
+    {
+      "english": "I am sorry to say that our planned visit cannot go ahead this Wednesday because the museum will be closed for maintenance.",
+      "meaning": "很抱歉，由于博物馆闭馆维护，我们原定本周三的参访无法照常进行。",
+      "zhParts": [
+        "很抱歉",
+        "，",
+        "由于博物馆闭馆维护",
+        "，",
+        "我们原定本周三的参访无法照常进行",
+        "。"
+      ],
+      "groups": [
+        {
+          "en": [
+            0,
+            1,
+            2,
+            3,
+            4
+          ],
+          "zh": [
+            0
+          ]
+        },
+        {
+          "en": [
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13
+          ],
+          "zh": [
+            4
+          ]
+        },
+        {
+          "en": [
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21
+          ],
+          "zh": [
+            2
+          ]
+        }
+      ]
+    },
+    {
+      "english": "The museum has offered us a guided tour on Friday morning instead.",
+      "meaning": "博物馆提议改到周五上午，并为我们提供导览。",
+      "zhParts": [
+        "博物馆提议",
+        "改到周五上午，并为我们提供导览",
+        "。"
+      ],
+      "groups": [
+        {
+          "en": [
+            0,
+            1,
+            2,
+            3,
+            4
+          ],
+          "zh": [
+            0
+          ]
+        },
+        {
+          "en": [
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11
+          ],
+          "zh": [
+            1
+          ]
+        }
+      ]
+    },
+    {
+      "english": "If that works for your group, we can meet at the east gate at nine and take the bus together.",
+      "meaning": "如果你的团队方便，我们可以九点在学校东门集合，然后一起坐公交。",
+      "zhParts": [
+        "如果你的团队方便",
+        "，",
+        "我们可以九点在学校东门集合",
+        "，",
+        "然后一起坐公交",
+        "。"
+      ],
+      "groups": [
+        {
+          "en": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5
+          ],
+          "zh": [
+            0
+          ]
+        },
+        {
+          "en": [
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14
+          ],
+          "zh": [
+            2
+          ]
+        },
+        {
+          "en": [
+            15,
+            16,
+            17,
+            18,
+            19
+          ],
+          "zh": [
+            4
+          ]
+        }
+      ]
+    },
+    {
+      "english": "The tour will last about an hour, leaving enough time for lunch on campus.",
+      "meaning": "导览大约持续一小时，结束后还有足够时间回校吃午饭。",
+      "zhParts": [
+        "导览",
+        "大约持续一小时",
+        "，",
+        "结束后还有足够时间回校吃午饭",
+        "。"
+      ],
+      "groups": [
+        {
+          "en": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "zh": [
+            0
+          ]
+        },
+        {
+          "en": [
+            4,
+            5,
+            6
+          ],
+          "zh": [
+            1
+          ]
+        },
+        {
+          "en": [
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13
+          ],
+          "zh": [
+            3
+          ]
+        }
+      ]
+    },
+    {
+      "english": "Please let me know by Tuesday whether everyone can join us on Friday.",
+      "meaning": "请在周二之前告诉我大家周五能否参加。",
+      "zhParts": [
+        "请在周二之前",
+        "告诉我",
+        "大家周五能否参加",
+        "。"
+      ],
+      "groups": [
+        {
+          "en": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "zh": [
+            1
+          ]
+        },
+        {
+          "en": [
+            4,
+            5
+          ],
+          "zh": [
+            0
+          ]
+        },
+        {
+          "en": [
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12
+          ],
+          "zh": [
+            2
+          ]
+        }
+      ]
+    },
+    {
+      "english": "I can ask for a different time if several students have classes that morning.",
+      "meaning": "如果有几位同学那天上午有课，我可以向馆方询问其他时段。",
+      "zhParts": [
+        "如果有几位同学",
+        "那天上午有课",
+        "，",
+        "我可以向馆方询问其他时段",
+        "。"
+      ],
+      "groups": [
+        {
+          "en": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6
+          ],
+          "zh": [
+            3
+          ]
+        },
+        {
+          "en": [
+            7,
+            8,
+            9
+          ],
+          "zh": [
+            0
+          ]
+        },
+        {
+          "en": [
+            10,
+            11,
+            12,
+            13
+          ],
+          "zh": [
+            1
+          ]
+        }
+      ]
+    },
+    {
+      "english": "The table compares the services that students reported using most often in two surveys at the same university library.",
+      "meaning": "表格对比了同一所大学的图书馆在两次调查中被学生填报为最常使用的服务。",
+      "zhParts": [
+        "表格对比了",
+        "同一所大学的图书馆在两次调查中",
+        "被学生填报为最常使用的服务",
+        "。"
+      ],
+      "groups": [
+        {
+          "en": [
+            0,
+            1,
+            2
+          ],
+          "zh": [
+            0
+          ]
+        },
+        {
+          "en": [
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10
+          ],
+          "zh": [
+            2
+          ]
+        },
+        {
+          "en": [
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18
+          ],
+          "zh": [
+            1
+          ]
+        }
+      ]
+    },
+    {
+      "english": "The share choosing electronic resources rose from twenty to thirty-five percent, the largest change in the table.",
+      "meaning": "选择电子资源的学生比例从百分之二十升至百分之三十五，是表中变动最大的一项。",
+      "zhParts": [
+        "选择电子资源的学生比例",
+        "从百分之二十升至百分之三十五",
+        "，",
+        "是表中变动最大的一项",
+        "。"
+      ],
+      "groups": [
+        {
+          "en": [
+            0,
+            1,
+            2,
+            3,
+            4
+          ],
+          "zh": [
+            0
+          ]
+        },
+        {
+          "en": [
+            5,
+            6,
+            7,
+            8,
+            9,
+            10
+          ],
+          "zh": [
+            1
+          ]
+        },
+        {
+          "en": [
+            11,
+            12,
+            13,
+            14,
+            15,
+            16
+          ],
+          "zh": [
+            3
+          ]
+        }
+      ]
+    },
+    {
+      "english": "Quiet study remained the most common choice, although its share fell by five percentage points.",
+      "meaning": "安静自习仍是最多学生选择的服务，尽管其占比下降了五个百分点。",
+      "zhParts": [
+        "安静自习",
+        "仍是最多学生选择的服务",
+        "，",
+        "尽管其占比下降了五个百分点",
+        "。"
+      ],
+      "groups": [
+        {
+          "en": [
+            0,
+            1
+          ],
+          "zh": [
+            0
+          ]
+        },
+        {
+          "en": [
+            2,
+            3,
+            4,
+            5,
+            6
+          ],
+          "zh": [
+            1
+          ]
+        },
+        {
+          "en": [
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14
+          ],
+          "zh": [
+            3
+          ]
+        }
+      ]
+    },
+    {
+      "english": "Wider access to electronic journals, including those students need for their coursework, may be one reason for the shift.",
+      "meaning": "包括课程学习所需的期刊在内，电子期刊整体更容易获取，这可能是偏好变化的原因之一。",
+      "zhParts": [
+        "包括课程学习所需的期刊在内",
+        "，",
+        "电子期刊整体更容易获取",
+        "，",
+        "这可能是偏好变化的原因之一",
+        "。"
+      ],
+      "groups": [
+        {
+          "en": [
+            0,
+            1,
+            2,
+            3,
+            4
+          ],
+          "zh": [
+            2
+          ]
+        },
+        {
+          "en": [
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11
+          ],
+          "zh": [
+            0
+          ]
+        },
+        {
+          "en": [
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18
+          ],
+          "zh": [
+            4
+          ]
+        }
+      ]
+    },
+    {
+      "english": "Students can check sources at home and search a long document for specific terms.",
+      "meaning": "学生可以在家查阅资料，也能在长篇文档中检索具体词语。",
+      "zhParts": [
+        "学生可以",
+        "在家查阅资料",
+        "，",
+        "也能在长篇文档中检索",
+        "具体词语",
+        "。"
+      ],
+      "groups": [
+        {
+          "en": [
+            0,
+            1
+          ],
+          "zh": [
+            0
+          ]
+        },
+        {
+          "en": [
+            2,
+            3,
+            4,
+            5
+          ],
+          "zh": [
+            1
+          ]
+        },
+        {
+          "en": [
+            6,
+            7,
+            8,
+            9,
+            10
+          ],
+          "zh": [
+            3
+          ]
+        },
+        {
+          "en": [
+            11,
+            12,
+            13
+          ],
+          "zh": [
+            4
+          ]
+        }
+      ]
+    },
+    {
+      "english": "However, a lower share for borrowing printed books does not tell us whether fewer students borrowed them overall.",
+      "meaning": "但纸质图书借阅所占的比例下降，并不能说明借阅纸质书的学生总数减少了。",
+      "zhParts": [
+        "但",
+        "纸质图书借阅所占的比例下降",
+        "，",
+        "并不能说明",
+        "借阅纸质书的学生总数减少了",
+        "。"
+      ],
+      "groups": [
+        {
+          "en": [
+            0
+          ],
+          "zh": [
+            0
+          ]
+        },
+        {
+          "en": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7
+          ],
+          "zh": [
+            1
+          ]
+        },
+        {
+          "en": [
+            8,
+            9,
+            10,
+            11,
+            12
+          ],
+          "zh": [
+            3
+          ]
+        },
+        {
+          "en": [
+            13,
+            14,
+            15,
+            16,
+            17
+          ],
+          "zh": [
+            4
+          ]
+        }
+      ]
+    },
+    {
+      "english": "The library could offer a short workshop on using online databases effectively.",
+      "meaning": "图书馆可以举办一场短时培训，教学生高效使用数据库。",
+      "zhParts": [
+        "图书馆可以举办",
+        "一场短时培训",
+        "，",
+        "教学生高效使用数据库",
+        "。"
+      ],
+      "groups": [
+        {
+          "en": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "zh": [
+            0
+          ]
+        },
+        {
+          "en": [
+            4,
+            5,
+            6
+          ],
+          "zh": [
+            1
+          ]
+        },
+        {
+          "en": [
+            7,
+            8,
+            9,
+            10,
+            11
+          ],
+          "zh": [
+            3
+          ]
+        }
+      ]
+    },
+    {
+      "english": "It should also protect quiet study areas, which still serve the largest group of respondents.",
+      "meaning": "图书馆也应保障安静自习区，因为选择这项服务的受访者仍然最多。",
+      "zhParts": [
+        "图书馆也应保障",
+        "安静自习区",
+        "，",
+        "因为选择这项服务的受访者仍然最多",
+        "。"
+      ],
+      "groups": [
+        {
+          "en": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "zh": [
+            0
+          ]
+        },
+        {
+          "en": [
+            4,
+            5,
+            6
+          ],
+          "zh": [
+            1
+          ]
+        },
+        {
+          "en": [
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14
+          ],
+          "zh": [
+            3
+          ]
+        }
+      ]
+    },
+    {
+      "english": "A follow-up survey could help the library decide where additional resources would make the greatest difference.",
+      "meaning": "图书馆可以开展后续调查，判断把新增资源投到哪里最能发挥作用。",
+      "zhParts": [
+        "图书馆可以开展后续调查",
+        "，",
+        "判断",
+        "把新增资源投到哪里最能发挥作用",
+        "。"
+      ],
+      "groups": [
+        {
+          "en": [
+            0,
+            1,
+            2
+          ],
+          "zh": [
+            0
+          ]
+        },
+        {
+          "en": [
+            3,
+            4,
+            5,
+            6,
+            7
+          ],
+          "zh": [
+            2
+          ]
+        },
+        {
+          "en": [
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15
+          ],
+          "zh": [
+            3
+          ]
+        }
+      ]
+    },
+    {
+      "english": "The table shows how students traveled to campus before and after a new cycle lane opened near the university.",
+      "meaning": "表格显示了大学附近一条新自行车道启用前后，学生前往校园的方式。",
+      "zhParts": [
+        "表格显示了",
+        "大学附近一条新自行车道启用前后",
+        "，",
+        "学生前往校园的方式",
+        "。"
+      ],
+      "groups": [
+        {
+          "en": [
+            0,
+            1,
+            2
+          ],
+          "zh": [
+            0
+          ]
+        },
+        {
+          "en": [
+            3,
+            4,
+            5,
+            6,
+            7
+          ],
+          "zh": [
+            3
+          ]
+        },
+        {
+          "en": [
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18
+          ],
+          "zh": [
+            1
+          ]
+        }
+      ]
+    },
+    {
+      "english": "Cycling rose from fifteen to thirty percent, while the share of trips made by private car fell.",
+      "meaning": "骑行占比从百分之十五升至百分之三十，开私家车出行的占比则有所下降。",
+      "zhParts": [
+        "骑行占比",
+        "从百分之十五升至百分之三十",
+        "，",
+        "开私家车出行的占比则有所下降",
+        "。"
+      ],
+      "groups": [
+        {
+          "en": [
+            0,
+            1
+          ],
+          "zh": [
+            0
+          ]
+        },
+        {
+          "en": [
+            2,
+            3,
+            4,
+            5,
+            6
+          ],
+          "zh": [
+            1
+          ]
+        },
+        {
+          "en": [
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16
+          ],
+          "zh": [
+            3
+          ]
+        }
+      ]
+    },
+    {
+      "english": "Bus travel declined slightly but remained the most common choice, and walking held steady at twenty percent.",
+      "meaning": "公交出行略有下降，仍是最多人选择的方式，步行则稳定在百分之二十。",
+      "zhParts": [
+        "公交出行略有下降",
+        "，",
+        "仍是最多人选择的方式",
+        "，",
+        "步行则稳定在百分之二十",
+        "。"
+      ],
+      "groups": [
+        {
+          "en": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "zh": [
+            0
+          ]
+        },
+        {
+          "en": [
+            4,
+            5,
+            6,
+            7,
+            8,
+            9
+          ],
+          "zh": [
+            2
+          ]
+        },
+        {
+          "en": [
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16
+          ],
+          "zh": [
+            4
+          ]
+        }
+      ]
+    },
+    {
+      "english": "A safer route may have encouraged students to cycle, especially those who live nearby.",
+      "meaning": "更安全的路线可能鼓励了学生骑行，尤其是住在附近的学生。",
+      "zhParts": [
+        "更安全的路线",
+        "可能鼓励了学生骑行",
+        "，",
+        "尤其是住在附近的学生",
+        "。"
+      ],
+      "groups": [
+        {
+          "en": [
+            0,
+            1,
+            2
+          ],
+          "zh": [
+            0
+          ]
+        },
+        {
+          "en": [
+            3,
+            4,
+            5,
+            6,
+            7,
+            8
+          ],
+          "zh": [
+            1
+          ]
+        },
+        {
+          "en": [
+            9,
+            10,
+            11,
+            12,
+            13
+          ],
+          "zh": [
+            3
+          ]
+        }
+      ]
+    },
+    {
+      "english": "Cycling can also save time when traffic moves slowly around the campus gates.",
+      "meaning": "校门周边车流缓慢时，骑行也能节省时间。",
+      "zhParts": [
+        "校门周边",
+        "车流缓慢时",
+        "，",
+        "骑行也能节省时间",
+        "。"
+      ],
+      "groups": [
+        {
+          "en": [
+            0,
+            1,
+            2,
+            3,
+            4
+          ],
+          "zh": [
+            3
+          ]
+        },
+        {
+          "en": [
+            5,
+            6,
+            7,
+            8
+          ],
+          "zh": [
+            1
+          ]
+        },
+        {
+          "en": [
+            9,
+            10,
+            11,
+            12
+          ],
+          "zh": [
+            0
+          ]
+        }
+      ]
+    },
+    {
+      "english": "Still, factors such as changes in bus schedules could have influenced the results as well.",
+      "meaning": "不过，公交时刻表变化等因素也可能影响了结果。",
+      "zhParts": [
+        "不过",
+        "，",
+        "公交时刻表变化等因素",
+        "也可能影响了结果",
+        "。"
+      ],
+      "groups": [
+        {
+          "en": [
+            0
+          ],
+          "zh": [
+            0
+          ]
+        },
+        {
+          "en": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7
+          ],
+          "zh": [
+            2
+          ]
+        },
+        {
+          "en": [
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14
+          ],
+          "zh": [
+            3
+          ]
+        }
+      ]
+    },
+    {
+      "english": "The university could add covered bicycle parking near busy entrances to make daily cycling more convenient in wet weather.",
+      "meaning": "学校可以在人流量较大的入口附近增设带顶棚的自行车停车区，方便学生在雨天骑车通勤。",
+      "zhParts": [
+        "学校可以",
+        "在人流量较大的入口附近增设带顶棚的自行车停车区",
+        "，",
+        "方便学生在雨天骑车通勤",
+        "。"
+      ],
+      "groups": [
+        {
+          "en": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "zh": [
+            0
+          ]
+        },
+        {
+          "en": [
+            4,
+            5,
+            6,
+            7,
+            8,
+            9
+          ],
+          "zh": [
+            1
+          ]
+        },
+        {
+          "en": [
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18
+          ],
+          "zh": [
+            3
+          ]
+        }
+      ]
+    },
+    {
+      "english": "Clear signs could guide riders safely from the lane to the parking area without crossing busy walkways.",
+      "meaning": "清晰的标识可以引导骑行者从车道安全进入停车区，避免穿过行人密集的通道。",
+      "zhParts": [
+        "清晰的标识",
+        "可以引导骑行者",
+        "从车道安全进入停车区",
+        "，",
+        "避免穿过行人密集的通道",
+        "。"
+      ],
+      "groups": [
+        {
+          "en": [
+            0,
+            1
+          ],
+          "zh": [
+            0
+          ]
+        },
+        {
+          "en": [
+            2,
+            3,
+            4,
+            5
+          ],
+          "zh": [
+            1
+          ]
+        },
+        {
+          "en": [
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12
+          ],
+          "zh": [
+            2
+          ]
+        },
+        {
+          "en": [
+            13,
+            14,
+            15,
+            16
+          ],
+          "zh": [
+            4
+          ]
+        }
+      ]
+    },
+    {
+      "english": "Keeping bus stops easy to reach would give students who live farther away a practical option too.",
+      "meaning": "同时，保持公交站点便于到达，也能为住得较远的学生提供实用的出行选择。",
+      "zhParts": [
+        "同时，保持公交站点便于到达",
+        "，",
+        "也能为",
+        "住得较远的学生",
+        "提供实用的出行选择",
+        "。"
+      ],
+      "groups": [
+        {
+          "en": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5
+          ],
+          "zh": [
+            0
+          ]
+        },
+        {
+          "en": [
+            6,
+            7
+          ],
+          "zh": [
+            2
+          ]
+        },
+        {
+          "en": [
+            8,
+            9,
+            10,
+            11,
+            12
+          ],
+          "zh": [
+            3
+          ]
+        },
+        {
+          "en": [
+            13,
+            14,
+            15,
+            16
+          ],
+          "zh": [
+            4
+          ]
+        }
+      ]
     }
   ]
 }

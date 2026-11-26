@@ -6,6 +6,7 @@ import { bumpContentVersion, migrateAndSeed, migrateDatabase, openDatabase } fro
 import {
   applyGaokaoWritingUpdate, GAOKAO_WRITING_SOURCE, GAOKAO_WRITING_UPDATE, parseGaokaoWritingContent
 } from "../src/gaokao-writing.js";
+import { GRADUATE_WRITING_UPDATE } from "../src/graduate-writing.js";
 
 const SOURCE = resolve(import.meta.dirname, "../..");
 
@@ -29,7 +30,7 @@ function readSource(): Source {
 function previousCorpus() {
   const db = openDatabase({ databasePath: ":memory:" });
   migrateDatabase(db);
-  db.prepare("INSERT INTO app_meta(key, value) VALUES (?, '1')").run(GAOKAO_WRITING_UPDATE);
+  db.prepare("INSERT INTO app_meta(key, value) VALUES (?, '1'), (?, '1')").run(GAOKAO_WRITING_UPDATE, GRADUATE_WRITING_UPDATE);
   migrateAndSeed(db, SOURCE);
   db.prepare("DELETE FROM app_meta WHERE key = ?").run(GAOKAO_WRITING_UPDATE);
   return db;

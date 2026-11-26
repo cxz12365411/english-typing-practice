@@ -3,7 +3,7 @@ cxzenglish.cn {
 
 	# Older public learning-data URLs are retired. Current data is served through
 	# authenticated /api/content-resources endpoints, never through the SPA fallback.
-	@retired_content path_regexp retired_content ^/(?:assets/)?(?:sentence-alignments|cet4-writing|cet6-writing|gaokao-writing)(?:-[A-Za-z0-9_-]+)?\.json$
+	@retired_content path_regexp retired_content ^/(?:assets/)?(?:sentence-alignments|cet4-writing|cet6-writing|gaokao-writing|graduate-writing)(?:-[A-Za-z0-9_-]+)?\.json$
 	handle @retired_content {
 		respond 404
 	}

@@ -6,6 +6,52 @@
 
   function bilingual(value) { return text(value?.english) && text(value?.meaning); }
   function gaokaoLabel(essay) { return essay.type === "continuation" ? "高考读后续写" : "高考应用文"; }
+  function graduateLabel(essay) {
+    return `考研英语${essay.track === "one" ? "一" : "二"}·${essay.type === "short" ? "小" : "大"}作文`;
+  }
+
+  function parseGraduate(data) {
+    const fail = field => { throw new Error(`Invalid graduate writing resource: ${field}`); };
+    if (data.version !== 1 || data.sourceLabel !== "原创模拟题与参考范文"
+      || !Array.isArray(data.essays) || data.essays.length !== 8) fail("essay list");
+    const categories = [], items = [], englishTexts = new Set();
+    data.essays.forEach((essay, index) => {
+      const number = String(index + 1).padStart(2, "0");
+      const slug = `grad-essay-${number}`;
+      const firstTrack = index < 4;
+      const short = index % 4 < 2;
+      if (essay?.id !== slug || essay.track !== (firstTrack ? "one" : "two") || essay.type !== (short ? "short" : "long")
+        || !text(essay.title) || !text(essay.titleEnglish) || !text(essay.prompt)
+        || !Array.isArray(essay.outline) || !essay.outline.length || !essay.outline.every(text)
+        || !Array.isArray(essay.paragraphs) || !essay.paragraphs.length
+        || essay.paragraphs.some(paragraph => !Array.isArray(paragraph) || !paragraph.length)) fail(slug);
+      if ([essay.greeting, essay.closing].some(frame => frame !== undefined && !bilingual(frame))) fail(`${slug} framing`);
+      const material = essay.material;
+      if (short) {
+        if (material !== undefined) fail(`${slug} short writing material`);
+      } else if (firstTrack) {
+        if (material?.kind !== "picture" || !bilingual(material)) fail(`${slug} picture`);
+      } else if (material?.kind !== "table" || !text(material.caption)
+          || !Array.isArray(material.columns) || material.columns.length < 2 || !material.columns.every(text)
+          || !Array.isArray(material.rows) || !material.rows.length || material.rows.some(row =>
+            !Array.isArray(row) || row.length !== material.columns.length || !row.every(text))) {
+        fail(`${slug} table`);
+      }
+      const sentences = essay.paragraphs.flat();
+      const count = wordCount(sentences.map(sentence => sentence?.english ?? "").join(" "));
+      const [min, max] = short ? [90, 115] : firstTrack ? [160, 200] : [140, 165];
+      if (sentences.length !== (short ? 6 : 9) || count < min || count > max) fail(`${slug} length`);
+      categories.push({ slug, name: `${graduateLabel(essay)}：${essay.title}`, kind: "sentence", sortOrder: 320 + index });
+      sentences.forEach((sentence, offset) => {
+        const key = `grad-e${number}-s${String(offset + 1).padStart(2, "0")}`;
+        if (!bilingual(sentence) || sentence.key !== key || englishTexts.has(sentence.english)) fail(key);
+        englishTexts.add(sentence.english);
+        items.push({ key, english: sentence.english, meaning: sentence.meaning, categorySlug: slug,
+          kind: "sentence", pronunciation: "", sortOrder: offset + 1 });
+      });
+    });
+    return { essays: data.essays, categories, items };
+  }
 
   function parseGaokao(data) {
     const fail = field => { throw new Error(`Invalid Gaokao writing resource: ${field}`); };
@@ -50,6 +96,7 @@
 
   function parse(data) {
     if (data?.exam === "gaokao") return parseGaokao(data);
+    if (data?.exam === "graduate") return parseGraduate(data);
     const advanced = data?.level === 6;
     const prefix = advanced ? "cet6" : "cet4";
     const label = advanced ? "六级" : "四级";
@@ -124,6 +171,30 @@
     return element;
   }
 
+  function buildMaterialTable(material) {
+    const scroll = node("div", "writing-table-scroll");
+    scroll.tabIndex = 0;
+    scroll.setAttribute("role", "region");
+    scroll.setAttribute("aria-label", "题目数据表，可左右滚动");
+    const table = node("table", "writing-table");
+    table.append(node("caption", "", material.caption));
+    const head = table.createTHead().insertRow();
+    material.columns.forEach(value => {
+      const cell = node("th", "", value);
+      cell.scope = "col";
+      head.append(cell);
+    });
+    const tableBody = table.createTBody();
+    material.rows.forEach(cells => {
+      const row = tableBody.insertRow();
+      const header = node("th", "", cells[0]);
+      header.scope = "row";
+      row.append(header, ...cells.slice(1).map(value => node("td", "", value)));
+    });
+    scroll.append(table);
+    return scroll;
+  }
+
   class Preview {
     constructor(container) {
       this.container = container;
@@ -139,11 +210,11 @@
     }
     setData(data) {
       const parsed = parse(data);
-      const prefix = data.exam === "gaokao" ? "gaokao-" : data.level === 6 ? "cet6-" : "cet4-";
+      const prefix = data.exam === "graduate" ? "grad-" : data.exam === "gaokao" ? "gaokao-" : data.level === 6 ? "cet6-" : "cet4-";
       this.data = { ...parsed, essays: [...(this.data?.essays || []).filter(essay => !essay.id.startsWith(prefix)), ...parsed.essays] };
     }
     buildMaterials(essay) {
-      const details = node("details", "gaokao-materials");
+      const details = node("details", `writing-materials ${essay.id.startsWith("gaokao-") ? "gaokao-materials" : "graduate-materials"}`);
       const body = node("div", "cet4-body");
       body.append(node("p", "cet4-source", "原创模拟题"),
         node("h4", "", "题目要求"), node("p", "cet4-prompt", essay.prompt));
@@ -163,6 +234,13 @@
         });
         body.append(starts);
       }
+      if (essay.material?.kind === "picture") {
+        const english = node("p", "writing-picture", essay.material.english);
+        english.lang = "en";
+        body.append(node("h4", "", "图画描述"), english, node("p", "writing-picture", essay.material.meaning));
+      } else if (essay.material?.kind === "table") {
+        body.append(node("h4", "", "图表数据"), buildMaterialTable(essay.material));
+      }
       details.append(node("summary", "", "题目与材料"), body);
       return details;
     }
@@ -171,9 +249,10 @@
       details.append(node("summary", "", "查看全文"));
       const body = node("div", "cet4-body");
       const gaokao = essay.id.startsWith("gaokao-");
+      const graduate = essay.id.startsWith("grad-");
       body.append(node("h3", "", essay.titleEnglish));
       body.append(node("p", "cet4-source", `原创参考范文 · 正文 ${wordCount(essay.paragraphs.flat().map(item => item.english).join(" "))} 词`));
-      if (!gaokao) body.append(node("h4", "", "题目要求"), node("p", "cet4-prompt", essay.prompt));
+      if (!gaokao && !graduate) body.append(node("h4", "", "题目要求"), node("p", "cet4-prompt", essay.prompt));
       body.append(node("h4", "", "写作思路"));
       const outline = node("ol", "cet4-outline");
       essay.outline.forEach(note => outline.append(node("li", "", note)));
@@ -218,7 +297,7 @@
         if (this.details) this.details.open = false;
         if (this.materials) this.materials.open = false;
         this.essay = null;
-        this.container.hidden = !/^(?:cet[46]|gaokao)-e/.test(item?.key || "");
+        this.container.hidden = !/^(?:cet[46]|gaokao|grad)-e/.test(item?.key || "");
         this.position.textContent = "";
         this.unavailable.hidden = this.container.hidden;
         if (this.details) this.details.hidden = true;
@@ -227,10 +306,11 @@
       }
       const valid = matchesEssay(essay, items);
       const gaokao = essay.id.startsWith("gaokao-");
+      const graduate = essay.id.startsWith("grad-");
       if (essay !== this.essay || valid !== this.valid) {
         this.details?.remove();
         this.materials?.remove();
-        this.materials = valid && gaokao ? this.buildMaterials(essay) : null;
+        this.materials = valid && (gaokao || graduate) ? this.buildMaterials(essay) : null;
         this.details = valid ? this.build(essay) : null;
         if (this.materials) this.container.append(this.materials);
         if (this.details) this.container.append(this.details);
@@ -242,7 +322,7 @@
       const paragraphIndex = essay.paragraphs.findIndex(paragraph => paragraph.some(sentence => sentence.key === item?.key));
       this.position.textContent = valid && sentenceIndex >= 0
         ? `${essay.title} · 第 ${paragraphIndex + 1} 段 · 第 ${sentenceIndex + 1} / ${sentences.length} 句`
-        : (gaokao ? gaokaoLabel(essay) : essay.id.startsWith("cet6-") ? "六级作文" : "四级作文");
+        : (graduate ? graduateLabel(essay) : gaokao ? gaokaoLabel(essay) : essay.id.startsWith("cet6-") ? "六级作文" : "四级作文");
       this.container.hidden = false;
       this.unavailable.hidden = valid;
       if (!this.details) return;

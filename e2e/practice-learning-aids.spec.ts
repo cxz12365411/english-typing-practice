@@ -178,7 +178,7 @@ test("account practice loads all sentence alignments and highlights the screensh
     expect(new URL(response.url()).pathname).toBe("/api/content-resources/sentence-alignments.json");
   }
   const writing = require("../cet4-writing.js");
-  const writingSources = ["cet4-writing.json", "cet6-writing.json", "gaokao-writing.json"];
+  const writingSources = ["cet4-writing.json", "cet6-writing.json", "gaokao-writing.json", "graduate-writing.json"];
   const practiceSentences = writingSources.reduce((count, file) =>
     count + writing.parse(JSON.parse(readFileSync(file, "utf8"))).items.length, 294);
   expect(alignmentData.entries).toHaveLength(practiceSentences);

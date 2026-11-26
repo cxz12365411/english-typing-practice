@@ -105,7 +105,7 @@ async function geometryErrors(page: Page) {
   });
 }
 
-test("daily English, CET4, CET6 and Gaokao alignments cover the sources and every token and Chinese fragment", () => {
+test("all sentence alignments cover the sources and every token and Chinese fragment", () => {
   const data = JSON.parse(readFileSync("sentence-alignments.json", "utf8")) as AlignmentData;
   const source = readFileSync("daily-english-high-frequency-sentences.md", "utf8").split(/\r?\n/)
     .filter(line => line.startsWith("|") && line.includes("<br>"))
@@ -116,7 +116,7 @@ test("daily English, CET4, CET6 and Gaokao alignments cover the sources and ever
   expect(data.version).toBe(1);
   expect(source).toHaveLength(294);
   const writing = require("../cet4-writing.js");
-  const writingItems = ["cet4", "cet6", "gaokao"].flatMap(exam =>
+  const writingItems = ["cet4", "cet6", "gaokao", "graduate"].flatMap(exam =>
     writing.parse(JSON.parse(readFileSync(`${exam}-writing.json`, "utf8"))).items
   );
   expect(data.entries).toHaveLength(source.length + writingItems.length);
