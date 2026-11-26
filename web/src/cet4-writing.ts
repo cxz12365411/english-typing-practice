@@ -1,9 +1,10 @@
 import "../../cet4-writing.js";
 import "../../cet4-writing.css";
-const writingDataUrl = "/api/content-resources/cet4-writing.json";
-const advancedWritingDataUrl = "/api/content-resources/cet6-writing.json";
 import type { ContentCategory, ContentItem } from "./types";
 import { mustElement } from "./ui";
+
+const writingDataUrls = ["cet4-writing.json", "cet6-writing.json", "gaokao-writing.json"]
+  .map(name => `/api/content-resources/${name}`);
 
 interface WritingItem {
   key: string;
@@ -26,8 +27,8 @@ export function createWritingPreview(options: { isActive(): boolean; onDataReady
   const abort = new AbortController();
   let disposed = false;
   if (renderer) {
-    for (const resourceUrl of [writingDataUrl, advancedWritingDataUrl]) void fetch(resourceUrl, { signal: abort.signal, credentials: "same-origin", cache: "no-store" }).then(response => {
-      if (!response.ok) throw new Error("CET-4 preview unavailable");
+    for (const resourceUrl of writingDataUrls) void fetch(resourceUrl, { signal: abort.signal, credentials: "same-origin", cache: "no-store" }).then(response => {
+      if (!response.ok) throw new Error("Writing preview unavailable");
       return response.json() as Promise<unknown>;
     }).then(data => {
       if (disposed || !options.isActive()) return;

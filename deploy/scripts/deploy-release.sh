@@ -102,6 +102,7 @@ for required_path in \
   daily-english-high-frequency-sentences.md \
   cet4-writing.json \
   cet6-writing.json \
+  gaokao-writing.json \
   sentence-alignments.json \
   release.json; do
   [[ -e "${incoming}/${required_path}" ]] || die "incoming release is missing ${required_path}"
@@ -186,6 +187,7 @@ fi
 /usr/bin/install -m 0640 -o root -g englishapp "${incoming}/daily-english-high-frequency-sentences.md" "$staging_dir/daily-english-high-frequency-sentences.md"
 /usr/bin/install -m 0640 -o root -g englishapp "${incoming}/cet4-writing.json" "$staging_dir/cet4-writing.json"
 /usr/bin/install -m 0640 -o root -g englishapp "${incoming}/cet6-writing.json" "$staging_dir/cet6-writing.json"
+/usr/bin/install -m 0640 -o root -g englishapp "${incoming}/gaokao-writing.json" "$staging_dir/gaokao-writing.json"
 /usr/bin/install -m 0640 -o root -g englishapp "${incoming}/sentence-alignments.json" "$staging_dir/sentence-alignments.json"
 /usr/bin/install -m 0600 -o root -g root "${incoming}/release.json" "$staging_dir/release.json"
 
@@ -221,8 +223,10 @@ if [[ -d "${release_dir}/server/audio" ]]; then
 fi
 "$RUNUSER" --user englishapp -- /usr/bin/test -r "${release_dir}/cet4-writing.json" || die "API account cannot read writing content"
 "$RUNUSER" --user englishapp -- /usr/bin/test -r "${release_dir}/cet6-writing.json" || die "API account cannot read writing content"
+"$RUNUSER" --user englishapp -- /usr/bin/test -r "${release_dir}/gaokao-writing.json" || die "API account cannot read Gaokao writing content"
 "$RUNUSER" --user englishapp -- /usr/bin/test -r "${release_dir}/sentence-alignments.json" || die "API account cannot read alignment content"
-if "$RUNUSER" --user caddy -- /usr/bin/test -r "${release_dir}/sentence-alignments.json"; then
+if "$RUNUSER" --user caddy -- /usr/bin/test -r "${release_dir}/sentence-alignments.json" ||
+   "$RUNUSER" --user caddy -- /usr/bin/test -r "${release_dir}/gaokao-writing.json"; then
   die "Caddy unexpectedly reads protected learning data"
 fi
 if "$RUNUSER" --user englishapp -- /usr/bin/test -r "${release_dir}/web/dist/index.html"; then

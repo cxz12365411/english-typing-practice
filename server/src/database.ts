@@ -8,6 +8,7 @@ import { parseSentenceMarkdown, parseWordMarkdown, type ParsedContent } from "./
 import { applyContentUpdates, applyTravelShoppingUpdate } from "./content-updates.js";
 import { applyCet6WritingUpdate } from "./cet6-writing.js";
 import { applyCet4WritingUpdate } from "./cet4-writing.js";
+import { applyGaokaoWritingUpdate, GAOKAO_WRITING_SOURCE } from "./gaokao-writing.js";
 
 export type SqliteDatabase = Database.Database;
 
@@ -580,10 +581,17 @@ export function migrateAndSeed(db: SqliteDatabase, explicitSourceDir?: string): 
       () => parseSentenceMarkdown(readFileSync(resolve(locateContentSource(explicitSourceDir), "daily-english-high-frequency-sentences.md"), "utf8")),
       () => bumpContentVersion(db)
     );
+    const gaokaoWriting = applyGaokaoWritingUpdate(
+      db,
+      () => JSON.parse(readFileSync(resolve(locateContentSource(explicitSourceDir), GAOKAO_WRITING_SOURCE), "utf8")),
+      () => bumpContentVersion(db)
+    );
     const counts = contentCounts(db);
     return {
-      categoriesInserted: seeded.categoriesInserted + updated.categoriesInserted + writing.categoriesInserted + advancedWriting.categoriesInserted + travelShopping.categoriesInserted,
-      itemsInserted: seeded.itemsInserted + updated.itemsInserted + writing.itemsInserted + advancedWriting.itemsInserted + travelShopping.itemsInserted,
+      categoriesInserted: seeded.categoriesInserted + updated.categoriesInserted + writing.categoriesInserted +
+        advancedWriting.categoriesInserted + travelShopping.categoriesInserted + gaokaoWriting.categoriesInserted,
+      itemsInserted: seeded.itemsInserted + updated.itemsInserted + writing.itemsInserted + advancedWriting.itemsInserted +
+        travelShopping.itemsInserted + gaokaoWriting.itemsInserted,
       words: counts.words,
       sentences: counts.sentences
     };

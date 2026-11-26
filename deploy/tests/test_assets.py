@@ -13,10 +13,11 @@ class DeploymentAssetTests(unittest.TestCase):
     def test_writing_source_survives_staging_and_release_permissions(self) -> None:
         stage = (DEPLOY / "scripts" / "stage-release.sh").read_text(encoding="utf-8")
         deploy = (DEPLOY / "scripts" / "deploy-release.sh").read_text(encoding="utf-8")
-        self.assertIn('"$build_dir/cet4-writing.json" "$staging/cet4-writing.json"', stage)
-        self.assertIn("  cet4-writing.json \\\n", deploy)
-        self.assertIn('-m 0640 -o root -g englishapp "${incoming}/cet4-writing.json" "$staging_dir/cet4-writing.json"', deploy)
-        self.assertIn('"$RUNUSER" --user englishapp -- /usr/bin/test -r "${release_dir}/cet4-writing.json"', deploy)
+        for name in ("cet4-writing.json", "cet6-writing.json", "gaokao-writing.json"):
+            self.assertIn(f'"$build_dir/{name}" "$staging/{name}"', stage)
+            self.assertIn(f"  {name} \\\n", deploy)
+            self.assertIn(f'-m 0640 -o root -g englishapp "${{incoming}}/{name}" "$staging_dir/{name}"', deploy)
+            self.assertIn(f'"$RUNUSER" --user englishapp -- /usr/bin/test -r "${{release_dir}}/{name}"', deploy)
 
     def test_every_shell_script_uses_strict_mode(self) -> None:
         scripts = sorted((DEPLOY / "scripts").glob("*.sh"))

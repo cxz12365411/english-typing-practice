@@ -473,9 +473,9 @@ re-enable GitHub Pages or deploy the historical `codex/static-pages` branch.
 
 Publish source changes on `main`, then stage and promote the exact tested account
 commit using the steps above. Standalone entries remain local regression fixtures.
-CET-4/CET-6 releases require both writing JSON sources and `sentence-alignments.json`
-in the protected staging and final release root. The membership release fetches
-them through authenticated APIs rather than bundling public preview data. Verify the Aliyun site after
+CET-4, CET-6 and Gaokao practice use the three writing JSON sources and
+`sentence-alignments.json` in the protected staging and final release root.
+The account site fetches them through authenticated APIs. Verify the Aliyun site after
 deployment; private accounts, imports, and learning records stay on Aliyun.
 Historical content-sync notes describe former Pages releases, not permission to
 restore them. Reopening Pages requires a new explicit request from the user.

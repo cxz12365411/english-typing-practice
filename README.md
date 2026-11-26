@@ -125,8 +125,8 @@ update it, and a typo keeps the highlight at the first incorrect word. Long
 diagrams scroll horizontally to keep the current word visible without moving the
 page or interrupting the answer.
 
-All 850 words link to their existing complete definitions. All 502 sentences (294
-conversation sentences, 130 CET-4 and 78 CET-6 practice sentences) have
+All 850 words link to their existing complete definitions. All 578 sentences (294
+conversation sentences, 130 CET-4, 78 CET-6 and 76 Gaokao practice sentences) have
 reviewed semantic groups: contractions, hyphenated words, numbers, and `____` are
 tokens; punctuation and spaces remain unchanged. Articles, auxiliaries, idioms,
 and omitted words belong to their full expression, with explanatory notes where
@@ -270,3 +270,16 @@ without altering existing content, user records or administrator edits. Both
 writing JSON resources must be included in staged and promoted releases. A failed
 preview resource only disables its own preview; independent CET-4 and CET-6 asset
 responses merge without overwriting each other or resetting the answer.
+
+## Gaokao writing practice
+
+`gaokao-writing.json` adds six original applications and four original reading
+continuations. Each continuation includes a reading passage, a Chinese synopsis
+and two supplied paragraph starts. The practice page keeps the prompt available
+when the learner hides the model essay. Only the model's body sentences enter
+typing practice. Every new sentence has bilingual alignments and recordings in
+the six published voices.
+
+The `content_update:gaokao-writing-v1` update adds ten categories under stable
+`gaokao-*` keys. The account site serves the source through the authorized
+`/api/content-resources/gaokao-writing.json` route.

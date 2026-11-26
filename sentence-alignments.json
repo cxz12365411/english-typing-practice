@@ -29185,6 +29185,3669 @@
           "note": "按语义词组理解，冠词、助动词等随所属表达合译。"
         }
       ]
+    },
+    {
+      "english": "I am writing to invite you to join our school’s English Corner as a guest.",
+      "meaning": "我写信是想邀请您参加我们学校的英语角并担任嘉宾。",
+      "zhParts": [
+        "我写信",
+        "是想邀请您",
+        "参加我们学校的英语角",
+        "并担任嘉宾",
+        "。"
+      ],
+      "groups": [
+        {
+          "en": [
+            0,
+            1,
+            2
+          ],
+          "zh": [
+            0
+          ]
+        },
+        {
+          "en": [
+            3,
+            4,
+            5
+          ],
+          "zh": [
+            1
+          ]
+        },
+        {
+          "en": [
+            6,
+            7,
+            8,
+            9,
+            10,
+            11
+          ],
+          "zh": [
+            2
+          ]
+        },
+        {
+          "en": [
+            12,
+            13,
+            14
+          ],
+          "zh": [
+            3
+          ]
+        }
+      ]
+    },
+    {
+      "english": "We will all meet in the school library at four this Friday afternoon.",
+      "meaning": "我们会一起集合，地点在学校图书馆，时间是本周五下午四点。",
+      "zhParts": [
+        "我们会一起集合",
+        "，",
+        "地点在学校图书馆",
+        "，",
+        "时间是本周五下午四点",
+        "。"
+      ],
+      "groups": [
+        {
+          "en": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "zh": [
+            0
+          ]
+        },
+        {
+          "en": [
+            4,
+            5,
+            6,
+            7
+          ],
+          "zh": [
+            2
+          ]
+        },
+        {
+          "en": [
+            8,
+            9,
+            10,
+            11,
+            12
+          ],
+          "zh": [
+            4
+          ]
+        }
+      ]
+    },
+    {
+      "english": "Our topic is how to make new students feel welcome.",
+      "meaning": "我们的主题是如何让新同学感受到大家的欢迎。",
+      "zhParts": [
+        "我们的主题是",
+        "如何让",
+        "新同学",
+        "感受到大家的欢迎",
+        "。"
+      ],
+      "groups": [
+        {
+          "en": [
+            0,
+            1,
+            2
+          ],
+          "zh": [
+            0
+          ]
+        },
+        {
+          "en": [
+            3,
+            4,
+            5
+          ],
+          "zh": [
+            1
+          ]
+        },
+        {
+          "en": [
+            6,
+            7
+          ],
+          "zh": [
+            2
+          ]
+        },
+        {
+          "en": [
+            8,
+            9
+          ],
+          "zh": [
+            3
+          ]
+        }
+      ]
+    },
+    {
+      "english": "We hope you can share a short story before we discuss the topic in small groups.",
+      "meaning": "我们希望您能先分享一个小故事，然后我们分组讨论这个话题。",
+      "zhParts": [
+        "我们希望",
+        "您能先分享一个小故事",
+        "，",
+        "然后我们分组讨论这个话题",
+        "。"
+      ],
+      "groups": [
+        {
+          "en": [
+            0,
+            1
+          ],
+          "zh": [
+            0
+          ]
+        },
+        {
+          "en": [
+            2,
+            3,
+            4,
+            5,
+            6,
+            7
+          ],
+          "zh": [
+            1
+          ]
+        },
+        {
+          "en": [
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15
+          ],
+          "zh": [
+            3
+          ]
+        }
+      ]
+    },
+    {
+      "english": "Your advice would help us speak with more confidence.",
+      "meaning": "您的建议会帮助我们更自信地开口表达。",
+      "zhParts": [
+        "您的建议",
+        "会帮助",
+        "我们",
+        "更自信地开口表达",
+        "。"
+      ],
+      "groups": [
+        {
+          "en": [
+            0,
+            1
+          ],
+          "zh": [
+            0
+          ]
+        },
+        {
+          "en": [
+            2,
+            3
+          ],
+          "zh": [
+            1
+          ]
+        },
+        {
+          "en": [
+            4
+          ],
+          "zh": [
+            2
+          ]
+        },
+        {
+          "en": [
+            5,
+            6,
+            7,
+            8
+          ],
+          "zh": [
+            3
+          ]
+        }
+      ]
+    },
+    {
+      "english": "Could you let me know whether you are free to join us?",
+      "meaning": "您能告诉我是否有空参加这次活动吗？",
+      "zhParts": [
+        "您能告诉我",
+        "是否有空",
+        "参加这次活动吗",
+        "？"
+      ],
+      "groups": [
+        {
+          "en": [
+            0,
+            1,
+            2,
+            3,
+            4
+          ],
+          "zh": [
+            0
+          ]
+        },
+        {
+          "en": [
+            5,
+            6,
+            7,
+            8
+          ],
+          "zh": [
+            1
+          ]
+        },
+        {
+          "en": [
+            9,
+            10,
+            11
+          ],
+          "zh": [
+            2
+          ]
+        }
+      ]
+    },
+    {
+      "english": "I would like to suggest a short reading break at lunchtime once a week.",
+      "meaning": "我想建议安排一段短时阅读，每周一次，利用午间时间进行。",
+      "zhParts": [
+        "我想建议",
+        "安排一段短时阅读",
+        "，",
+        "每周一次",
+        "，",
+        "利用午间时间进行",
+        "。"
+      ],
+      "groups": [
+        {
+          "en": [
+            0,
+            1,
+            2,
+            3,
+            4
+          ],
+          "zh": [
+            0
+          ]
+        },
+        {
+          "en": [
+            5,
+            6,
+            7,
+            8
+          ],
+          "zh": [
+            1
+          ]
+        },
+        {
+          "en": [
+            9,
+            10,
+            11,
+            12,
+            13
+          ],
+          "zh": [
+            3,
+            5
+          ]
+        }
+      ]
+    },
+    {
+      "english": "It could take place in the library every Wednesday after lunch.",
+      "meaning": "活动可以安排在每周三午饭后，在图书馆举行。",
+      "zhParts": [
+        "活动可以",
+        "安排在每周三午饭后",
+        "，",
+        "在图书馆举行",
+        "。"
+      ],
+      "groups": [
+        {
+          "en": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "zh": [
+            0
+          ]
+        },
+        {
+          "en": [
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10
+          ],
+          "zh": [
+            1,
+            3
+          ]
+        }
+      ]
+    },
+    {
+      "english": "Students could bring a book of their choice or borrow one from the library.",
+      "meaning": "同学们可以带来自己挑选的一本书，也可以从图书馆借一本。",
+      "zhParts": [
+        "同学们可以带来",
+        "自己挑选的一本书",
+        "，",
+        "也可以从图书馆借一本",
+        "。"
+      ],
+      "groups": [
+        {
+          "en": [
+            0,
+            1,
+            2
+          ],
+          "zh": [
+            0
+          ]
+        },
+        {
+          "en": [
+            3,
+            4,
+            5,
+            6,
+            7
+          ],
+          "zh": [
+            1
+          ]
+        },
+        {
+          "en": [
+            8,
+            9,
+            10,
+            11,
+            12,
+            13
+          ],
+          "zh": [
+            3
+          ]
+        }
+      ]
+    },
+    {
+      "english": "At the end, two volunteers could share a favorite line with the group.",
+      "meaning": "活动结束时，两位自愿参加的同学可以分享一句自己喜欢的话给大家听。",
+      "zhParts": [
+        "活动结束时",
+        "，",
+        "两位自愿参加的同学可以分享",
+        "一句自己喜欢的话",
+        "给大家听",
+        "。"
+      ],
+      "groups": [
+        {
+          "en": [
+            0,
+            1,
+            2
+          ],
+          "zh": [
+            0
+          ]
+        },
+        {
+          "en": [
+            3,
+            4,
+            5,
+            6
+          ],
+          "zh": [
+            2
+          ]
+        },
+        {
+          "en": [
+            7,
+            8,
+            9
+          ],
+          "zh": [
+            3
+          ]
+        },
+        {
+          "en": [
+            10,
+            11,
+            12
+          ],
+          "zh": [
+            4
+          ]
+        }
+      ]
+    },
+    {
+      "english": "This simple activity would help us read regularly and discover new books.",
+      "meaning": "这个简单的活动能帮助我们养成经常阅读的习惯，也能让我们发现新书。",
+      "zhParts": [
+        "这个简单的活动",
+        "能帮助我们",
+        "养成经常阅读的习惯",
+        "，",
+        "也能让我们发现新书",
+        "。"
+      ],
+      "groups": [
+        {
+          "en": [
+            0,
+            1,
+            2
+          ],
+          "zh": [
+            0
+          ]
+        },
+        {
+          "en": [
+            3,
+            4,
+            5
+          ],
+          "zh": [
+            1
+          ]
+        },
+        {
+          "en": [
+            6,
+            7
+          ],
+          "zh": [
+            2
+          ]
+        },
+        {
+          "en": [
+            8,
+            9,
+            10,
+            11
+          ],
+          "zh": [
+            4
+          ]
+        }
+      ]
+    },
+    {
+      "english": "I hope we can try it for a month and ask students what they think.",
+      "meaning": "我希望我们可以先试行一个月，再听听同学们的意见。",
+      "zhParts": [
+        "我希望",
+        "我们可以先试行",
+        "一个月",
+        "，",
+        "再听听同学们的意见",
+        "。"
+      ],
+      "groups": [
+        {
+          "en": [
+            0,
+            1
+          ],
+          "zh": [
+            0
+          ]
+        },
+        {
+          "en": [
+            2,
+            3,
+            4,
+            5
+          ],
+          "zh": [
+            1
+          ]
+        },
+        {
+          "en": [
+            6,
+            7,
+            8
+          ],
+          "zh": [
+            2
+          ]
+        },
+        {
+          "en": [
+            9,
+            10,
+            11,
+            12,
+            13,
+            14
+          ],
+          "zh": [
+            4
+          ]
+        }
+      ]
+    },
+    {
+      "english": "The English Club will visit the city museum this Saturday morning.",
+      "meaning": "英语社将于本周六上午参观城市博物馆。",
+      "zhParts": [
+        "英语社",
+        "将于本周六上午参观城市博物馆",
+        "。"
+      ],
+      "groups": [
+        {
+          "en": [
+            0,
+            1,
+            2
+          ],
+          "zh": [
+            0
+          ]
+        },
+        {
+          "en": [
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10
+          ],
+          "zh": [
+            1
+          ]
+        }
+      ]
+    },
+    {
+      "english": "Please meet at the school gate at half past eight and arrive five minutes early.",
+      "meaning": "请大家于八点半在校门口集合，并提前五分钟到达。",
+      "zhParts": [
+        "请大家",
+        "于八点半在校门口集合",
+        "，",
+        "并提前五分钟到达",
+        "。"
+      ],
+      "groups": [
+        {
+          "en": [
+            0,
+            1
+          ],
+          "zh": [
+            0
+          ]
+        },
+        {
+          "en": [
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9
+          ],
+          "zh": [
+            1
+          ]
+        },
+        {
+          "en": [
+            10,
+            11,
+            12,
+            13,
+            14
+          ],
+          "zh": [
+            3
+          ]
+        }
+      ]
+    },
+    {
+      "english": "A guide will show us how people in our city used to travel.",
+      "meaning": "讲解员会向我们介绍本市居民过去如何出行。",
+      "zhParts": [
+        "讲解员",
+        "会向我们介绍",
+        "本市居民",
+        "过去如何出行",
+        "。"
+      ],
+      "groups": [
+        {
+          "en": [
+            0,
+            1
+          ],
+          "zh": [
+            0
+          ]
+        },
+        {
+          "en": [
+            2,
+            3,
+            4
+          ],
+          "zh": [
+            1
+          ]
+        },
+        {
+          "en": [
+            5,
+            6,
+            7,
+            8,
+            9
+          ],
+          "zh": [
+            2
+          ]
+        },
+        {
+          "en": [
+            10,
+            11,
+            12
+          ],
+          "zh": [
+            3
+          ]
+        }
+      ]
+    },
+    {
+      "english": "Bring a notebook and prepare one question in English for the guide.",
+      "meaning": "请带上笔记本，并准备好一个要向讲解员提问的英文问题。",
+      "zhParts": [
+        "请带上笔记本",
+        "，",
+        "并准备好一个要向讲解员提问的英文问题",
+        "。"
+      ],
+      "groups": [
+        {
+          "en": [
+            0,
+            1,
+            2
+          ],
+          "zh": [
+            0
+          ]
+        },
+        {
+          "en": [
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11
+          ],
+          "zh": [
+            2
+          ]
+        }
+      ]
+    },
+    {
+      "english": "If you would like to join, please sign up in the club room by Thursday afternoon.",
+      "meaning": "如果你想参加，请最晚于周四下午到社团活动室报名。",
+      "zhParts": [
+        "如果你想参加",
+        "，",
+        "请最晚于周四下午到社团活动室报名",
+        "。"
+      ],
+      "groups": [
+        {
+          "en": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5
+          ],
+          "zh": [
+            0
+          ]
+        },
+        {
+          "en": [
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15
+          ],
+          "zh": [
+            2
+          ]
+        }
+      ]
+    },
+    {
+      "english": "We look forward to exploring the museum with you.",
+      "meaning": "我们期待和你一起参观博物馆。",
+      "zhParts": [
+        "我们期待",
+        "和你一起参观博物馆",
+        "。"
+      ],
+      "groups": [
+        {
+          "en": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "zh": [
+            0
+          ]
+        },
+        {
+          "en": [
+            4,
+            5,
+            6,
+            7,
+            8
+          ],
+          "zh": [
+            1
+          ]
+        }
+      ]
+    },
+    {
+      "english": "Thank you for making me feel at home during my visit.",
+      "meaning": "谢谢你们让我在访问期间感受到家的温暖。",
+      "zhParts": [
+        "谢谢你们",
+        "让我在访问期间感受到家的温暖",
+        "。"
+      ],
+      "groups": [
+        {
+          "en": [
+            0,
+            1,
+            2
+          ],
+          "zh": [
+            0
+          ]
+        },
+        {
+          "en": [
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10
+          ],
+          "zh": [
+            1
+          ]
+        }
+      ]
+    },
+    {
+      "english": "On my first evening, I was too nervous to talk much, but you waited patiently.",
+      "meaning": "到达的第一晚，我紧张得说不出多少话，但你们耐心地等我。",
+      "zhParts": [
+        "到达的第一晚",
+        "，",
+        "我紧张得",
+        "说不出多少话",
+        "，",
+        "但你们耐心地等我",
+        "。"
+      ],
+      "groups": [
+        {
+          "en": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "zh": [
+            0
+          ]
+        },
+        {
+          "en": [
+            4,
+            5,
+            6,
+            7
+          ],
+          "zh": [
+            2
+          ]
+        },
+        {
+          "en": [
+            8,
+            9,
+            10
+          ],
+          "zh": [
+            3
+          ]
+        },
+        {
+          "en": [
+            11,
+            12,
+            13,
+            14
+          ],
+          "zh": [
+            5
+          ]
+        }
+      ]
+    },
+    {
+      "english": "I also enjoyed making dinner with you and learning the names of different vegetables.",
+      "meaning": "我也很喜欢和你们一起做晚饭，顺便学习不同蔬菜的英文名称。",
+      "zhParts": [
+        "我也很喜欢",
+        "和你们一起做晚饭",
+        "，",
+        "顺便学习不同蔬菜的英文名称",
+        "。"
+      ],
+      "groups": [
+        {
+          "en": [
+            0,
+            1,
+            2
+          ],
+          "zh": [
+            0
+          ]
+        },
+        {
+          "en": [
+            3,
+            4,
+            5,
+            6
+          ],
+          "zh": [
+            1
+          ]
+        },
+        {
+          "en": [
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13
+          ],
+          "zh": [
+            3
+          ]
+        }
+      ]
+    },
+    {
+      "english": "By the end of the week, I felt much more comfortable speaking English at the table.",
+      "meaning": "到那周结束时，我已经能更自在地在饭桌上用英语聊天了。",
+      "zhParts": [
+        "到那周结束时",
+        "，",
+        "我已经能更自在地",
+        "在饭桌上用英语聊天了",
+        "。"
+      ],
+      "groups": [
+        {
+          "en": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5
+          ],
+          "zh": [
+            0
+          ]
+        },
+        {
+          "en": [
+            6,
+            7,
+            8,
+            9,
+            10
+          ],
+          "zh": [
+            2
+          ]
+        },
+        {
+          "en": [
+            11,
+            12,
+            13,
+            14,
+            15
+          ],
+          "zh": [
+            3
+          ]
+        }
+      ]
+    },
+    {
+      "english": "If you ever visit China, I would love to show you around my hometown.",
+      "meaning": "如果你们有机会来中国，我很愿意带你们逛逛我的家乡。",
+      "zhParts": [
+        "如果你们有机会来中国",
+        "，",
+        "我很愿意带你们",
+        "逛逛我的家乡",
+        "。"
+      ],
+      "groups": [
+        {
+          "en": [
+            0,
+            1,
+            2,
+            3,
+            4
+          ],
+          "zh": [
+            0
+          ]
+        },
+        {
+          "en": [
+            5,
+            6,
+            7,
+            8,
+            9,
+            10
+          ],
+          "zh": [
+            2
+          ]
+        },
+        {
+          "en": [
+            11,
+            12,
+            13
+          ],
+          "zh": [
+            3
+          ]
+        }
+      ]
+    },
+    {
+      "english": "Let us keep in touch and share more stories.",
+      "meaning": "让我们保持联系，继续分享更多故事吧。",
+      "zhParts": [
+        "让我们",
+        "保持联系",
+        "，",
+        "继续分享更多故事吧",
+        "。"
+      ],
+      "groups": [
+        {
+          "en": [
+            0,
+            1
+          ],
+          "zh": [
+            0
+          ]
+        },
+        {
+          "en": [
+            2,
+            3,
+            4
+          ],
+          "zh": [
+            1
+          ]
+        },
+        {
+          "en": [
+            5,
+            6,
+            7,
+            8
+          ],
+          "zh": [
+            3
+          ]
+        }
+      ]
+    },
+    {
+      "english": "Last Saturday, nearly thirty students from our school volunteered at the local park.",
+      "meaning": "上周六，我校近三十名学生在社区公园参加了志愿活动。",
+      "zhParts": [
+        "上周六",
+        "，",
+        "我校近三十名学生",
+        "在社区公园参加了志愿活动",
+        "。"
+      ],
+      "groups": [
+        {
+          "en": [
+            0,
+            1
+          ],
+          "zh": [
+            0
+          ]
+        },
+        {
+          "en": [
+            2,
+            3,
+            4,
+            5,
+            6,
+            7
+          ],
+          "zh": [
+            2
+          ]
+        },
+        {
+          "en": [
+            8,
+            9,
+            10,
+            11,
+            12
+          ],
+          "zh": [
+            3
+          ]
+        }
+      ]
+    },
+    {
+      "english": "Working in groups, they picked up litter along the paths and sorted it for recycling.",
+      "meaning": "他们分组行动，捡拾步道沿线的垃圾，并进行分类，以便回收。",
+      "zhParts": [
+        "他们分组行动",
+        "，",
+        "捡拾步道沿线的垃圾",
+        "，",
+        "并进行分类",
+        "，",
+        "以便回收",
+        "。"
+      ],
+      "groups": [
+        {
+          "en": [
+            0,
+            1,
+            2
+          ],
+          "zh": [
+            0
+          ]
+        },
+        {
+          "en": [
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9
+          ],
+          "zh": [
+            2
+          ]
+        },
+        {
+          "en": [
+            10,
+            11,
+            12
+          ],
+          "zh": [
+            4
+          ]
+        },
+        {
+          "en": [
+            13,
+            14
+          ],
+          "zh": [
+            6
+          ]
+        }
+      ]
+    },
+    {
+      "english": "Some students also made signs to remind visitors to take their rubbish home.",
+      "meaning": "一些同学还制作了提示牌，提醒游客把自己的垃圾带走。",
+      "zhParts": [
+        "一些同学还制作了提示牌",
+        "，",
+        "提醒游客",
+        "把自己的垃圾带走",
+        "。"
+      ],
+      "groups": [
+        {
+          "en": [
+            0,
+            1,
+            2,
+            3,
+            4
+          ],
+          "zh": [
+            0
+          ]
+        },
+        {
+          "en": [
+            5,
+            6,
+            7
+          ],
+          "zh": [
+            2
+          ]
+        },
+        {
+          "en": [
+            8,
+            9,
+            10,
+            11,
+            12
+          ],
+          "zh": [
+            3
+          ]
+        }
+      ]
+    },
+    {
+      "english": "By noon, the paths were cleaner, and several visitors had stopped to thank the students.",
+      "meaning": "到中午时，步道比之前干净了，还有几位游客停下来向同学们道谢。",
+      "zhParts": [
+        "到中午时",
+        "，",
+        "步道比之前干净了",
+        "，",
+        "还有几位游客",
+        "停下来向同学们道谢",
+        "。"
+      ],
+      "groups": [
+        {
+          "en": [
+            0,
+            1
+          ],
+          "zh": [
+            0
+          ]
+        },
+        {
+          "en": [
+            2,
+            3,
+            4,
+            5
+          ],
+          "zh": [
+            2
+          ]
+        },
+        {
+          "en": [
+            6,
+            7,
+            8
+          ],
+          "zh": [
+            4
+          ]
+        },
+        {
+          "en": [
+            9,
+            10,
+            11,
+            12,
+            13,
+            14
+          ],
+          "zh": [
+            5
+          ]
+        }
+      ]
+    },
+    {
+      "english": "A park worker said the new signs would be put up near the entrances.",
+      "meaning": "一位公园工作人员表示，新提示牌会安放在各入口附近。",
+      "zhParts": [
+        "一位公园工作人员",
+        "表示",
+        "，",
+        "新提示牌",
+        "会安放",
+        "在各入口附近",
+        "。"
+      ],
+      "groups": [
+        {
+          "en": [
+            0,
+            1,
+            2
+          ],
+          "zh": [
+            0
+          ]
+        },
+        {
+          "en": [
+            3
+          ],
+          "zh": [
+            1
+          ]
+        },
+        {
+          "en": [
+            4,
+            5,
+            6
+          ],
+          "zh": [
+            3
+          ]
+        },
+        {
+          "en": [
+            7,
+            8,
+            9,
+            10
+          ],
+          "zh": [
+            4
+          ]
+        },
+        {
+          "en": [
+            11,
+            12,
+            13
+          ],
+          "zh": [
+            5
+          ]
+        }
+      ]
+    },
+    {
+      "english": "The school plans to organize another visit next month.",
+      "meaning": "学校计划下个月再组织一次志愿活动。",
+      "zhParts": [
+        "学校计划",
+        "下个月再组织一次志愿活动",
+        "。"
+      ],
+      "groups": [
+        {
+          "en": [
+            0,
+            1,
+            2
+          ],
+          "zh": [
+            0
+          ]
+        },
+        {
+          "en": [
+            3,
+            4,
+            5,
+            6,
+            7,
+            8
+          ],
+          "zh": [
+            1
+          ]
+        }
+      ]
+    },
+    {
+      "english": "Last week, I noticed that lights were still on in several empty classrooms.",
+      "meaning": "上周，我注意到好几间没人的教室还开着灯。",
+      "zhParts": [
+        "上周",
+        "，",
+        "我注意到",
+        "好几间没人的教室还开着灯",
+        "。"
+      ],
+      "groups": [
+        {
+          "en": [
+            0,
+            1
+          ],
+          "zh": [
+            0
+          ]
+        },
+        {
+          "en": [
+            2,
+            3
+          ],
+          "zh": [
+            2
+          ]
+        },
+        {
+          "en": [
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12
+          ],
+          "zh": [
+            3
+          ]
+        }
+      ]
+    },
+    {
+      "english": "Saving energy at school can begin with a simple habit.",
+      "meaning": "节约能源在校园里可以从一个简单的习惯做起。",
+      "zhParts": [
+        "节约能源",
+        "在校园里",
+        "可以从一个简单的习惯做起",
+        "。"
+      ],
+      "groups": [
+        {
+          "en": [
+            0,
+            1
+          ],
+          "zh": [
+            0
+          ]
+        },
+        {
+          "en": [
+            2,
+            3
+          ],
+          "zh": [
+            1
+          ]
+        },
+        {
+          "en": [
+            4,
+            5,
+            6,
+            7,
+            8,
+            9
+          ],
+          "zh": [
+            2
+          ]
+        }
+      ]
+    },
+    {
+      "english": "Before you leave a classroom, check whether the lights need to be turned off.",
+      "meaning": "离开教室前，请检查一下是否需要关灯。",
+      "zhParts": [
+        "离开教室前",
+        "，",
+        "请检查一下",
+        "是否需要关灯",
+        "。"
+      ],
+      "groups": [
+        {
+          "en": [
+            0,
+            1,
+            2,
+            3,
+            4
+          ],
+          "zh": [
+            0
+          ]
+        },
+        {
+          "en": [
+            5
+          ],
+          "zh": [
+            2
+          ]
+        },
+        {
+          "en": [
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13
+          ],
+          "zh": [
+            3
+          ]
+        }
+      ]
+    },
+    {
+      "english": "At lunchtime, bring a reusable bottle instead of buying a plastic one.",
+      "meaning": "午餐时，带上可反复使用的水瓶，就不用再买一次性的塑料瓶了。",
+      "zhParts": [
+        "午餐时",
+        "，",
+        "带上可反复使用的水瓶",
+        "，",
+        "就不用再买",
+        "一次性的塑料瓶了",
+        "。"
+      ],
+      "groups": [
+        {
+          "en": [
+            0,
+            1
+          ],
+          "zh": [
+            0
+          ]
+        },
+        {
+          "en": [
+            2,
+            3,
+            4,
+            5
+          ],
+          "zh": [
+            2
+          ]
+        },
+        {
+          "en": [
+            6,
+            7,
+            8
+          ],
+          "zh": [
+            4
+          ]
+        },
+        {
+          "en": [
+            9,
+            10,
+            11
+          ],
+          "zh": [
+            5
+          ]
+        }
+      ]
+    },
+    {
+      "english": "Each action may seem small, but together our choices can make a difference.",
+      "meaning": "每个行动可能看起来很小，但汇聚在一起，我们的选择就能带来改变。",
+      "zhParts": [
+        "每个行动",
+        "可能看起来很小",
+        "，",
+        "但汇聚在一起",
+        "，",
+        "我们的选择就能带来改变",
+        "。"
+      ],
+      "groups": [
+        {
+          "en": [
+            0,
+            1
+          ],
+          "zh": [
+            0
+          ]
+        },
+        {
+          "en": [
+            2,
+            3,
+            4
+          ],
+          "zh": [
+            1
+          ]
+        },
+        {
+          "en": [
+            5,
+            6
+          ],
+          "zh": [
+            3
+          ]
+        },
+        {
+          "en": [
+            7,
+            8,
+            9,
+            10,
+            11,
+            12
+          ],
+          "zh": [
+            5
+          ]
+        }
+      ]
+    },
+    {
+      "english": "Let us start today and work together to make our school a greener place.",
+      "meaning": "让我们从今天做起，一起努力，让校园变得更环保。",
+      "zhParts": [
+        "让我们从今天做起",
+        "，",
+        "一起努力",
+        "，",
+        "让校园变得更环保",
+        "。"
+      ],
+      "groups": [
+        {
+          "en": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "zh": [
+            0
+          ]
+        },
+        {
+          "en": [
+            4,
+            5,
+            6
+          ],
+          "zh": [
+            2
+          ]
+        },
+        {
+          "en": [
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13
+          ],
+          "zh": [
+            4
+          ]
+        }
+      ]
+    },
+    {
+      "english": "I sat beside her and showed her the planning sheet she had left under the book.",
+      "meaning": "我在她身边坐下，给她看了她落在书底下的准备提纲。",
+      "zhParts": [
+        "我在她身边坐下",
+        "，",
+        "给她看了",
+        "她落在书底下的准备提纲",
+        "。"
+      ],
+      "groups": [
+        {
+          "en": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "zh": [
+            0
+          ]
+        },
+        {
+          "en": [
+            4,
+            5,
+            6
+          ],
+          "zh": [
+            2
+          ]
+        },
+        {
+          "en": [
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15
+          ],
+          "zh": [
+            3
+          ]
+        }
+      ]
+    },
+    {
+      "english": "I told her the question mark was about the claim, and apologized for leaving my note unfinished.",
+      "meaning": "我告诉她问号针对的是那条说法，并为没把留言写完而道歉。",
+      "zhParts": [
+        "我告诉她",
+        "问号针对的是那条说法",
+        "，",
+        "并为没把留言写完而道歉",
+        "。"
+      ],
+      "groups": [
+        {
+          "en": [
+            0,
+            1,
+            2
+          ],
+          "zh": [
+            0
+          ]
+        },
+        {
+          "en": [
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9
+          ],
+          "zh": [
+            1
+          ]
+        },
+        {
+          "en": [
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16
+          ],
+          "zh": [
+            3
+          ]
+        }
+      ]
+    },
+    {
+      "english": "Emma read the line again and admitted that four interviews were not enough to speak for everyone.",
+      "meaning": "艾玛又读了一遍那句话，也承认只采访四个人不足以代表所有同学。",
+      "zhParts": [
+        "艾玛又读了一遍那句话",
+        "，",
+        "也承认",
+        "只采访四个人不足以代表所有同学",
+        "。"
+      ],
+      "groups": [
+        {
+          "en": [
+            0,
+            1,
+            2,
+            3,
+            4
+          ],
+          "zh": [
+            0
+          ]
+        },
+        {
+          "en": [
+            5,
+            6
+          ],
+          "zh": [
+            2
+          ]
+        },
+        {
+          "en": [
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16
+          ],
+          "zh": [
+            3
+          ]
+        }
+      ]
+    },
+    {
+      "english": "We decided to keep one student’s story and say clearly how many people we had asked.",
+      "meaning": "我们决定保留一位同学的故事，也说清楚我们实际采访了多少人。",
+      "zhParts": [
+        "我们决定",
+        "保留一位同学的故事",
+        "，",
+        "也说清楚",
+        "我们实际采访了多少人",
+        "。"
+      ],
+      "groups": [
+        {
+          "en": [
+            0,
+            1
+          ],
+          "zh": [
+            0
+          ]
+        },
+        {
+          "en": [
+            2,
+            3,
+            4,
+            5,
+            6
+          ],
+          "zh": [
+            1
+          ]
+        },
+        {
+          "en": [
+            7,
+            8,
+            9
+          ],
+          "zh": [
+            3
+          ]
+        },
+        {
+          "en": [
+            10,
+            11,
+            12,
+            13,
+            14,
+            15
+          ],
+          "zh": [
+            4
+          ]
+        }
+      ]
+    },
+    {
+      "english": "By the time we finished, Emma was adding ideas to my notes again.",
+      "meaning": "等修改完时，艾玛又在我的笔记里补充她的想法了。",
+      "zhParts": [
+        "等修改完时",
+        "，",
+        "艾玛又在我的笔记里补充她的想法了",
+        "。"
+      ],
+      "groups": [
+        {
+          "en": [
+            0,
+            1,
+            2,
+            3,
+            4
+          ],
+          "zh": [
+            0
+          ]
+        },
+        {
+          "en": [
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12
+          ],
+          "zh": [
+            2
+          ]
+        }
+      ]
+    },
+    {
+      "english": "Emma gave our opening, and I described what one student did while waiting for her bus.",
+      "meaning": "艾玛作了开场陈述，我则讲述了一位同学等公交车时做了些什么。",
+      "zhParts": [
+        "艾玛作了开场陈述",
+        "，",
+        "我则讲述了",
+        "一位同学等公交车时做了些什么",
+        "。"
+      ],
+      "groups": [
+        {
+          "en": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "zh": [
+            0
+          ]
+        },
+        {
+          "en": [
+            4,
+            5,
+            6
+          ],
+          "zh": [
+            2
+          ]
+        },
+        {
+          "en": [
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15
+          ],
+          "zh": [
+            3
+          ]
+        }
+      ]
+    },
+    {
+      "english": "When a classmate asked whether our example was unusual, we explained the limits of our survey.",
+      "meaning": "有位同学问这个例子是不是个例，我们解释了调查的局限。",
+      "zhParts": [
+        "有位同学问",
+        "这个例子是不是个例",
+        "，",
+        "我们解释了",
+        "调查的局限",
+        "。"
+      ],
+      "groups": [
+        {
+          "en": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "zh": [
+            0
+          ]
+        },
+        {
+          "en": [
+            4,
+            5,
+            6,
+            7,
+            8
+          ],
+          "zh": [
+            1
+          ]
+        },
+        {
+          "en": [
+            9,
+            10
+          ],
+          "zh": [
+            3
+          ]
+        },
+        {
+          "en": [
+            11,
+            12,
+            13,
+            14,
+            15
+          ],
+          "zh": [
+            4
+          ]
+        }
+      ]
+    },
+    {
+      "english": "Our teacher praised us for making a careful argument with limited evidence.",
+      "meaning": "老师表扬了我们，因为我们做到了用有限的证据提出审慎的论点。",
+      "zhParts": [
+        "老师",
+        "表扬了我们",
+        "，",
+        "因为我们做到了",
+        "用有限的证据提出审慎的论点",
+        "。"
+      ],
+      "groups": [
+        {
+          "en": [
+            0,
+            1
+          ],
+          "zh": [
+            0
+          ]
+        },
+        {
+          "en": [
+            2,
+            3
+          ],
+          "zh": [
+            1
+          ]
+        },
+        {
+          "en": [
+            4,
+            5
+          ],
+          "zh": [
+            3
+          ]
+        },
+        {
+          "en": [
+            6,
+            7,
+            8,
+            9,
+            10,
+            11
+          ],
+          "zh": [
+            4
+          ]
+        }
+      ]
+    },
+    {
+      "english": "As we packed our notes, Emma drew another question mark beside a line on my page.",
+      "meaning": "收拾笔记时，艾玛又在我笔记里的一句话旁画了一个问号。",
+      "zhParts": [
+        "收拾笔记时",
+        "，",
+        "艾玛又在我笔记里的一句话旁画了一个问号",
+        "。"
+      ],
+      "groups": [
+        {
+          "en": [
+            0,
+            1,
+            2,
+            3,
+            4
+          ],
+          "zh": [
+            0
+          ]
+        },
+        {
+          "en": [
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15
+          ],
+          "zh": [
+            2
+          ]
+        }
+      ]
+    },
+    {
+      "english": "This time I asked what she meant, and we both smiled.",
+      "meaning": "这次我问她是什么意思，我们都笑了。",
+      "zhParts": [
+        "这次我问她是什么意思",
+        "，",
+        "我们都笑了",
+        "。"
+      ],
+      "groups": [
+        {
+          "en": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6
+          ],
+          "zh": [
+            0
+          ]
+        },
+        {
+          "en": [
+            7,
+            8,
+            9,
+            10
+          ],
+          "zh": [
+            2
+          ]
+        }
+      ]
+    },
+    {
+      "english": "They followed me across the street, and we waited together under the roof of the shop.",
+      "meaning": "她们跟我穿过街道，我们一起等在小店的屋檐下。",
+      "zhParts": [
+        "她们跟我穿过街道",
+        "，",
+        "我们一起等在",
+        "小店的屋檐下",
+        "。"
+      ],
+      "groups": [
+        {
+          "en": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5
+          ],
+          "zh": [
+            0
+          ]
+        },
+        {
+          "en": [
+            6,
+            7,
+            8,
+            9
+          ],
+          "zh": [
+            2
+          ]
+        },
+        {
+          "en": [
+            10,
+            11,
+            12,
+            13,
+            14,
+            15
+          ],
+          "zh": [
+            3
+          ]
+        }
+      ]
+    },
+    {
+      "english": "While my cousin stayed with them, I ran to the ticket office and checked the timetable.",
+      "meaning": "表亲留下陪她们，我跑到售票亭查看时刻表。",
+      "zhParts": [
+        "表亲留下陪她们",
+        "，",
+        "我跑到售票亭",
+        "查看时刻表",
+        "。"
+      ],
+      "groups": [
+        {
+          "en": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5
+          ],
+          "zh": [
+            0
+          ]
+        },
+        {
+          "en": [
+            6,
+            7,
+            8,
+            9,
+            10,
+            11
+          ],
+          "zh": [
+            2
+          ]
+        },
+        {
+          "en": [
+            12,
+            13,
+            14,
+            15
+          ],
+          "zh": [
+            3
+          ]
+        }
+      ]
+    },
+    {
+      "english": "The last bus did stop at the station, and we still had ten minutes before it arrived.",
+      "meaning": "末班车确实会停靠火车站，而且再过十分钟它就到站了。",
+      "zhParts": [
+        "末班车",
+        "确实会停靠火车站",
+        "，",
+        "而且再过十分钟它就到站了",
+        "。"
+      ],
+      "groups": [
+        {
+          "en": [
+            0,
+            1,
+            2
+          ],
+          "zh": [
+            0
+          ]
+        },
+        {
+          "en": [
+            3,
+            4,
+            5,
+            6,
+            7
+          ],
+          "zh": [
+            1
+          ]
+        },
+        {
+          "en": [
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16
+          ],
+          "zh": [
+            3
+          ]
+        }
+      ]
+    },
+    {
+      "english": "On the bus, the woman asked for my address, saying her daughter wanted to send me something.",
+      "meaning": "上车后，那位女士问了我的地址，说她女儿想寄点东西给我。",
+      "zhParts": [
+        "上车后",
+        "，",
+        "那位女士问了我的地址",
+        "，",
+        "说她女儿想寄点东西给我",
+        "。"
+      ],
+      "groups": [
+        {
+          "en": [
+            0,
+            1,
+            2
+          ],
+          "zh": [
+            0
+          ]
+        },
+        {
+          "en": [
+            3,
+            4,
+            5,
+            6,
+            7,
+            8
+          ],
+          "zh": [
+            2
+          ]
+        },
+        {
+          "en": [
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16
+          ],
+          "zh": [
+            4
+          ]
+        }
+      ]
+    },
+    {
+      "english": "When they got off, the girl waved until the bus turned the corner.",
+      "meaning": "她们下车后，女孩一直挥手，直到公交车拐过街角。",
+      "zhParts": [
+        "她们下车后",
+        "，",
+        "女孩一直挥手",
+        "，",
+        "直到公交车拐过街角",
+        "。"
+      ],
+      "groups": [
+        {
+          "en": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "zh": [
+            0
+          ]
+        },
+        {
+          "en": [
+            4,
+            5,
+            6
+          ],
+          "zh": [
+            2
+          ]
+        },
+        {
+          "en": [
+            7,
+            8,
+            9,
+            10,
+            11,
+            12
+          ],
+          "zh": [
+            4
+          ]
+        }
+      ]
+    },
+    {
+      "english": "On the front was a drawing of the little shop with its bright blue door.",
+      "meaning": "明信片正面画着那家有亮蓝色门的小店。",
+      "zhParts": [
+        "明信片正面",
+        "画着那家有亮蓝色门的小店",
+        "。"
+      ],
+      "groups": [
+        {
+          "en": [
+            0,
+            1,
+            2
+          ],
+          "zh": [
+            0
+          ]
+        },
+        {
+          "en": [
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14
+          ],
+          "zh": [
+            1
+          ]
+        }
+      ]
+    },
+    {
+      "english": "Under the roof, four people stood close together while rain fell in thick blue lines.",
+      "meaning": "屋檐下，四个人挨在一起，雨水被画成一道道粗粗的蓝线。",
+      "zhParts": [
+        "屋檐下",
+        "，",
+        "四个人挨在一起",
+        "，",
+        "雨水被画成一道道粗粗的蓝线",
+        "。"
+      ],
+      "groups": [
+        {
+          "en": [
+            0,
+            1,
+            2
+          ],
+          "zh": [
+            0
+          ]
+        },
+        {
+          "en": [
+            3,
+            4,
+            5,
+            6,
+            7
+          ],
+          "zh": [
+            2
+          ]
+        },
+        {
+          "en": [
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14
+          ],
+          "zh": [
+            4
+          ]
+        }
+      ]
+    },
+    {
+      "english": "The girl wrote that they had caught their train and were safely home.",
+      "meaning": "女孩写道，她们赶上了火车，已经平安到家。",
+      "zhParts": [
+        "女孩写道",
+        "，",
+        "她们赶上了火车",
+        "，",
+        "已经平安到家",
+        "。"
+      ],
+      "groups": [
+        {
+          "en": [
+            0,
+            1,
+            2
+          ],
+          "zh": [
+            0
+          ]
+        },
+        {
+          "en": [
+            3,
+            4,
+            5,
+            6,
+            7,
+            8
+          ],
+          "zh": [
+            2
+          ]
+        },
+        {
+          "en": [
+            9,
+            10,
+            11,
+            12
+          ],
+          "zh": [
+            4
+          ]
+        }
+      ]
+    },
+    {
+      "english": "I showed the card to my cousin, who laughed at the enormous umbrella in the drawing.",
+      "meaning": "我把明信片拿给表亲看，画上那把大得出奇的伞把表亲逗笑了。",
+      "zhParts": [
+        "我把明信片拿给表亲看",
+        "，",
+        "画上那把大得出奇的伞把表亲逗笑了",
+        "。"
+      ],
+      "groups": [
+        {
+          "en": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6
+          ],
+          "zh": [
+            0
+          ]
+        },
+        {
+          "en": [
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15
+          ],
+          "zh": [
+            2
+          ]
+        }
+      ]
+    },
+    {
+      "english": "We kept it as a reminder of what a small act of help can mean.",
+      "meaning": "我们把它留了下来，让它提醒我们，一点小小的帮助也可以很有意义。",
+      "zhParts": [
+        "我们把它留了下来",
+        "，",
+        "让它提醒我们",
+        "，",
+        "一点小小的帮助也可以很有意义",
+        "。"
+      ],
+      "groups": [
+        {
+          "en": [
+            0,
+            1,
+            2
+          ],
+          "zh": [
+            0
+          ]
+        },
+        {
+          "en": [
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14
+          ],
+          "zh": [
+            2,
+            4
+          ]
+        }
+      ]
+    },
+    {
+      "english": "One teammate cut out a panel while another covered its surface with strips of clear tape.",
+      "meaning": "一位队友裁下一块纸板，另一位在板面上贴好一条条透明胶带。",
+      "zhParts": [
+        "一位队友裁下一块纸板",
+        "，",
+        "另一位在板面上贴好",
+        "一条条透明胶带",
+        "。"
+      ],
+      "groups": [
+        {
+          "en": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5
+          ],
+          "zh": [
+            0
+          ]
+        },
+        {
+          "en": [
+            6,
+            7,
+            8,
+            9,
+            10
+          ],
+          "zh": [
+            2
+          ]
+        },
+        {
+          "en": [
+            11,
+            12,
+            13,
+            14,
+            15
+          ],
+          "zh": [
+            3
+          ]
+        }
+      ]
+    },
+    {
+      "english": "I bent the sides upwards so water would stay on the ramp as it flowed down.",
+      "meaning": "我把两侧向上折起，这样水就会留在坡道上，顺着它往下流。",
+      "zhParts": [
+        "我把两侧向上折起",
+        "，",
+        "这样水就会留在坡道上",
+        "，",
+        "顺着它往下流",
+        "。"
+      ],
+      "groups": [
+        {
+          "en": [
+            0,
+            1,
+            2,
+            3,
+            4
+          ],
+          "zh": [
+            0
+          ]
+        },
+        {
+          "en": [
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11
+          ],
+          "zh": [
+            2
+          ]
+        },
+        {
+          "en": [
+            12,
+            13,
+            14,
+            15
+          ],
+          "zh": [
+            4
+          ]
+        }
+      ]
+    },
+    {
+      "english": "Our first test sent water past the mouth of the bottle and onto the table.",
+      "meaning": "第一次试验时，水越过了瓶口，流到了桌面上。",
+      "zhParts": [
+        "第一次试验时",
+        "，",
+        "水越过了瓶口",
+        "，",
+        "流到了桌面上",
+        "。"
+      ],
+      "groups": [
+        {
+          "en": [
+            0,
+            1,
+            2
+          ],
+          "zh": [
+            0
+          ]
+        },
+        {
+          "en": [
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10
+          ],
+          "zh": [
+            2
+          ]
+        },
+        {
+          "en": [
+            11,
+            12,
+            13,
+            14
+          ],
+          "zh": [
+            4
+          ]
+        }
+      ]
+    },
+    {
+      "english": "We lowered one end and tried again after moving the bottle slightly to the left.",
+      "meaning": "我们把其中一端放低，把瓶子往左挪了一点再试。",
+      "zhParts": [
+        "我们把其中一端放低",
+        "，",
+        "把瓶子往左挪了一点再试",
+        "。"
+      ],
+      "groups": [
+        {
+          "en": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "zh": [
+            0
+          ]
+        },
+        {
+          "en": [
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14
+          ],
+          "zh": [
+            2
+          ]
+        }
+      ]
+    },
+    {
+      "english": "This time the water went straight into the bottle, and we all cheered.",
+      "meaning": "这次水直接流进了瓶子，我们都欢呼起来。",
+      "zhParts": [
+        "这次水",
+        "直接流进了瓶子",
+        "，",
+        "我们都欢呼起来",
+        "。"
+      ],
+      "groups": [
+        {
+          "en": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "zh": [
+            0
+          ]
+        },
+        {
+          "en": [
+            4,
+            5,
+            6,
+            7,
+            8
+          ],
+          "zh": [
+            1
+          ]
+        },
+        {
+          "en": [
+            9,
+            10,
+            11,
+            12
+          ],
+          "zh": [
+            3
+          ]
+        }
+      ]
+    },
+    {
+      "english": "He pointed at the ramp and asked why we had chosen to make it from cardboard.",
+      "meaning": "他指着坡道，问我们为什么选择用纸板来做。",
+      "zhParts": [
+        "他指着坡道",
+        "，",
+        "问我们为什么选择",
+        "用纸板来做",
+        "。"
+      ],
+      "groups": [
+        {
+          "en": [
+            0,
+            1,
+            2,
+            3,
+            4
+          ],
+          "zh": [
+            0
+          ]
+        },
+        {
+          "en": [
+            5,
+            6,
+            7,
+            8,
+            9,
+            10
+          ],
+          "zh": [
+            2
+          ]
+        },
+        {
+          "en": [
+            11,
+            12,
+            13,
+            14,
+            15
+          ],
+          "zh": [
+            3
+          ]
+        }
+      ]
+    },
+    {
+      "english": "Instead of hiding the broken piece, I showed him what had happened earlier that morning.",
+      "meaning": "我没有把断掉的零件藏起来，而是拿给他看，解释了当天上午的意外。",
+      "zhParts": [
+        "我没有把断掉的零件藏起来",
+        "，",
+        "而是拿给他看",
+        "，",
+        "解释了当天上午的意外",
+        "。"
+      ],
+      "groups": [
+        {
+          "en": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5
+          ],
+          "zh": [
+            0
+          ]
+        },
+        {
+          "en": [
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14
+          ],
+          "zh": [
+            2,
+            4
+          ]
+        }
+      ]
+    },
+    {
+      "english": "My teammate let him change the angle of the ramp before pouring another cup of water.",
+      "meaning": "我的队友让他调整坡道的角度，然后又倒了一杯水。",
+      "zhParts": [
+        "我的队友让他调整",
+        "坡道的角度",
+        "，",
+        "然后又倒了一杯水",
+        "。"
+      ],
+      "groups": [
+        {
+          "en": [
+            0,
+            1,
+            2,
+            3,
+            4
+          ],
+          "zh": [
+            0
+          ]
+        },
+        {
+          "en": [
+            5,
+            6,
+            7,
+            8,
+            9
+          ],
+          "zh": [
+            1
+          ]
+        },
+        {
+          "en": [
+            10,
+            11,
+            12,
+            13,
+            14,
+            15
+          ],
+          "zh": [
+            3
+          ]
+        }
+      ]
+    },
+    {
+      "english": "Watching the water move, he said he could build a model like ours at home.",
+      "meaning": "看着水流动，他说他在家也能做一个这样的模型。",
+      "zhParts": [
+        "看着水流动",
+        "，",
+        "他说",
+        "他在家也能做一个这样的模型",
+        "。"
+      ],
+      "groups": [
+        {
+          "en": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "zh": [
+            0
+          ]
+        },
+        {
+          "en": [
+            4,
+            5
+          ],
+          "zh": [
+            2
+          ]
+        },
+        {
+          "en": [
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14
+          ],
+          "zh": [
+            3
+          ]
+        }
+      ]
+    },
+    {
+      "english": "That was when we realized our repair had made the idea easier to share.",
+      "meaning": "那时我们才意识到，这次修理让这个点子更容易和别人分享。",
+      "zhParts": [
+        "那时我们才意识到",
+        "，",
+        "这次修理让这个点子",
+        "更容易和别人分享",
+        "。"
+      ],
+      "groups": [
+        {
+          "en": [
+            0,
+            1,
+            2,
+            3,
+            4
+          ],
+          "zh": [
+            0
+          ]
+        },
+        {
+          "en": [
+            5,
+            6,
+            7,
+            8,
+            9,
+            10
+          ],
+          "zh": [
+            2
+          ]
+        },
+        {
+          "en": [
+            11,
+            12,
+            13
+          ],
+          "zh": [
+            3
+          ]
+        }
+      ]
+    },
+    {
+      "english": "I told the librarian about the drawing lesson and the way Daniel made his leaves.",
+      "meaning": "我告诉图书管理员那堂绘画课的事，也说了丹尼尔是怎么画树叶的。",
+      "zhParts": [
+        "我告诉图书管理员",
+        "那堂绘画课的事",
+        "，",
+        "也说了丹尼尔是怎么画树叶的",
+        "。"
+      ],
+      "groups": [
+        {
+          "en": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "zh": [
+            0
+          ]
+        },
+        {
+          "en": [
+            4,
+            5,
+            6,
+            7
+          ],
+          "zh": [
+            1
+          ]
+        },
+        {
+          "en": [
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14
+          ],
+          "zh": [
+            3
+          ]
+        }
+      ]
+    },
+    {
+      "english": "She agreed to keep the book at the desk until we could ask him to identify it.",
+      "meaning": "她同意把本子暂时留在服务台，等我们请丹尼尔过来辨认。",
+      "zhParts": [
+        "她同意把本子暂时留在服务台",
+        "，",
+        "等我们请丹尼尔过来辨认",
+        "。"
+      ],
+      "groups": [
+        {
+          "en": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8
+          ],
+          "zh": [
+            0
+          ]
+        },
+        {
+          "en": [
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16
+          ],
+          "zh": [
+            2
+          ]
+        }
+      ]
+    },
+    {
+      "english": "The next morning, I told Daniel what I had seen when he arrived at school.",
+      "meaning": "第二天早上，我把看到的情况告诉了丹尼尔，那时他刚到学校。",
+      "zhParts": [
+        "第二天早上",
+        "，",
+        "我把看到的情况告诉了丹尼尔",
+        "，",
+        "那时他刚到学校",
+        "。"
+      ],
+      "groups": [
+        {
+          "en": [
+            0,
+            1,
+            2
+          ],
+          "zh": [
+            0
+          ]
+        },
+        {
+          "en": [
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9
+          ],
+          "zh": [
+            2
+          ]
+        },
+        {
+          "en": [
+            10,
+            11,
+            12,
+            13,
+            14
+          ],
+          "zh": [
+            4
+          ]
+        }
+      ]
+    },
+    {
+      "english": "He described another picture near the back of the book, and we checked it together at the library.",
+      "meaning": "他描述了画册靠后几页的另一幅画，我们就一起去图书馆核对。",
+      "zhParts": [
+        "他描述了画册靠后几页的另一幅画",
+        "，",
+        "我们就一起去图书馆核对",
+        "。"
+      ],
+      "groups": [
+        {
+          "en": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9
+          ],
+          "zh": [
+            0
+          ]
+        },
+        {
+          "en": [
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17
+          ],
+          "zh": [
+            2
+          ]
+        }
+      ]
+    },
+    {
+      "english": "The librarian smiled and handed the sketchbook back to him.",
+      "meaning": "图书管理员笑了，把素描本还给他。",
+      "zhParts": [
+        "图书管理员笑了",
+        "，",
+        "把素描本还给他",
+        "。"
+      ],
+      "groups": [
+        {
+          "en": [
+            0,
+            1,
+            2
+          ],
+          "zh": [
+            0
+          ]
+        },
+        {
+          "en": [
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9
+          ],
+          "zh": [
+            2
+          ]
+        }
+      ]
+    },
+    {
+      "english": "Daniel thanked me and showed me a new drawing of the library desk he had just made.",
+      "meaning": "丹尼尔向我道谢，还给我看了他刚画好的图书馆服务台。",
+      "zhParts": [
+        "丹尼尔向我道谢",
+        "，",
+        "还给我看了",
+        "他刚画好的图书馆服务台",
+        "。"
+      ],
+      "groups": [
+        {
+          "en": [
+            0,
+            1,
+            2
+          ],
+          "zh": [
+            0
+          ]
+        },
+        {
+          "en": [
+            3,
+            4,
+            5
+          ],
+          "zh": [
+            2
+          ]
+        },
+        {
+          "en": [
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16
+          ],
+          "zh": [
+            3
+          ]
+        }
+      ]
+    },
+    {
+      "english": "I told him that I admired his tree drawing before I ever knew how important the book was.",
+      "meaning": "我告诉他，我早就很喜欢他画的那棵树，当时还不知道那本画册对他有多重要。",
+      "zhParts": [
+        "我告诉他",
+        "，",
+        "我早就很喜欢他画的那棵树",
+        "，",
+        "当时还不知道那本画册对他有多重要",
+        "。"
+      ],
+      "groups": [
+        {
+          "en": [
+            0,
+            1,
+            2
+          ],
+          "zh": [
+            0
+          ]
+        },
+        {
+          "en": [
+            3,
+            4,
+            5,
+            6,
+            7,
+            8
+          ],
+          "zh": [
+            2
+          ]
+        },
+        {
+          "en": [
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17
+          ],
+          "zh": [
+            4
+          ]
+        }
+      ]
+    },
+    {
+      "english": "Then I asked if he would like to draw the old tree again with me.",
+      "meaning": "接着我问他愿不愿意和我再画一次那棵老树。",
+      "zhParts": [
+        "接着我问他",
+        "愿不愿意和我再画一次那棵老树",
+        "。"
+      ],
+      "groups": [
+        {
+          "en": [
+            0,
+            1,
+            2
+          ],
+          "zh": [
+            0
+          ]
+        },
+        {
+          "en": [
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14
+          ],
+          "zh": [
+            1
+          ]
+        }
+      ]
+    },
+    {
+      "english": "He opened his sketchbook to a clean page and offered me a spare pencil.",
+      "meaning": "他打开素描本翻到空白页，递给我一支备用铅笔。",
+      "zhParts": [
+        "他打开素描本",
+        "翻到空白页",
+        "，",
+        "递给我",
+        "一支备用铅笔",
+        "。"
+      ],
+      "groups": [
+        {
+          "en": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "zh": [
+            0
+          ]
+        },
+        {
+          "en": [
+            4,
+            5,
+            6,
+            7
+          ],
+          "zh": [
+            1
+          ]
+        },
+        {
+          "en": [
+            8,
+            9,
+            10
+          ],
+          "zh": [
+            3
+          ]
+        },
+        {
+          "en": [
+            11,
+            12,
+            13
+          ],
+          "zh": [
+            4
+          ]
+        }
+      ]
+    },
+    {
+      "english": "We sat under the tree and drew side by side, talking easily at last.",
+      "meaning": "我们坐在树下，并排画画，终于自然地聊了起来。",
+      "zhParts": [
+        "我们坐在树下",
+        "，",
+        "并排画画",
+        "，",
+        "终于自然地聊了起来",
+        "。"
+      ],
+      "groups": [
+        {
+          "en": [
+            0,
+            1,
+            2,
+            3,
+            4
+          ],
+          "zh": [
+            0
+          ]
+        },
+        {
+          "en": [
+            5,
+            6,
+            7,
+            8,
+            9
+          ],
+          "zh": [
+            2
+          ]
+        },
+        {
+          "en": [
+            10,
+            11,
+            12,
+            13
+          ],
+          "zh": [
+            4
+          ]
+        }
+      ]
     }
   ]
 }

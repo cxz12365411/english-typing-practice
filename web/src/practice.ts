@@ -119,7 +119,7 @@ function handleMembershipError(error: unknown): boolean {
   const speak = document.querySelector<HTMLButtonElement>("#speakButton");
   if (speak) speak.disabled = true;
   setPracticeInputsDisabled(true);
-  document.querySelector<HTMLDetailsElement>("#cet4Writing details")?.removeAttribute("open");
+  document.querySelectorAll("#cet4Writing details[open]").forEach(details => details.removeAttribute("open"));
   document.querySelector("#cet4Writing")?.setAttribute("inert", "");
   setSyncProblem("试用或会员已到期，当前输入保留。请在“会员与记录”中续费，然后核实会员状态。", null);
   const text = document.querySelector("#practiceMembershipText");
@@ -268,7 +268,7 @@ function practiceMarkup(
             <progress class="progress-bar" id="progressBar" value="0" max="1">0%</progress>
           </div>
 
-          <section id="cet4Writing" class="cet4-writing" aria-label="四六级作文全文" hidden></section>
+          <section id="cet4Writing" class="cet4-writing" aria-label="作文练习资料" hidden></section>
           <div class="prompt">
             <div class="alignment-scroll" id="alignmentScroll">
               <div class="alignment-stage" id="alignmentStage">

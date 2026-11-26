@@ -95,7 +95,7 @@ test("malformed writing content is rejected without losing the original corpus",
   await page.goto("/index.html");
   await expect(page.locator("#answerInput")).toBeEnabled();
   await expect(page.locator("#loadStatus")).toContainText("四级作文暂未加载");
-  expect(await page.locator("#categorySelect option").count()).toBe(38);
+  expect(await page.locator("#categorySelect option").count()).toBe(48);
 });
 
 test("browsers without AbortSignal.timeout still load and practice writing", async ({ page }) => {

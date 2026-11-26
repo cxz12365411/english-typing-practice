@@ -177,8 +177,11 @@ test("account practice loads all sentence alignments and highlights the screensh
     await expect(page.locator('script[src*="/@vite/client"]')).toHaveCount(0);
     expect(new URL(response.url()).pathname).toBe("/api/content-resources/sentence-alignments.json");
   }
-  const writing = require("../cet4-writing.js").parse(JSON.parse(readFileSync("cet4-writing.json", "utf8")));
-  expect(alignmentData.entries).toHaveLength(294 + writing.items.length + require("../cet4-writing.js").parse(JSON.parse(readFileSync("cet6-writing.json", "utf8"))).items.length);
+  const writing = require("../cet4-writing.js");
+  const writingSources = ["cet4-writing.json", "cet6-writing.json", "gaokao-writing.json"];
+  const practiceSentences = writingSources.reduce((count, file) =>
+    count + writing.parse(JSON.parse(readFileSync(file, "utf8"))).items.length, 294);
+  expect(alignmentData.entries).toHaveLength(practiceSentences);
   await expect(page.locator("#targetWord")).toHaveText(hey.english);
   await expect(page.locator("#meaningText")).toHaveText(hey.meaning);
   await expect(page.locator(".alignment-token")).toHaveCount(5);

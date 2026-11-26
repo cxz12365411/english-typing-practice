@@ -105,7 +105,7 @@ async function geometryErrors(page: Page) {
   });
 }
 
-test("daily English, CET4 and CET6 alignments cover the sources and every token and Chinese fragment", () => {
+test("daily English, CET4, CET6 and Gaokao alignments cover the sources and every token and Chinese fragment", () => {
   const data = JSON.parse(readFileSync("sentence-alignments.json", "utf8")) as AlignmentData;
   const source = readFileSync("daily-english-high-frequency-sentences.md", "utf8").split(/\r?\n/)
     .filter(line => line.startsWith("|") && line.includes("<br>"))
@@ -115,8 +115,11 @@ test("daily English, CET4 and CET6 alignments cover the sources and every token 
     });
   expect(data.version).toBe(1);
   expect(source).toHaveLength(294);
-  const writing = require("../cet4-writing.js").parse(JSON.parse(readFileSync("cet4-writing.json", "utf8")));
-  expect(data.entries).toHaveLength(source.length + writing.items.length + require("../cet4-writing.js").parse(JSON.parse(readFileSync("cet6-writing.json", "utf8"))).items.length);
+  const writing = require("../cet4-writing.js");
+  const writingItems = ["cet4", "cet6", "gaokao"].flatMap(exam =>
+    writing.parse(JSON.parse(readFileSync(`${exam}-writing.json`, "utf8"))).items
+  );
+  expect(data.entries).toHaveLength(source.length + writingItems.length);
   const expectedKeys = source.map(entry => api.key(entry.english, entry.meaning)).sort();
   expect(data.entries.slice(0, source.length).map(entry => api.key(entry.english, entry.meaning)).sort()).toEqual(expectedKeys);
   expect(new Set(expectedKeys).size).toBe(source.length);

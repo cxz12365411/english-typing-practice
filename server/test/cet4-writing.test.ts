@@ -7,6 +7,7 @@ import { applyCet4WritingUpdate, CET4_WRITING_UPDATE, countCet4Words, parseCet4W
 import { applyContentUpdates } from "../src/content-updates.js";
 import { parseSentenceMarkdown, parseWordMarkdown } from "../src/content-parser.js";
 import { bumpContentVersion, migrateAndSeed, migrateDatabase, openDatabase, seedContent, type SqliteDatabase } from "../src/database.js";
+import { GAOKAO_WRITING_UPDATE } from "../src/gaokao-writing.js";
 
 const SOURCE = resolve(import.meta.dirname, "../..");
 
@@ -57,6 +58,7 @@ function snapshot(db: SqliteDatabase): string {
 function oldDatabase(): SqliteDatabase {
   const db = openDatabase({ databasePath: ":memory:" });
   migrateDatabase(db);
+  db.prepare("INSERT INTO app_meta(key, value) VALUES (?, '1')").run(GAOKAO_WRITING_UPDATE);
   seedContent(db, SOURCE);
   applyContentUpdates(db, () => ({
     categories: [...parseWordMarkdown(readFileSync(resolve(SOURCE, "basic-english-850.md"), "utf8")).categories,
@@ -107,6 +109,8 @@ test("fresh installation atomically adds CET4 content, revisions, version and au
   const directory = sourceDirectory();
   const db = openDatabase({ databasePath: ":memory:" });
   try {
+    migrateDatabase(db);
+    db.prepare("INSERT INTO app_meta(key, value) VALUES (?, '1')").run(GAOKAO_WRITING_UPDATE);
     assert.deepEqual(migrateAndSeed(db, directory), { categoriesInserted: 51, itemsInserted: 1302, words: 850, sentences: 452 });
     assert.equal(count(db, "item_revisions"), 1302);
     assert.equal(count(db, "items WHERE item_key LIKE 'cet4-%' AND status = 'published'"), 80);

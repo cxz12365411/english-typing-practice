@@ -1,10 +1,55 @@
-/* Shared CET-4 and CET-6 content and full-essay preview for both practice sites. */
+/* Shared writing content and full-essay preview for both practice sites. */
 (function (root) {
   "use strict";
   function text(value) { return typeof value === "string" && value.trim().length > 0; }
   function wordCount(value) { return (value.match(/[A-Za-z0-9]+(?:['’\-][A-Za-z0-9]+)*/g) || []).length; }
 
+  function bilingual(value) { return text(value?.english) && text(value?.meaning); }
+  function gaokaoLabel(essay) { return essay.type === "continuation" ? "高考读后续写" : "高考应用文"; }
+
+  function parseGaokao(data) {
+    const fail = field => { throw new Error(`Invalid Gaokao writing resource: ${field}`); };
+    if (data.version !== 1 || data.sourceLabel !== "原创模拟题与参考范文"
+      || !Array.isArray(data.essays) || data.essays.length !== 10) fail("essay list");
+    const categories = [], items = [], englishTexts = new Set();
+    data.essays.forEach((essay, index) => {
+      const number = String(index + 1).padStart(2, "0");
+      const slug = `gaokao-essay-${number}`;
+      const continuation = index >= 6;
+      const type = continuation ? "continuation" : "application";
+      if (essay?.id !== slug || essay.type !== type || !text(essay.title) || !text(essay.titleEnglish)
+        || !text(essay.prompt) || !Array.isArray(essay.outline) || !essay.outline.length
+        || !essay.outline.every(text) || !Array.isArray(essay.paragraphs) || !essay.paragraphs.length
+        || essay.paragraphs.some(paragraph => !Array.isArray(paragraph) || !paragraph.length)) fail(slug);
+      if ([essay.greeting, essay.closing].some(frame => frame !== undefined && !bilingual(frame))) fail(`${slug} framing`);
+      const starts = new Set();
+      if (continuation) {
+        if (!text(essay.reading?.english) || !text(essay.reading?.summary)
+          || wordCount(essay.reading.english) < 200 || wordCount(essay.reading.english) > 300
+          || essay.paragraphs.length !== 2 || essay.paragraphs.some(paragraph => paragraph.length !== 5)
+          || !Array.isArray(essay.paragraphStarts) || essay.paragraphStarts.length !== 2
+          || !essay.paragraphStarts.every(bilingual)) fail(`${slug} continuation material`);
+        essay.paragraphStarts.forEach(start => starts.add(start.english));
+        if (starts.size !== 2) fail(`${slug} paragraph starts`);
+      } else if (essay.reading !== undefined || essay.paragraphStarts !== undefined) fail(`${slug} application material`);
+      const sentences = essay.paragraphs.flat();
+      const count = wordCount(sentences.map(sentence => sentence?.english ?? "").join(" "));
+      if (sentences.length !== (continuation ? 10 : 6)
+        || count < (continuation ? 140 : 75) || count > (continuation ? 160 : 95)) fail(`${slug} length`);
+      categories.push({ slug, name: `${gaokaoLabel(essay)}：${essay.title}`, kind: "sentence", sortOrder: 300 + index });
+      sentences.forEach((sentence, offset) => {
+        const key = `gaokao-e${number}-s${String(offset + 1).padStart(2, "0")}`;
+        if (!bilingual(sentence) || sentence.key !== key || starts.has(sentence.english) || englishTexts.has(sentence.english)) fail(key);
+        englishTexts.add(sentence.english);
+        items.push({ key, english: sentence.english, meaning: sentence.meaning, categorySlug: slug,
+          kind: "sentence", pronunciation: "", sortOrder: offset + 1 });
+      });
+    });
+    return { essays: data.essays, categories, items };
+  }
+
   function parse(data) {
+    if (data?.exam === "gaokao") return parseGaokao(data);
     const advanced = data?.level === 6;
     const prefix = advanced ? "cet6" : "cet4";
     const label = advanced ? "六级" : "四级";
@@ -85,6 +130,7 @@
       this.data = null;
       this.essay = null;
       this.details = null;
+      this.materials = null;
       this.valid = false;
       this.position = node("p", "cet4-position");
       this.unavailable = node("p", "cet4-unavailable", "全文资料暂不可用，仍可逐句练习。");
@@ -93,16 +139,41 @@
     }
     setData(data) {
       const parsed = parse(data);
-      const prefix = data.level === 6 ? "cet6-" : "cet4-";
+      const prefix = data.exam === "gaokao" ? "gaokao-" : data.level === 6 ? "cet6-" : "cet4-";
       this.data = { ...parsed, essays: [...(this.data?.essays || []).filter(essay => !essay.id.startsWith(prefix)), ...parsed.essays] };
+    }
+    buildMaterials(essay) {
+      const details = node("details", "gaokao-materials");
+      const body = node("div", "cet4-body");
+      body.append(node("p", "cet4-source", "原创模拟题"),
+        node("h4", "", "题目要求"), node("p", "cet4-prompt", essay.prompt));
+      if (essay.type === "continuation") {
+        const reading = node("p", "gaokao-reading", essay.reading.english);
+        reading.lang = "en";
+        body.append(node("h4", "", "阅读材料"), reading,
+          node("h4", "", "中文梗概"), node("p", "", essay.reading.summary),
+          node("h4", "", "给定段首句"));
+        const starts = node("ol", "cet4-outline");
+        essay.paragraphStarts.forEach(start => {
+          const item = node("li");
+          const english = node("p", "cet4-english", start.english);
+          english.lang = "en";
+          item.append(english, node("p", "cet4-chinese", start.meaning));
+          starts.append(item);
+        });
+        body.append(starts);
+      }
+      details.append(node("summary", "", "题目与材料"), body);
+      return details;
     }
     build(essay) {
       const details = node("details", "cet4-preview");
       details.append(node("summary", "", "查看全文"));
       const body = node("div", "cet4-body");
+      const gaokao = essay.id.startsWith("gaokao-");
       body.append(node("h3", "", essay.titleEnglish));
       body.append(node("p", "cet4-source", `原创参考范文 · 正文 ${wordCount(essay.paragraphs.flat().map(item => item.english).join(" "))} 词`));
-      body.append(node("h4", "", "题目要求"), node("p", "cet4-prompt", essay.prompt));
+      if (!gaokao) body.append(node("h4", "", "题目要求"), node("p", "cet4-prompt", essay.prompt));
       body.append(node("h4", "", "写作思路"));
       const outline = node("ol", "cet4-outline");
       essay.outline.forEach(note => outline.append(node("li", "", note)));
@@ -121,6 +192,11 @@
         block.setAttribute("aria-label", `第 ${index + 1} 段`);
         const english = node("p", "cet4-english"), chinese = node("p", "cet4-chinese");
         english.lang = "en"; chinese.lang = "zh-CN";
+        const start = gaokao ? essay.paragraphStarts?.[index] : null;
+        if (start) {
+          english.append(node("strong", "", start.english), document.createTextNode(" "));
+          chinese.append(node("strong", "", start.meaning));
+        }
         paragraph.forEach((sentence, sentenceIndex) => {
           if (sentenceIndex) english.append(document.createTextNode(" "));
           for (const [parent, value] of [[english, sentence.english], [chinese, sentence.meaning]]) {
@@ -140,17 +216,23 @@
         || candidate.paragraphs.some(paragraph => paragraph.some(sentence => sentence.key === item?.key)));
       if (!essay) {
         if (this.details) this.details.open = false;
+        if (this.materials) this.materials.open = false;
         this.essay = null;
-        this.container.hidden = !/^cet[46]-e/.test(item?.key || "");
+        this.container.hidden = !/^(?:cet[46]|gaokao)-e/.test(item?.key || "");
         this.position.textContent = "";
         this.unavailable.hidden = this.container.hidden;
         if (this.details) this.details.hidden = true;
+        if (this.materials) this.materials.hidden = true;
         return;
       }
       const valid = matchesEssay(essay, items);
+      const gaokao = essay.id.startsWith("gaokao-");
       if (essay !== this.essay || valid !== this.valid) {
         this.details?.remove();
+        this.materials?.remove();
+        this.materials = valid && gaokao ? this.buildMaterials(essay) : null;
         this.details = valid ? this.build(essay) : null;
+        if (this.materials) this.container.append(this.materials);
         if (this.details) this.container.append(this.details);
         this.essay = essay;
         this.valid = valid;
@@ -160,7 +242,7 @@
       const paragraphIndex = essay.paragraphs.findIndex(paragraph => paragraph.some(sentence => sentence.key === item?.key));
       this.position.textContent = valid && sentenceIndex >= 0
         ? `${essay.title} · 第 ${paragraphIndex + 1} 段 · 第 ${sentenceIndex + 1} / ${sentences.length} 句`
-        : (essay.id.startsWith("cet6-") ? "六级作文" : "四级作文");
+        : (gaokao ? gaokaoLabel(essay) : essay.id.startsWith("cet6-") ? "六级作文" : "四级作文");
       this.container.hidden = false;
       this.unavailable.hidden = valid;
       if (!this.details) return;

@@ -165,12 +165,18 @@ status="$(/usr/bin/curl --silent --show-error --max-time 15 \
 assert_status "$status" 401 "anonymous admin access"
 
 # Compatibility releases do not expose the membership routes yet.
+protected_routes=(/api/membership /api/payments/orders /api/content-resources/sentence-alignments.json /api/content-resources/cet4-writing.json /api/content-resources/cet6-writing.json)
+retired_resources=(/sentence-alignments.json /cet4-writing.json /cet6-writing.json /assets/sentence-alignments-retired123.json /assets/cet4-writing-retired123.json)
+if [[ -f "${CURRENT_SERVER}/../gaokao-writing.json" ]]; then
+  protected_routes+=(/api/content-resources/gaokao-writing.json)
+  retired_resources+=(/gaokao-writing.json /assets/gaokao-writing-retired123.json)
+fi
 if [[ -f "${CURRENT_SERVER}/dist/membership.js" ]]; then
-  for route in /api/membership /api/payments/orders /api/content-resources/sentence-alignments.json /api/content-resources/cet4-writing.json /api/content-resources/cet6-writing.json; do
+  for route in "${protected_routes[@]}"; do
     status="$(curl_status "${BASE_URL}${route}" "${temp_dir}/protected.body" "${temp_dir}/protected.headers")"
     assert_status "$status" 401 "anonymous ${route}"
   done
-  for route in /sentence-alignments.json /cet4-writing.json /cet6-writing.json /assets/sentence-alignments-retired123.json /assets/cet4-writing-retired123.json; do
+  for route in "${retired_resources[@]}"; do
     status="$(curl_status "${BASE_URL}${route}" "${temp_dir}/retired.body" "${temp_dir}/retired.headers")"
     assert_status "$status" 404 "retired public learning resource ${route}"
   done
@@ -259,7 +265,7 @@ assert payload.get("error", {}).get("code") == "MUST_CHANGE_PASSWORD"
   else
     assert_status "$content_status" 200 "published content"
     if [[ -f "${CURRENT_SERVER}/dist/membership.js" ]]; then
-      for route in /api/membership /api/payments/orders /api/content-resources/sentence-alignments.json /api/content-resources/cet4-writing.json /api/content-resources/cet6-writing.json; do
+      for route in "${protected_routes[@]}"; do
         status="$(/usr/bin/curl --silent --show-error --max-time 30 --cookie "${temp_dir}/cookies.txt" --output "${temp_dir}/member-resource.body" --write-out '%{http_code}' "${BASE_URL}${route}")"
         assert_status "$status" 200 "authorized ${route}"
       done

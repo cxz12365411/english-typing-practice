@@ -8,7 +8,7 @@ import { buildApp } from "../src/app.js";
 import { openDatabase } from "../src/database.js";
 import { hashPassword } from "../src/security.js";
 
-const resources = ["sentence-alignments.json", "cet4-writing.json", "cet6-writing.json"];
+const resources = ["sentence-alignments.json", "cet4-writing.json", "cet6-writing.json", "gaokao-writing.json"];
 const origin = "https://resources.test";
 const password = "Resource-access-test-123!";
 function cookie(headers: Record<string, unknown>) {
